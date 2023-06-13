@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MTG</title>
+    <style>
+        body {
+            background: url('https://example.com/background.jpg');
+            background-size: cover;
+            font-family: 'Times New Roman', serif;
+            color: #800080;
+            margin: 0;
+            padding: 0;
+            animation: colorchange 5s infinite;
+        }
+
+        @keyframes colorchange {
+            0%   {background-color: #ff0000;}
+            25%  {background-color: #00ff00;}
+            50%  {background-color: #0000ff;}
+            100% {background-color: #ff0000;}
+        }
+
+        h1 {
+            text-align: center;
+            color: #800080;
+            font-size: 2.5em;
+            margin-top: 50px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000;
+            }
+            to {
+                text-shadow: 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000;
+            }
+        }
+
+        .container {
+            margin: 0 auto;
+            width: 80%;
+            background: url('https://example.com/paper.jpg');
+            background-size: cover;
+            padding: 20px;
+            border: 1px solid #000;
+            box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            font-size: 1.2em;
+            text-align: justify;
+            color: #000;
+            padding: 20px;
+            border-top: 1px solid #000;
+            margin-top: 20px;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            width: 50%;
+            border: 1px solid #000;
+            box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+            transition: transform .2s;
+        }
+
+        img:hover {
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>MTG: Matheus & Gabriel</h1>
+    <div class="container">
+        <img src="https://lh3.googleusercontent.com/pw/AJFCJaW89iRzX-jU_BpbLbKR0bo0Vr6mDldrW_RJdGpSSRN9Hwg7ya-osfN5mXhg88lkLtJotRIGkz_cwn14lq54LnWo-s4X9WN5QVguyCCgXutN0QOb2Uyi3iP27IbmHdQwi7qhnqIfeXjNLuOIUoOJDK6iE0PO_euoemrvkBapfmiYQ-oF02O2rlhlnUYsJuOf7_ZPMyhjtA5eEUuuhxMvDjm6PEt-ceTIdPnhISU-Cy-1FJegxNs82jJiKQtyERMRjItrPXM6C3b8oDfSB3C-U6bjocJoL7yJREKmuGgyWD5pFXhpJS-vCJTvdOTl4A-gKBQIPoyEUzYKV9LTKZWdBXF7AXrQY50N_ZtuQE2iActf9RbTKORvkmjXVFBb1hNbwdiWgu1SA2DCjlY2QC1CFJZ9rgaweegegM79Fmh17EamG5rVGNH54l5vyiXS7DcC8BEceER3ekoX0bopcHy2tHWUqJXS1ksfcpyMtbwznc8ZVc-yYpiUWsguCPEoXeRwgS5LeOza16vk3wGgyTHjTTYmoM-_uvz2jfws6v-n3U8DO5hRiDSkKmQln1lg4IC-35Jp2y4_uxpnH-JWWV1LSsWb5eDJ8CkZRrKV2apOEcGdxcrZeV43Gxof45gKqld9lsxqLFHV-xNE6bkQwdxvx2QJ4PKP51i7nnV_ox3mkCXRRbedNslUFaOSxk8R29X2SnIE-9hd0ab_athySxlbdJwsKAe7cSs755ZscZnAFKWVzLf7WbujXnb7gIG6LjfqAIgUPyJha7wIjFtqHSmn9qcVJ-5ZxRy_33Sr8vljchj_4Y9BtyxY-29iZsO8o27yAsQbqW6cJXclPLmOaW6M0jP6Wz60OhUdvkz5LNzzmQf7aePi46zniYfvYnk_Qqab6-Fyes84WmG0rluth92pX1YZyd4sk-EFAjCIY-blBdt3-vtN6OqrXAjbnQMiMRg=w1280-h960-s-no?authuser=0" alt="Imagem 1">
+        <p class="content">
+            Matheus e Gabriel se conheceram na escola quando tinham apenas 6 anos...
+        </p>
+
+        <img src="https://lh3.googleusercontent.com/pw/AJFCJaXA9eRd5o0KkvV9Qt7cG5q4GQEpJUEc_IVjSRH8HVu00yxtvGNcPykDl445NOiSw2x5w7lzp4lDXgcahkPVdGpJZaFeb-9APOS0ZR7fs3-0Ac94M7lRStUtqm3nCSlMjeL8iJSnejEwfYwy0lNYA3ILK7Ec_2Qy9Osky8Ujgf2ULq-lmgZ1hQCKdHS6_I8sThXIXa70y_m7R1p3kBeaC71lJZ1Pkg70J8C80Y5v2pss92PMCtjAlVxqXoj35PqphishV8eCzSdA9TvTfKnuiOTCzUa6PiTMKbFpPmJCb0jzFGkhNmaF9AmRl4PMGOfrkaXUC0_HJ0e8IhBVwhn1_CELIRZWFy0LNfuF8sS6zuGBUPQeM-QE5XcUlWjiuvfiH6G8XXMqiRWhy7iMjKTiVmpanjpN-lCKd-PX1G5fLDB57dD-yLqG2Dk1x92kzG6p9sTxsnqPouokW1WkTV6m1Vh7LXsFXMA8-S7FPHYlIFCDIkIt63gfhOBTyqRV6FwEYMhRJv01J8ao-TNy8pG45teNfW6BDdxOmANP6hxblA_c3v9ss6mvHdlDDYwUiHftDHJIPH3D1Ktho9iots13K28i9O4TB03eH3sL2oyhv30lRl2cAi7ZlYYiJSkS_5AwRaFXFcxCjN2UbizNYOXFRbr0RI4Nr23UhoO2AszQbu_a4NhyPpx_6F0C30RetRUQCga9GIiS4bQJ0mSg5T1k7KE-km81rD4rrfunSycBrUuA7hI4V4q4BYkNd9JplnFFQCH5DfRnTXhJYIN_MzdRCPuWvkYQf4N-ddDxKpTAJpemlIn7XL0MN_ZoxpxgZ3mAo70wRSy_IUoqafY5-5rRb-4knb1XK3CnDSo7RB04d7uBnnn4HO03AA8Y2xaqq5cCu2DcbtYYgTfVQXBC-tZzlO10uFZtC5cvsOcYhCeWoKpN93C8GmJyvtRyUNWr2xw=w541-h961-s-no?authuser=0" alt="Imagem 2">
+        <p class="content">
+            Conforme os anos passavam, sua amizade se aprofundava...
+        </p>
+
+        <img src="https://lh3.googleusercontent.com/pw/AJFCJaVwzd5vmEx69oabmRzSnchY2LiHREMCjS-1oIv04qQbNmNLNRBe93liIPoVGf5lm7rCM9evu0zj-0PfF7oCOH2SoobgVPc6MJoZHk9WLAm7zMM02PhEiNwQy913TTrTmmAdvVc-by3QYW5jsVhJRg0soN8UX20HuM7D3W_VVbSKtAQKkkBIJrJTqUEHdPnHEefT7WJ42zYfpBdxc7N_DydgLB8MxMbm7B1x7cnluc4GjSjRGG6IBNYlIRW9MBoGEn0soAcbhDjqLAP9SPBBub6pSH3N3ZpUI9CpNKFoOgTnfi9l9BMOxRHgyEhDpCxaSBgGSqRfUnHeWfgB6j1RVFcqwaIfczEtsbg9Y3RRodI5azRLWtVWTHQQpUfUXaMsQtsBhHy_ADRjO93H3gQjU3qzvfrTrLWp3Zlds54ovpDa99i6SODbX_TMm9kWEtHpq6_rr3nf_SsDDHgDE7NZHGs7wcLdcn66Se5oxnRkUYvLOHzl4ZCLxTWMxplfG7pP3GqUgtXJJPNbCH8Cv9ALSC3Z0uhV36RZ0dl0ND4FVFDy_13GbjBIYbUBLbpNOVeSa9Xt9QTEwHFi63Pfq4UskoLBkVQP8cPK04QOmN1p-fe6zcq394rTAh6CV4lkMfyy1He1vD_lUug08IlANnhC6Ai3hCXITUNOPEB5omWg5evptzcpzgpoZM3kfLZd3c2AmXpV9L9tm2M9pT0PN-YM2La5OOKogcree4Ik12o48B4I0ILxDDcdUjjookD3FCeSFRge4JIxcC-lJKPJTMwsCLEkehmDlMwo1iGrjWtDBUtJFQPIAn-_OA6otpgn68rqEJb3coQ_gldRvXiQNC0VOpGTG1LkuY5Z8Y9n9914waZHjP4j1KrqvetX5shU4wfnyOkUE6ytiuuDq-_S4LZe_U7mvGKZdZHtXtKWoJgOueRw1L1CC1i8JCbKYS8tM_Wk=w769-h961-s-no?authuser=0" alt="Imagem 3">
+        <p class="content">
+            Hoje, eles continuam a compartilhar um amor e uma amizade que transcendem o tempo e o espaço...
+        </p>
+    </div>
+</body>
+</html>
