@@ -1,730 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matheus Teixeira - Full-Stack Developer | Laravel & React</title>
-  <meta name="description" content="I'm Full-Stack Developer | Laravel & React. I use Laravel Sail to handle containers and Livewire on the front-end!">
-  <meta name="keywords"
-    content="back end laravel, laravel, software engineer laravel, desenvolvimento, desenvolvedor, Freelancer, rio de janeiro, rj, web, desenvolvedor web, desenvolvimento web, sites, sistemas, php, mysql, sql, jquery, javascript, java, api facebook, api twitter, profissional, freela, android, ios, wordpress, loja virtual, e-commerce, aplicativos, aplicações, software, analista de sistemas, nerd, desenvolvedor wordpress rj, desenvolvedor laravel rj" />
-  <meta property="og:title"
-    content="Matheus Teixeira - Full-Stack Developer | Laravel & React" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.matheusteixeira.com.br" />
-  <meta property="og:image" content="https://matheusteixeira.com.br/images/matheus-teixeira.jpg" />
-  <meta property="og:site_name" content="Matheus Teixeira - Full-Stack Developer | Laravel & React" />
-  <meta property="og:description" content="I'm Full-Stack Developer | Laravel & React. I use Laravel Sail to handle containers and Livewire on the front-end!" />
-  <meta name="owner" content="contato.matheusteixeira@gmail.com">
-  <meta name="rating" content="Geral">
-  <meta name="robots" content="index,follow">
-  <meta name="revisit-after" content="1 day">
-  <meta name="language" content="English">
-  <meta name="distribution" content="Global">
-  <meta name="generator" content="N/A">
-  <link rel="icon" type="image/png" href="images/favicon.png" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Matheus Teixeira - Desenvolvedor</title>
+    <style>
+        body {
+            background-color: #000b76;
+            font-family: 'Courier New', Courier, monospace;
+            color: #FFFFFF;
+        }
 
-  <!-- ** Plugins Needed for the Project ** -->
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
-  <!-- slick slider -->
-  <link rel="stylesheet" href="plugins/slick/slick.css">
-  <!-- themefy-icon -->
-  <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
+        h1, h2 {
+            text-align: center;
+            color: #FFD700;
+        }
 
-  <!-- Main Stylesheet -->
-  <link href="css/style.css" rel="stylesheet">
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2GVV5142QM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+        marquee {
+            color: #FF0000;
+            font-size: 1.2em;
+        }
 
-  gtag('config', 'G-2GVV5142QM');
-</script>
+        #skills {
+            font-size: 1em;
+            text-align: center;
+            color: #FFFFFF;
+        }
+
+        #contact-form input, textarea {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #FFFFFF;
+            background-color: #000b76;
+            color: #FFFFFF;
+        }
+
+        #contact-form button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            color: #000;
+            cursor: pointer;
+        }
+
+        #contact-form button:hover {
+            background-color: #FFA500;
+        }
+
+        #menu {
+            background-color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+
+        #menu ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #menu li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        #menu a {
+            color: #000b76;
+            text-decoration: none;
+        }
+
+        #menu a:hover {
+            color: #FFD700;
+            text-decoration: underline;
+        }
+
+    </style>
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            alert("Formulário enviado!");
+        }
+    </script>
 </head>
 
 <body>
-
-
-  <header class="navigation fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark">
-      <a class="navbar-brand font-tertiary d-md-block d-lg-none h4 scroll" href="#parallax">
-        Matheus Teixeira
-      </a>
-      <a class="navbar-brand font-tertiary d-none d-lg-block h3 scroll" href="#parallax">
-        Matheus Teixeira
-      </a>
-
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation"
-        aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse text-center" id="navigation">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link scroll" href="#parallax">
-              Home
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#about">
-              About
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#experience">
-              Experience
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#education">
-              Education
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#services">
-              Services
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#portfolio">
-              Portfolio
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#blog">
-              Blog
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link scroll" href="#contact">Contact</a>
-          </li>
+    <div id="menu">
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Sobre mim</a></li>
+            <li><a href="#">Habilidades</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="pages/memories/mtg.html">MTG</a></li>
         </ul>
-      </div>
-    </nav>
-  </header>
+    </div>
 
-  <!-- hero area -->
-  <section class="hero-area bg-primary" id="parallax">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-11 mx-auto">
-          <h1 class="text-white font-tertiary">Hi! I’m <br> Matheus, <br>Full-Stack Developer Laravel and React</h1>
-        </div>
-      </div>
-    </div>
-    <div class="layer-bg w-100">
-      <img class="img-fluid w-100" src="images/illustrations/leaf-bg.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l2">
-      <img src="images/illustrations/dots-cyan.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l3">
-      <img src="images/illustrations/leaf-orange.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l4">
-      <img src="images/illustrations/dots-orange.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l5">
-      <img src="images/illustrations/leaf-yellow.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l6">
-      <img src="images/illustrations/leaf-cyan.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l7">
-      <img src="images/illustrations/dots-group-orange.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l8">
-      <img src="images/illustrations/leaf-pink-round.png" alt="bg-shape">
-    </div>
-    <div class="layer" id="l9">
-      <img src="images/illustrations/leaf-cyan-2.png" alt="bg-shape">
-    </div>
-    <!-- social icon -->
-    <ul class="list-unstyled ml-5 mt-3 position-relative zindex-1">
-      <li class="mb-3">
-        <a class="text-white" href="https://www.linkedin.com/in/aeusteixeira/" target="_blank">
-          <i class="ti-linkedin"></i>
-        </a>
-      </li>
-       <li class="mb-3">
-          <a class="text-white" href="https://github.com/aeusteixeira" target="_blank">
-            <i class="ti-github"></i>
-          </a>
-       </li>
-    </ul>
-    <!-- /social icon -->
-  </section>
-  <!-- /hero area -->
+    <h1>Olá! Eu sou Matheus Teixeira</h1>
+    <marquee>Bem-vindo ao meu website pessoal!</marquee>
+    <h2>Sobre mim</h2>
+    <p class="about-me">
+        Sou um desenvolvedor apaixonado por criar soluções eficazes para problemas complexos...
+    </p>
 
-  <!-- about -->
-  <section class="section" id="about">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-10 mx-auto text-center">
-          <p class="font-secondary paragraph-lg text-dark">My name is Matheus Teixeira (he/him). I'm Full-Stack Developer | Laravel & React
+    <h2>Habilidades</h2>
+    <p id="skills">
+        HTML, CSS, JavaScript, Python, Django...
+    </p>
 
-          <p class="font-secondary paragraph-lg text-dark">I love to create and develop new projects and ideas! If you want to work with me, send me an email!</p>
-          <a href="https://docs.google.com/document/d/1WZrOIgvyDoFg_1fCFEiXBsZh8QVrVCUcpG7l-u6aiHw/edit" target="_blank" class="btn btn-transparent">know more</a>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /about -->
-
-  <!-- skills -->
-  <section class="section">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-center">
-          <h2 class="section-title">Skills</h2>
-        </div>
-        <div class="col-lg-3 col-sm-6 mb-4 mb-lg-0">
-          <div class="card shadow text-center">
-            <div class="position-relative rounded-top progress-wrapper" data-color="#fb503b">
-              <div class="wave" data-progress="90%"></div>
-            </div>
-            <div class="card-footer bg-white">
-              <h4 class="card-title">Laravel (90%)</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 mb-4 mb-lg-0">
-          <div class="card shadow text-center">
-            <div class="position-relative rounded-top progress-wrapper" data-color="#61dbfb">
-              <div class="wave" data-progress="80%"></div>
-            </div>
-            <div class="card-footer bg-white">
-              <h4 class="card-title">React (80%)</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 mb-4 mb-lg-0">
-          <div class="card shadow text-center">
-            <div class="position-relative rounded-top progress-wrapper" data-color="#0db7ed">
-              <div class="wave" data-progress="70%"></div>
-            </div>
-            <div class="card-footer bg-white">
-              <h4 class="card-title">Docker (70%)</h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 mb-4 mb-lg-0">
-          <div class="card shadow text-center">
-            <div class="position-relative rounded-top progress-wrapper" data-color="#415970">
-              <div class="wave" data-progress="100%"></div>
-            </div>
-            <div class="card-footer bg-white">
-              <h4 class="card-title">Scrum (100%)</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /skills -->
-
-  <!-- experience -->
-  <section class="section" id="experience">
-    <div class="container">
-      <div class="row justify-content-around">
-        <div class="col-lg-12 text-center">
-          <h2 class="section-title">Experience</h2>
-        </div>
-        <div class="col-lg-3 col-md-4 text-center">
-          <img src="images/experience/icon-3.png" alt="icon">
-          <p class="mb-0">Out 2020 - Present</p>
-          <h4>
-            Back End Developer
-          </h4>
-          <h6 class="text-light">
-            BPO INNOVA BRASIL
-          </h6>
-        </div>
-        <div class="col-lg-3 col-md-4 text-center">
-          <img src="images/experience/icon-2.png" alt="icon">
-          <p class="mb-0">Jan 2020 - Present</p>
-          <h4>
-            CEO
-          </h4>
-          <h6 class="text-light">
-            EKKO DIGITAL
-          </h6>
-        </div>
-        <div class="col-lg-3 col-md-4 text-center">
-          <img src="images/experience/icon-1.png" alt="icon">
-          <p class="mb-0">May 2019 - July 2020</p>
-          <h4>
-            Analyst Marketing
-          </h4>
-          </h4>
-          <h6 class="text-light">
-            CEBRAT
-          </h6>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- ./experience -->
-
-  <!-- education -->
-  <section class="section position-relative" id="education">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-center">
-          <h2 class="section-title">Education</h2>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-80">
-          <div class="d-flex">
-            <div class="mr-lg-5 mr-3">
-              <i class="ti-medall icon icon-light icon-bg bg-white shadow rounded-circle d-block"></i>
-            </div>
-            <div>
-              <p class="text-dark mb-1">2019 - Present</p>
-              <h4>
-                Technologist Course in Systems Analysis and Development
-              </h4>
-              <p class="mb-0 text-light">
-                Estácio de Sá
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-80">
-          <div class="d-flex">
-            <div class="mr-lg-5 mr-3">
-              <i class="ti-medall icon icon-light icon-bg bg-white shadow rounded-circle d-block"></i>
-            </div>
-            <div>
-              <p class="text-dark mb-1">2020</p>
-              <h4>
-                Laravel Developer Course
-              </h4>
-              <p class="mb-0 text-light">
-                UP Inside
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-80">
-          <div class="d-flex">
-            <div class="mr-lg-5 mr-3">
-              <i class="ti-medall icon icon-light icon-bg bg-white shadow rounded-circle d-block"></i>
-            </div>
-            <div>
-              <p class="text-dark mb-1">2021</p>
-              <h4>
-                Bootcamp Analyst in Cyber Security
-              </h4>
-              <p class="mb-0 text-light">IGTI</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-80">
-          <div class="d-flex">
-            <div class="mr-lg-5 mr-3">
-              <i class="ti-medall icon icon-light icon-bg bg-white shadow rounded-circle d-block"></i>
-            </div>
-            <div>
-              <p class="text-dark mb-1">2017</p>
-              <h4>
-                Technologist Course in Web Application Development
-              </h4>
-              <p class="mb-0 text-light">
-                SENAC Rio
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- bg image -->
-    <img class="img-fluid edu-bg-image w-100" src="images/backgrounds/education-bg.png" alt="bg-image">
-  </section>
-  <!-- /education -->
-
-  <!-- services -->
-  <section class="section" id="services">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <h2 class="section-title">Services</h2>
-        </div>
-        <div class="col-md-4 mb-4 mb-md-0">
-          <div class="card hover-shadow shadow">
-            <div class="card-body text-center px-4 py-5">
-              <i class="ti-palette icon mb-5 d-inline-block"></i>
-              <h4 class="mb-4">
-                SEO
-              </h4>
-              <p>
-                I have experience in SEO, I can help you to improve your website's ranking in search engines.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4 mb-md-0">
-          <div class="card active-bg-primary hover-shadow shadow">
-            <div class="card-body text-center px-4 py-5">
-              <i class="ti-vector icon mb-5 d-inline-block"></i>
-              <h4 class="mb-4">
-                Web Development
-              </h4>
-              <p>
-                I have experience in Web Development, I can help you to create your project in a fast and efficient way.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4 mb-md-0">
-          <div class="card hover-shadow shadow">
-            <div class="card-body text-center px-4 py-5">
-              <i class="ti-panel icon mb-5 d-inline-block"></i>
-              <h4 class="mb-4">
-                Maintenance
-              </h4>
-              <p>
-                I have experience in maintenance, I can help you improve the performance of your website or online application.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /services -->
-
-  <!-- portfolio -->
-  <section class="section" id="portfolio">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <h2 class="section-title">Portfolio</h2>
-        </div>
-      </div>
-      <div class="row shuffle-wrapper justify-content-center">
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-1.jpg" alt="Ekko Digital" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm" href="https://ekko.digital" target="_blank">
-                  View Project
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-2.jpg" alt="BPO INNOVA" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm" href="https://bpoinnova.com" target="_blank">
-                  View Project
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-3.jpg" alt="Gus Levy" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm" href="https://aeusteixeira.github.io/guslevy/" target="_blank">
-                  View Project
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-4.jpg" alt="Briefeed" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm" href="https://briefeed.com.br" target="_blank">
-                  View Project
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-5.jpg" alt="Spella Restaurant" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm" href="https://aeusteixeira.github.io/spella-restaurant/" target="_blank">
-                  View Project
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-6 mb-4 shuffle-item">
-          <div class="position-relative rounded hover-wrapper">
-            <img src="images/portfolio/item-6.jpg" alt="Meu Estúdio" class="img-fluid rounded w-100">
-            <div class="hover-overlay">
-              <div class="hover-content">
-                <a class="btn btn-light btn-sm disabled">
-                  Coming Soon
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /portfolio -->
-
-  <!-- testimonial -->
-  <section class="section bg-primary position-relative testimonial-bg-shapes d-none">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <h2 class="section-title text-white mb-5">Testimonials</h2>
-        </div>
-        <div class="col-lg-10 mx-auto testimonial-slider">
-          <!-- slider-item -->
-          <div class="text-center testimonial-content">
-            <i class="ti-quote-right text-white icon mb-4 d-inline-block"></i>
-            <p class="text-white mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, <strong>quis nostrud exercitation
-                ullamco laboris nisi ut aliquip ex ea commodo consequat.</strong> Duis aute irure dolor in reprehenderit
-              in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            <img class="img-fluid rounded-circle mb-4 d-inline-block" src="images/testimonial/client-1.png"
-              alt="client-image">
-            <h4 class="text-white">Jesica Gomez</h4>
-            <h6 class="text-light mb-4">CEO, Funder</h6>
-          </div>
-          <!-- slider-item -->
-          <div class="text-center testimonial-content">
-            <i class="ti-quote-right text-white icon mb-4 d-inline-block"></i>
-            <p class="text-white mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, <strong>quis nostrud exercitation
-                ullamco
-                laboris nisi ut aliquip ex ea commodo consequat.</strong> Duis aute irure dolor in reprehenderit in
-              voluptate velit
-              esse cillum dolore eu fugiat nulla pariatur.</p>
-            <img class="img-fluid rounded-circle mb-4 d-inline-block" src="images/testimonial/client-1.png"
-              alt="client-image">
-            <h4 class="text-white">Jesica Gomez</h4>
-            <h6 class="text-light mb-4">CEO, Funder</h6>
-          </div>
-          <!-- slider-item -->
-          <div class="text-center testimonial-content">
-            <i class="ti-quote-right text-white icon mb-4 d-inline-block"></i>
-            <p class="text-white mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, <strong>quis nostrud exercitation
-                ullamco
-                laboris nisi ut aliquip ex ea commodo consequat.</strong> Duis aute irure dolor in reprehenderit in
-              voluptate velit
-              esse cillum dolore eu fugiat nulla pariatur.</p>
-            <img class="img-fluid rounded-circle mb-4 d-inline-block" src="images/testimonial/client-1.png"
-              alt="client-image">
-            <h4 class="text-white">Jesica Gomez</h4>
-            <h6 class="text-light mb-4">CEO, Funder</h6>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- bg shapes -->
-    <img src="images/backgrounds/map.png" alt="map" class="img-fluid bg-map">
-    <img src="images/illustrations/dots-group-v.png" alt="bg-shape" class="img-fluid bg-shape-1">
-    <img src="images/illustrations/leaf-orange.png" alt="bg-shape" class="img-fluid bg-shape-2">
-    <img src="images/illustrations/dots-group-sm.png" alt="bg-shape" class="img-fluid bg-shape-3">
-    <img src="images/illustrations/leaf-pink-round.png" alt="bg-shape" class="img-fluid bg-shape-4">
-    <img src="images/illustrations/leaf-cyan.png" alt="bg-shape" class="img-fluid bg-shape-5">
-  </section>
-  <!-- /testimonial -->
-
-  <!-- client logo slider -->
-  <section class="section pb-0 d-none">
-    <div class="container">
-      <div class="client-logo-slider d-flex align-items-center">
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-1.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-2.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-3.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-4.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-5.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-1.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-2.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-3.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-4.png" alt="client-logo"></a>
-        <a href="#" class="text-center d-block outline-0 p-4"><img class="d-unset img-fluid"
-            src="images/clients-logo/client-logo-5.png" alt="client-logo"></a>
-      </div>
-    </div>
-  </section>
-  <!-- /client logo slider -->
-
-  <!-- blog -->
-  <section class="section" id="blog">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <h2 class="section-title">Blog</h2>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4 mb-lg-0">
-          <article class="card shadow">
-            <img class="rounded card-img-top" src="https://matheusteixeira.com.br/blog/wp-content/uploads/2020/10/Banners-Blog-Matheus-11-1.png" alt="post-thumb">
-            <div class="card-body">
-              <h4 class="card-title">
-                <a class="text-dark" href="https://matheusteixeira.com.br/blog/elaborando-relacionamentos-entre-modelos-no-laravel/" target="_blank">
-                Building relationships with models in Laravel
-              </a>
-              </h4>
-              <p class="cars-text">
-                In this article I will explain in detail how creating relationships with models in Laravel works...
-              </p>
-              <a href="https://matheusteixeira.com.br/blog/elaborando-relacionamentos-entre-modelos-no-laravel/" class="btn btn-primary btn-sm" target="_blank">Read more</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4 mb-lg-0">
-          <article class="card shadow">
-            <img class="rounded card-img-top" src="https://matheusteixeira.com.br/blog/wp-content/uploads/2021/03/photo-1574887427561-d3d5d58c9273-1-825x510.jpg" alt="post-thumb">
-            <div class="card-body">
-              <h4 class="card-title">
-                <a class="text-dark" href="https://matheusteixeira.com.br/blog/acessibilidade-na-web-dicas-de-como-criar-uma-web-mais-inclusiva-para-pessoas-com-deficiencia/" target="_blank">
-                  Web Accessibility: 8 Tips on Creating a More Inclusive Web for People with Disabilities
-              </a>
-              </h4>
-              <p class="cars-text">
-                In general, web accessibility is a set of measures that intend to break down digital barriers, that is: It intends to tr...
-              </p>
-              <a href="https://matheusteixeira.com.br/blog/acessibilidade-na-web-dicas-de-como-criar-uma-web-mais-inclusiva-para-pessoas-com-deficiencia/" class="btn btn-primary btn-sm" target="_blank">Read more</a>
-            </div>
-          </article>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4 mb-lg-0">
-          <article class="card shadow">
-            <img class="rounded card-img-top" src="https://matheusteixeira.com.br/blog/wp-content/uploads/2020/10/Banners-Blog-Matheus-4-1.png" alt="post-thumb">
-            <div class="card-body">
-              <h4 class="card-title">
-                <a class="text-dark" href="https://matheusteixeira.com.br/blog/como-gerar-e-inserir-graficos-em-um-arquivo-pdf-usando-laravel-dompdf-e-chartjs/" target="_blank">
-                  How to generate and insert charts into a PDF file using Laravel, DOMPDF and Chartjs
-              </a>
-              </h4>
-              <p class="cars-text">
-                Hello friends! In this article I will be teaching you how to easily insert a chart into a PDF file using the Chart.js libr...
-              </p>
-              <a href="https://matheusteixeira.com.br/blog/como-gerar-e-inserir-graficos-em-um-arquivo-pdf-usando-laravel-dompdf-e-chartjs/" class="btn btn-primary btn-sm" target="_blank">Read more</a>
-            </div>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /blog -->
-
-  <!-- contact -->
-  <section class="section section-on-footer" data-background="images/backgrounds/bg-dots.png" id="contact">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 text-center">
-          <h2 class="section-title">Contact Info</h2>
-        </div>
-        <div class="col-lg-8 mx-auto">
-          <div class="bg-white rounded text-center p-5 shadow-down">
-            <h4 class="mb-80">Contact Form</h4>
-            <form action="https://submit-form.com/7ecwFjns" class="row php-email-form">
-              <div class="col-md-6">
-                <input required type="text" id="name" name="name" placeholder="Full Name" class="form-control px-0 mb-4" data-rule="minlen:4"
-                data-msg="Por favor, informe seu nome" />
-                <div class="validate"></div>
-              </div>
-              <div class="col-md-6">
-                <input required type="email" id="email" name="email" placeholder="Email Address" class="form-control px-0 mb-4">
-              </div>
-              <div class="col-12">
-                <textarea required name="message" id="message" class="form-control px-0 mb-4"
-                  placeholder="Type Message Here"></textarea>
-              </div>
-              <div class="error-message" style="display: none;"></div>
-
-              <div class="col-lg-6 col-10 mx-auto">
-                <button class="btn btn-primary w-100">send</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- /contact -->
-
-  <!-- footer -->
-  <footer class="bg-dark footer-section">
-    <div class="section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">
-            <h5 class="text-light">Email</h5>
-            <a href="mailto:contato.matheusteixeira@gmail.com">
-              <p class="text-white paragraph-lg font-secondary">
-                contato.matheusteixeira@gmail.com
-              </p>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <h5 class="text-light">Phone</h5>
-            <a href="tel:+55 21 9 94282445">
-              <p class="text-white paragraph-lg font-secondary">
-                +55 21 9 94282445
-              </p>
-            </a>
-          </div>
-          <div class="col-md-4">
-            <h5 class="text-light">Location</h5>
-              <p class="text-white paragraph-lg font-secondary">
-                São Paulo, SP
-              </p>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="border-top text-center border-dark py-5">
-      <p class="mb-0 text-light">
-        <script>
-          var CurrentYear = new Date().getFullYear()
-          document.write(CurrentYear)
-        </script>
-        </p>
-    </div>
-  </footer>
-  <!-- /footer -->
-
-  <!-- jQuery -->
-  <script src="plugins/jQuery/jquery.min.js"></script>
-  <!-- Bootstrap JS -->
-  <script src="plugins/bootstrap/bootstrap.min.js"></script>
-  <!-- slick slider -->
-  <script src="plugins/slick/slick.min.js"></script>
-  <!-- filter -->
-  <script src="plugins/shuffle/shuffle.min.js"></script>
-
-  <!-- Main Script -->
-  <script src="js/script.js"></script>
-  <script src="plugins/php-form-validate/validate.js"></script>
-
+    <h2>Contato</h2>
+    <form id="contact-form" onsubmit="submitForm(event)">
+        <input type="text" name="name" placeholder="Seu nome" required />
+        <input type="email" name="email" placeholder="Seu email" required />
+        <textarea name="message" placeholder="Sua mensagem" required></textarea>
+        <button type="submit">Enviar</button>
+    </form>
 </body>
-
 </html>
