@@ -117,6 +117,29 @@ body {
     margin-right: 5px;
   }
 
+  .special-slide {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #e2e2e2;
+    padding: 20px;
+  }
+  
+  .special-slide img {
+    max-width: 80%;
+    height: auto;
+    border-radius: 5px;
+  }
+  
+  .special-slide h3 {
+    font-size: 24px;
+    margin-top: 10px;
+    color: #1b1b1b;
+    text-align: center;
+  }
+  
   
   
   @media screen and (max-width: 600px) {
