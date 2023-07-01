@@ -5,28 +5,36 @@ var resultElement = document.getElementById('result'); // Aqui buscamos o elemen
 
 var text = [
     '',
-    ' Mano,',
+    'Mano,',
     '',
-    ' Desde que nossos caminhos se cruzaram, minha vida se tornou infinitamente mais rica. Você se tornou meu melhor amigo, meu parceiro de vida, a ancora que mantém o meu navio firme em meio as tempestades da vida.',
+    'Desde que nossos caminhos se cruzaram, minha existência ganhou um novo significado. Você se tornou meu melhor amigo, meu companheiro de aventuras, o âncora que mantém meu barco estável em meio às tempestades do oceano.',
     '',
-    ' Passamos por inúmeras aventuras juntas, cada uma delas fortalecendo nossa amizade, nossa parceria, e cada riso incontrolável e desafio enfrentado ao seu lado apenas solidificou a certeza de uma verdade.',
+    'Passamos por incontáveis quests juntos, cada uma fortalecendo nossa amizade, nossa parceria, e cada riso incontrolável e desafio vencido ao seu lado apenas solidificou a certeza de uma verdade.',
     '',
-    ' Não há mais ninguém no mundo com quem eu prefira passar cada dia.',
+    'Não há mais ninguém no mundo com quem eu prefira passar cada dia.',
     '',
-    ' A alegria imensa que você traz à minha vida é palpável, e parafraseando a música Entre Laços da banda Zimbra,',
+    'A alegria imensa que você traz ao meu cotidiano é palpável, e parafraseando a música Entre Laços da banda Zimbra,',
     '',
-    ' <span style="color: red;">"Estranho é pensar em mim mesmo sem te incluir"</span>.',
+    '"Estranho é pensar em mim mesmo, sem te incluir."',
     '',
-    ' Estou empolgado com as possibilidades do nosso futuro e todas as aventuras que ainda temos pela frente.',
+    'Estou empolgado com as novas fases que nosso futuro reserva e todas as missões que ainda temos pela frente.',
     '',
-    ' Como diz Beth Carvalho: "Por onde for, quero ser seu par."',
+    'Tem também uma música da Beth Carvalho que diz: "Por onde for, quero ser seu par."',
     '',
-    ' Seja em Nova Iguaçu ou São Paulo, uma vez por mês em cada estado do Brasil, em Portugal, no Canadá, ou em qualquer lugar do mundo - Eu quero estar ao seu lado.',
+    'Seja aqui em Nova Iguaçu, São Paulo, uma vez por mês em cada estado do Brasil, em Portugal, no Canadá, ou em qualquer lugar do mundo',
     '',
-    ' Quero ser seu par. Quero continuar essa jornada com você.',
+    'Quero ser seu par.',
+    'Eu quero estar ao seu lado.',
+    'Quero continuar essa jornada com você.',
     '',
-    'const resposta = Gabriel.aceitaSerMeuNamorado(); // (s/n)'
+    'Eu quero ser seu player 2.',
+    '',
+    'Mas para que a lógica do nosso código funcione, preciso saber se você aceita ser meu player 1.',
+    '',
+    'Preciso saber qual é o valor que você atribui à variável "resposta".',
+    'const resposta = Gabriel.aceitaSerMeuPlayer1(); // (sim/não)',
 ];
+
 
 var line = 0;
 var character = 0;
@@ -69,9 +77,9 @@ typeCharacter();
 
 responseElement.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-        if (this.value.toLowerCase() === 's') {
+        if (this.value.toLowerCase() === 'sim') {
             resultElement.textContent = 'Uau! Isso é maravilhoso, Gabriel! Prometo dedicar cada dia para trazer alegria e amor à sua vida. Você é incrivelmente especial para mim. Te amo mais do que palavras ou código poderiam expressar. <3';
-        } else if (this.value.toLowerCase() === 'n') {
+        } else if (this.value.toLowerCase() === 'não') {
             resultElement.textContent = 'Entendo... Respeito completamente a sua decisão, Gabriel. Quero que saiba que eu valorizo cada momento que compartilhamos juntos. Você sempre terá um lugar especial em meu coração. Te amo!';
         } else {
             resultElement.textContent = 'Não entendi o que você quis dizer, Gabriel. Por favor, responda com "s" ou "n".';
