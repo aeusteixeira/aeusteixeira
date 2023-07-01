@@ -1,0 +1,44 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.centered-content {
+    position: relative;
+    text-align: center;
+    z-index: 2;  /* Adiciona um z-index para garantir que a mensagem e a imagem fiquem acima dos emojis */
+}
+
+#centered-image {
+    max-width: 50%;  /* Reduz a largura da imagem */
+    height: auto;
+    border-radius: 12px;
+}
+
+
+.message {
+    font-family: Arial, sans-serif;
+    font-size: 2em;
+    color: #000000;
+}
+
+.emoji {
+    position: absolute;
+    top: 0;
+    font-size: 30px;
+    animation: fall linear 5s;
+}
+
+@keyframes fall {
+    0% {
+      top: 0;
+    }
+    100% {
+      top: 100%;
+    }
+}
