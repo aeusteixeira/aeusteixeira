@@ -1,0 +1,77 @@
+body {
+    background: #1e1e1e;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .editor {
+    background: #252526;
+    color: #d4d4d4;
+    padding: 20px;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 20px;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .editor::before {
+    content: "main.js";
+    color: #808080;
+    background: #1e1e1e;
+    padding: 5px;
+    border-bottom: 1px solid #808080;
+    width: 100%;
+    display: inline-block;
+  }
+  
+  .editor::after {
+    content: "";
+    flex-grow: 1;
+  }
+  
+  input {
+    color: #d4d4d4;
+    background: #252526;
+    border: none;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 20px;
+    margin-top: 20px;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  #cursor {
+    display: inline-block;
+    background-color: #fff;
+    width: 0.5em;
+    height: 1em;
+    vertical-align: text-bottom;
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    50% {
+      background-color: transparent;
+    }
+  }
+  
+  #code {
+    white-space: pre-wrap;
+  }
+  
+  #result {
+    color: red;
+    font-weight: bold;
+}
