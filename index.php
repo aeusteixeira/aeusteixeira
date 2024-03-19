@@ -98,7 +98,7 @@
 
     <h1>Olá! Eu sou Matheus Teixeira</h1>
     <marquee>Bem-vindo ao meu website pessoal!</marquee>
-    <h2>Sobre mim</h2>
+    <h2>Eu</h2>
     <p class="about-me">
         Sou um desenvolvedor apaixonado por criar soluções eficazes para problemas complexos...
     </p>
