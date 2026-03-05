@@ -3656,7 +3656,7 @@ const clippyPhrases = [
     'Esse site roda em um único arquivo HTML. Não me julgue.',
     'Psiu... tenta digitar "about" no Prompt de Comando. 😉',
     'O Matheus já deu aula de PHP no SENAC. Na mesma sala onde estudou!',
-    'Fun fact: ele criou um dos maiores blogs da Moptop no Brasil.',
+    'Fun fact: ele criou um dos maiores blogs de One Direction no Brasil.',
     'Quer uma dica? Abre o LimeWire. Confia.',
     'Se quiser contratar ele, manda um e-mail. Eu sou só um clipe de papel.',
 ];
