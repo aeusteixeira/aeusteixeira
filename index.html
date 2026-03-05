@@ -74,7 +74,7 @@
         <div class="d-icon-lbl">Google Chrome</div>
       </div>
       <div class="d-icon" data-tip="Currículo — WordPad" ondblclick="openWindow('win-cv')">
-        <div class="d-icon-img">📋</div>
+        <div class="d-icon-img"><img src="src/img/system/wordpad.webp" alt="CV" style="width:32px;height:32px;"></div>
         <div class="d-icon-lbl">Curriculo.rtf</div>
       </div>
       <div class="d-icon" data-tip="Windows Media Player" ondblclick="toggleWMP()">
@@ -92,6 +92,10 @@
       <div class="d-icon" data-tip="Sobre o Matheus" ondblclick="openWindow('win-sobre-matheus')">
         <div class="d-icon-img"><img src="src/img/system/bloco-de-notas-icon.png" alt="Notepad" style="width:32px;height:32px;"></div>
         <div class="d-icon-lbl">sobre_o_matheus.txt</div>
+      </div>
+      <div class="d-icon" data-tip="NÃO ABRA ISSO" ondblclick="runVirusBat()">
+        <div class="d-icon-img"><img src="src/img/system/file-bat.ico" alt="virus.bat" style="width:32px;height:32px;"></div>
+        <div class="d-icon-lbl">virus.bat</div>
       </div>
     </div>
 
@@ -138,6 +142,11 @@
           <span class="chrome-tab-lbl">Orkut - Matheus Teixeira</span>
           <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(5)">✕</span>
         </div>
+        <div class="chrome-tab" id="ctab-6" onclick="chromeTab(6)" style="display:none;">
+          <span class="chrome-tab-fav">🕐</span>
+          <span class="chrome-tab-lbl">Histórico</span>
+          <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(6)">✕</span>
+        </div>
         <div class="chrome-newtab" title="Nova aba">+</div>
       </div>
       <!-- Chrome Nav Bar -->
@@ -155,8 +164,34 @@
         <div class="chrome-nav-extra">
           <button class="chrome-nav-btn" title="Favoritos">☆</button>
           <button class="chrome-nav-btn" title="Extensões">🧩</button>
-          <button class="chrome-nav-btn" title="Menu">⋮</button>
+          <div class="chrome-menu-wrap">
+            <button class="chrome-nav-btn" title="Menu" onclick="toggleChromeMenu()">⋮</button>
+            <div class="chrome-menu" id="chrome-menu" style="display:none;">
+              <div class="chrome-menu-item" onclick="chromeMenuAction('newtab')">Nova aba<span class="chrome-menu-key">Ctrl+T</span></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('newwin')">Nova janela<span class="chrome-menu-key">Ctrl+N</span></div>
+              <div class="chrome-menu-sep"></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('history')">🕐 Histórico<span class="chrome-menu-key">Ctrl+H</span></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('downloads')">⬇️ Downloads<span class="chrome-menu-key">Ctrl+J</span></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('bookmarks')">⭐ Favoritos<span class="chrome-menu-key">Ctrl+Shift+B</span></div>
+              <div class="chrome-menu-sep"></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('zoom')">🔍 Zoom (100%)</div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('print')">🖨️ Imprimir...<span class="chrome-menu-key">Ctrl+P</span></div>
+              <div class="chrome-menu-sep"></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('config')">⚙️ Configurações</div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('help')">❓ Ajuda</div>
+              <div class="chrome-menu-sep"></div>
+              <div class="chrome-menu-item" onclick="chromeMenuAction('exit')">✕ Sair<span class="chrome-menu-key">Alt+F4</span></div>
+            </div>
+          </div>
         </div>
+      </div>
+      <!-- Chrome Bookmarks Bar -->
+      <div class="chrome-bookmarks">
+        <span class="chrome-bm" onclick="sndClick();showNotif('🌐 iCarly','iCarly.com — o site que mudou tudo. Foi aqui que eu decidi: quero fazer sites.')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">iCarly.com</span>
+        <span class="chrome-bm" onclick="sndClick();showNotif('🎸 Moptop','moptop.com.br — meu blog da banda. Um dos maiores do Brasil na época!')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">Moptop Blog</span>
+        <span class="chrome-bm" onclick="sndClick();showNotif('🔧 Mestre Oficina','mestreoficina.com.br — meu SaaS pra gestão de oficinas mecânicas')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">Mestre Oficina</span>
+        <span class="chrome-bm" onclick="sndClick();showNotif('📖 PHP','Apostila de PHP e MySQL — o livro que minha mãe me deu. Mudou minha vida.')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">Apostila PHP</span>
+        <span class="chrome-bm" onclick="sndClick();showNotif('💼 LinkedIn','linkedin.com/in/aeusteixeira')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">LinkedIn</span>
       </div>
       <!-- Chrome Body -->
       <div class="xp-body chrome-body">
@@ -615,7 +650,7 @@
               <button class="gm2-compose-btn" onclick="gmCompose()">✏️ Escrever</button>
               <nav class="gm2-nav">
                 <div class="gm2-ni gm2-ni-active" id="gm2-nav-inbox" onclick="gmShowFolder('inbox')">📥 <span>Caixa de entrada</span> <span class="gm2-badge" id="gm2-unread-ct">4</span></div>
-                <div class="gm2-ni" onclick="gmShowFolder('starred')">⭐ <span>Com estrela</span></div>
+                <div class="gm2-ni" onclick="gmShowFolder('starred')"><img src="src/img/system/estrela-favorito.ico" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"><span>Com estrela</span></div>
                 <div class="gm2-ni" onclick="sndClick()">⏰ <span>Adiados</span></div>
                 <div class="gm2-ni" onclick="gmShowFolder('sent')">📤 <span>Enviados</span></div>
                 <div class="gm2-ni" onclick="sndClick()">📄 <span>Rascunhos</span> <span class="gm2-badge gm2-badge-gray">3</span></div>
@@ -857,11 +892,11 @@
             <!-- COLUNA ESQUERDA: foto + info + ações -->
             <div class="ok-col-left">
               <div class="ok-photo-box">
-                <div class="ok-photo">🧑‍💻</div>
+                <div class="ok-photo"><img src="src/img/matheus.jpg" alt="Matheus" style="width:100%;height:100%;object-fit:cover;border-radius:2px;"></div>
               </div>
               <div class="ok-user-info">
                 masculino, solteiro<br>
-                Rio de Janeiro, RJ<br>
+                Nova Iguaçu, RJ<br>
                 Brasil
               </div>
               <div class="ok-actions">
@@ -887,7 +922,7 @@
               <div class="ok-profile-header">
                 <div class="ok-profile-name">Matheus Teixeira</div>
                 <div class="ok-profile-stats">
-                  <a href="#" onclick="sndClick();return false">📋 47 scraps</a> &nbsp;
+                  <a href="#" onclick="sndClick();return false">📋 48 scraps</a> &nbsp;
                   <a href="#" onclick="sndClick();return false">📷 9 fotos</a> &nbsp;
                   <a href="#" onclick="sndClick();return false">🎬 0 vídeos</a> &nbsp;
                   ⭐ 5 fãs
@@ -902,34 +937,73 @@
 
               <!-- Tabs: social / profissional / pessoal -->
               <div class="ok-tabs">
-                <span class="ok-tab active" onclick="sndClick()">☕ social</span>
-                <span class="ok-tab" onclick="sndClick()">💼 profissional</span>
-                <span class="ok-tab" onclick="sndClick()">👤 pessoal</span>
+                <span class="ok-tab active" onclick="orkutTab('social',this)">☕ social</span>
+                <span class="ok-tab" onclick="orkutTab('profissional',this)">💼 profissional</span>
+                <span class="ok-tab" onclick="orkutTab('pessoal',this)">👤 pessoal</span>
               </div>
 
-              <!-- Info table (aba social) -->
-              <table class="ok-info-table">
+              <!-- Info table: ABA SOCIAL -->
+              <table class="ok-info-table ok-tab-content" id="ok-tab-social">
                 <tr><td class="ok-info-label">relacionamento:</td><td class="ok-info-value"><b>é complicado</b></td></tr>
                 <tr><td class="ok-info-label">aqui para:</td><td class="ok-info-value">amigos, networking</td></tr>
                 <tr class="ok-info-highlight"><td class="ok-info-label">sobre mim:</td><td class="ok-info-value">dev por profissão, ser humano normal nas horas vagas. gosto de café, joguinho e ficar até tarde na internet sem motivo nenhum.</td></tr>
                 <tr><td class="ok-info-label">humor:</td><td class="ok-info-value">sarcástico, irônico, memes</td></tr>
                 <tr class="ok-info-highlight"><td class="ok-info-label">moda:</td><td class="ok-info-value">casual, bermuda e chinelo</td></tr>
-                <tr><td class="ok-info-label">moradia:</td><td class="ok-info-value">sozinho</td></tr>
-                <tr class="ok-info-highlight"><td class="ok-info-label">cidade natal:</td><td class="ok-info-value"><span style="color:#315699">Rio de Janeiro</span></td></tr>
-                <tr><td class="ok-info-label">paixões:</td><td class="ok-info-value"><b>café, código, jogos, pizza, uma pessoa que mora longe demais 🇵🇪</b></td></tr>
-                <tr class="ok-info-highlight"><td class="ok-info-label">esportes:</td><td class="ok-info-value">futebol (só assistir)</td></tr>
-                <tr><td class="ok-info-label">atividades:</td><td class="ok-info-value">programar, jogar, procrastinar</td></tr>
+                <tr><td class="ok-info-label">moradia:</td><td class="ok-info-value">sozinho, em São Paulo</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">cidade natal:</td><td class="ok-info-value"><span style="color:#315699">Nova Iguaçu, RJ</span></td></tr>
+                <tr><td class="ok-info-label">paixões:</td><td class="ok-info-value"><b>café, código, mergulho, moto, cozinhar, uma pessoa que mora longe demais 🇵🇪</b></td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">esportes:</td><td class="ok-info-value">mergulho, futebol (só assistir)</td></tr>
+                <tr><td class="ok-info-label">atividades:</td><td class="ok-info-value">programar, cozinhar, andar de moto, fotografia urbana, fazer listas</td></tr>
                 <tr class="ok-info-highlight"><td class="ok-info-label">livros:</td><td class="ok-info-value">Guia do Mochileiro das Galáxias</td></tr>
-                <tr><td class="ok-info-label">música:</td><td class="ok-info-value">rock, MPB, lo-fi</td></tr>
-                <tr class="ok-info-highlight"><td class="ok-info-label">programas de tv:</td><td class="ok-info-value">Lost, The Office, Friends, BBB</td></tr>
+                <tr><td class="ok-info-label">música:</td><td class="ok-info-value">rock, MPB, lo-fi, Moptop</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">programas de tv:</td><td class="ok-info-value">Lost, The Office, Friends, BBB, iCarly</td></tr>
                 <tr><td class="ok-info-label">filmes:</td><td class="ok-info-value">Matrix, Senhor dos Anéis, Tropa de Elite</td></tr>
                 <tr class="ok-info-highlight"><td class="ok-info-label">cozinha:</td><td class="ok-info-value">pizza, churrasco, comida peruana 😏</td></tr>
+              </table>
+
+              <!-- Info table: ABA PROFISSIONAL -->
+              <table class="ok-info-table ok-tab-content" id="ok-tab-profissional" style="display:none;">
+                <tr><td class="ok-info-label">cargo:</td><td class="ok-info-value"><b>Desenvolvedor Back-End Pleno</b></td></tr>
+                <tr><td class="ok-info-label">empresa atual:</td><td class="ok-info-value"><span style="color:#315699">MUPER</span> — desde 07/2024</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">projeto próprio:</td><td class="ok-info-value"><b>Mestre Oficina</b> — SaaS para gestão de oficinas mecânicas (Fundador)</td></tr>
+                <tr><td class="ok-info-label">stack principal:</td><td class="ok-info-value">PHP, Laravel, MySQL, Docker, Python, n8n</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">também mexo com:</td><td class="ok-info-value">React, Vue, Next.js, Node.js, PostgreSQL, MongoDB</td></tr>
+                <tr><td class="ok-info-label">cloud:</td><td class="ok-info-value">AWS (estudando), Kubernetes (estudando)</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">formação:</td><td class="ok-info-value">ADS — Estácio de Sá (2023)<br>Pós-grad Cloud Computing — Gran (em andamento)</td></tr>
+                <tr><td class="ok-info-label">experiência:</td><td class="ok-info-value">
+                  SC Brasil (estágio, 2018) →<br>
+                  CEBRAT Educação (2019-2020) →<br>
+                  BPO Innova Jr → Pleno (2020-2024) →<br>
+                  Agilizza (2023-2024) →<br>
+                  MUPER (2024-atual)
+                </td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">ensino:</td><td class="ok-info-value">Instrutor de PHP e MySQL — SENAC (2023-2024)</td></tr>
+                <tr><td class="ok-info-label">certificações:</td><td class="ok-info-value">CISCO IT Essentials, Scrum Fundamentals, Cyber Security Foundation</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">comunidade:</td><td class="ok-info-value">Palestrante e participante ativo no PHPSP, PHP Rio e Hack in Rio</td></tr>
+                <tr><td class="ok-info-label">objetivo:</td><td class="ok-info-value">Continuar evoluindo em arquitetura de software, cloud e liderança técnica</td></tr>
+              </table>
+
+              <!-- Info table: ABA PESSOAL -->
+              <table class="ok-info-table ok-tab-content" id="ok-tab-pessoal" style="display:none;">
+                <tr><td class="ok-info-label">nome:</td><td class="ok-info-value"><b>Matheus Teixeira dos Santos</b></td></tr>
+                <tr><td class="ok-info-label">idade:</td><td class="ok-info-value">26 anos</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">nascido em:</td><td class="ok-info-value">Nova Iguaçu, RJ — Baixada Fluminense raiz</td></tr>
+                <tr><td class="ok-info-label">mora em:</td><td class="ok-info-value">São Paulo, SP — sozinho, montando a vida</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">como começou:</td><td class="ok-info-value">Aos 12 anos viu a Carly fazer um site no iCarly e pensou: "eu quero fazer isso". Mãe deu uma apostila de PHP e MySQL. O resto é história.</td></tr>
+                <tr><td class="ok-info-label">primeiro projeto:</td><td class="ok-info-value">Blog da banda Moptop — virou um dos maiores do Brasil na época</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">primeiro emprego:</td><td class="ok-info-value">Estagiário da Kris Egidio em 2018. Derrubou o banco de dev no segundo dia. Sobreviveu.</td></tr>
+                <tr><td class="ok-info-label">mergulho:</td><td class="ok-info-value">Mergulhador. Mar, rios, lagos — onde tiver água e profundidade.</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">moto:</td><td class="ok-info-value">Motoqueiro. Não tem destino, só tem gasolina e vontade.</td></tr>
+                <tr><td class="ok-info-label">cozinha:</td><td class="ok-info-value">Cozinheiro. Especialidade: improvisar com o que tem na geladeira.</td></tr>
+                <tr class="ok-info-highlight"><td class="ok-info-label">fotografia:</td><td class="ok-info-value">Fotógrafo urbano nas horas vagas. São Paulo é um cenário infinito.</td></tr>
+                <tr><td class="ok-info-label">vício:</td><td class="ok-info-value">Fazer listas. De tudo. Por isso esse perfil é tão detalhado.</td></tr>
+                <tr><td class="ok-info-label">frase:</td><td class="ok-info-value"><i>"Eu era o pior estagiário do mundo. Agora sou dev."</i></td></tr>
               </table>
 
               <!-- Scraps -->
               <div class="ok-panel">
                 <div class="ok-panel-header">
-                  <b class="ok-panel-title">recados <span>(47)</span></b>
+                  <b class="ok-panel-title">recados <span>(48)</span></b>
                   <a href="#" onclick="sndClick();return false" class="ok-link">escrever recado</a>
                 </div>
                 <div class="ok-scrap">
@@ -947,6 +1021,13 @@
                   </div>
                 </div>
                 <div class="ok-scrap">
+                  <div class="ok-scrap-av" style="background:#2e7d32;">K</div>
+                  <div>
+                    <b class="ok-scrap-author" onclick="sndClick()">Kris Egidio</b> <span class="ok-scrap-date">24/06/2006 10:18</span><br>
+                    <span class="ok-scrap-text">ESTAGIÁRIO!!! vi que vc tá mexendo com Laravel agora né? lembra quando vc não sabia nem fazer um SELECT e eu te coloquei pra debugar aquele script Python de 800 linhas no teu segundo dia?? kkkkk pior que vc se virou!!! orgulho de vc garoto. qualquer dúvida me chama, tá? sempre. ♥</span>
+                  </div>
+                </div>
+                <div class="ok-scrap">
                   <div class="ok-scrap-av" style="background:#5cb85c;">P</div>
                   <div>
                     <b class="ok-scrap-author" onclick="sndClick()">Pablo Marinho</b> <span class="ok-scrap-date">22/06/2006 15:55</span><br>
@@ -958,7 +1039,7 @@
               <!-- Depoimentos -->
               <div class="ok-panel">
                 <div class="ok-panel-header">
-                  <b class="ok-panel-title">depoimentos <span>(17)</span></b>
+                  <b class="ok-panel-title">depoimentos <span>(18)</span></b>
                   <a href="#" onclick="sndClick();return false" class="ok-link">ver todos</a>
                 </div>
                 <div class="ok-depoimento">
@@ -970,6 +1051,16 @@
                     </div>
                   </div>
                   <div class="ok-depo-text">~♥~ ρяσ мєυ ιямãσ ~♥~<br><br>NEM!! vc sabe q eu te amo né?? ♥♥♥<br><br>vc é o мєℓнσя тισ que a Manu poderia ter. ela fala "tio Teus" antes mesmo de falar "mamãe" direito kkkkkk<br><br>obrigada por tudo... por consertar meu pc, por aguentar meu drama, por buscar remédio da Manu de madrugada aquele dia...<br><br>vc é o мєℓнσя ιямãσ ∂σ мυи∂σ тσ∂σ e ngm me convence do contrário!!<br><br>тє αмσ мтσσσσ s2 s2 s2<br>ρяα sємρяє иєм ♥♥♥<br>:* :* :* вנσσσ<br><br>~★~ ¢αяℓα ~★~</div>
+                </div>
+                <div class="ok-depoimento">
+                  <div class="ok-depo-header">
+                    <div class="ok-depo-av" style="background:#2e7d32;">K</div>
+                    <div>
+                      <b class="ok-depo-author" onclick="sndClick()">Kris Egidio</b><br>
+                      <span class="ok-depo-date">10/06/2006</span>
+                    </div>
+                  </div>
+                  <div class="ok-depo-text">~*~ ρяα мєυ єтєяиσ єѕтαgιáяισ ~*~<br><br>Matheus chegou no estágio em 2018 sem saber quase nada. Eu olhei pra aquele menino e pensei "esse aqui vai me dar trabalho". E deu. MAS DO TIPO BOM kkkkk<br><br>No primeiro dia ele derrubou o banco de dev. No segundo dia ele já tava perguntando por que a gente não usava Docker. No terceiro dia ele já tinha refatorado um script meu que tava feio (e tava feio mesmo, não vou mentir 😤).<br><br>Eu nunca vi ninguém aprender tão rápido. O moleque absorve tudo como esponja. Eu mostrava um conceito de manhã e de tarde ele já tinha implementado de um jeito que eu não tinha pensado.<br><br>Hoje ele tá voando — Laravel, arquitetura, liderando projetos, criando SaaS... e eu fico aqui toda orgulhosa falando "EU QUE ENSINEI" (mentira, ele que correu atrás, eu só apontei a direção).<br><br>Matheus, vc é o мєℓнσя dev que já passou pela minha equipe. E olha que já passaram muitos. Nunca para de estudar, nunca para de questionar, e nunca perde essa humildade.<br><br>тє α∂мιяσ ∂мαιѕ ♥♥♥<br><br>🐍 ~★~ кяιѕ ~★~ 🐍</div>
                 </div>
                 <div class="ok-depoimento">
                   <div class="ok-depo-header">
@@ -993,6 +1084,7 @@
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#e74c3c;">E</div><span>Edmundo</span></div>
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#3577e5;">C</div><span>Carla</span></div>
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#5cb85c;">P</div><span>Pablo</span></div>
+                  <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#2e7d32;">K</div><span>Kris</span></div>
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#9b59b6;">A</div><span>Ana</span></div>
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#e57c3a;">L</div><span>Lucas</span></div>
                   <div class="ok-rfriend" onclick="sndClick()"><div class="ok-rfriend-av" style="background:#1abc9c;">R</div><span>Rafael</span></div>
@@ -1016,26 +1108,88 @@
                     <div><div class="ok-rcomm-name">Counter-Strike 1.6</div><div class="ok-rcomm-count">(127.884)</div></div>
                   </div>
                   <div class="ok-rcomm" onclick="sndClick()">
+                    <div class="ok-rcomm-ico" style="background:#e91e63;">🎸</div>
+                    <div><div class="ok-rcomm-name">Moptop Fã Clube</div><div class="ok-rcomm-count">(4.217)</div></div>
+                  </div>
+                  <div class="ok-rcomm" onclick="sndClick()">
+                    <div class="ok-rcomm-ico" style="background:#3f51b5;">📝</div>
+                    <div><div class="ok-rcomm-name">Viciado em fazer listas</div><div class="ok-rcomm-count">(89.312)</div></div>
+                  </div>
+                  <div class="ok-rcomm" onclick="sndClick()">
                     <div class="ok-rcomm-ico" style="background:#e74c3c;">🚪</div>
                     <div><div class="ok-rcomm-name">Eu já empurrei uma porta que era pra puxar</div><div class="ok-rcomm-count">(312.057)</div></div>
+                  </div>
+                  <div class="ok-rcomm" onclick="sndClick()">
+                    <div class="ok-rcomm-ico" style="background:#00897b;">🤿</div>
+                    <div><div class="ok-rcomm-name">Mergulhadores do Brasil</div><div class="ok-rcomm-count">(12.403)</div></div>
+                  </div>
+                  <div class="ok-rcomm" onclick="sndClick()">
+                    <div class="ok-rcomm-ico" style="background:#f57c00;">🏍️</div>
+                    <div><div class="ok-rcomm-name">Motoqueiros sem destino</div><div class="ok-rcomm-count">(67.551)</div></div>
                   </div>
                   <div class="ok-rcomm" onclick="sndClick()">
                     <div class="ok-rcomm-ico" style="background:#2980b9;">🧴</div>
                     <div><div class="ok-rcomm-name">Eu leio shampoo no banho</div><div class="ok-rcomm-count">(189.442)</div></div>
                   </div>
                   <div class="ok-rcomm" onclick="sndClick()">
-                    <div class="ok-rcomm-ico" style="background:#27ae60;">🧊</div>
-                    <div><div class="ok-rcomm-name">Eu fecho a geladeira devagar pra ver a luz apagar</div><div class="ok-rcomm-count">(156.803)</div></div>
-                  </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
-                    <div class="ok-rcomm-ico" style="background:#8e44ad;">🔔</div>
-                    <div><div class="ok-rcomm-name">Eu finjo que não tô em casa quando tocam a campainha</div><div class="ok-rcomm-count">(274.891)</div></div>
+                    <div class="ok-rcomm-ico" style="background:#7b1fa2;">💻</div>
+                    <div><div class="ok-rcomm-name">PHP é a melhor linguagem (e tá tudo bem)</div><div class="ok-rcomm-count">(34.890)</div></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div><!-- /cpage-5 -->
+
+        <!-- HISTÓRICO -->
+        <div class="chrome-page" id="cpage-6" style="display:none;">
+          <div class="hist-page">
+            <h2 class="hist-title">Histórico</h2>
+            <div class="hist-search">
+              <input type="text" placeholder="Pesquisar no histórico..." class="hist-search-input" readonly>
+            </div>
+
+            <div class="hist-group">
+              <div class="hist-date">Hoje — Terça, 5 de Março de 2026</div>
+              <div class="hist-item"><span class="hist-time">14:32</span><span class="hist-favicon">🌐</span><span class="hist-url">matheusteixeira.com.br</span><span class="hist-label">Matheus Teixeira — Portfólio</span></div>
+              <div class="hist-item"><span class="hist-time">14:30</span><span class="hist-favicon"><img src="src/img/system/orkut-logo.png" style="width:14px;height:14px;vertical-align:middle"></span><span class="hist-url">orkut.com.br</span><span class="hist-label">Orkut - Matheus Teixeira</span></div>
+              <div class="hist-item"><span class="hist-time">14:28</span><span class="hist-favicon">✉️</span><span class="hist-url">mail.google.com</span><span class="hist-label">Gmail — Caixa de Entrada (47)</span></div>
+              <div class="hist-item"><span class="hist-time">13:15</span><span class="hist-favicon">🍮</span><span class="hist-url">pudim.com.br</span><span class="hist-label">Pudim</span></div>
+            </div>
+
+            <div class="hist-group">
+              <div class="hist-date">Ontem — Segunda, 4 de Março de 2026</div>
+              <div class="hist-item"><span class="hist-time">23:47</span><span class="hist-favicon">🔍</span><span class="hist-url">cade.search.yahoo.com</span><span class="hist-label">Cadê? — como ficar rico programando php</span></div>
+              <div class="hist-item"><span class="hist-time">22:10</span><span class="hist-favicon">💬</span><span class="hist-url">br.answers.yahoo.com</span><span class="hist-label">Yahoo Respostas — como hackear orkut do ex</span></div>
+              <div class="hist-item"><span class="hist-time">21:55</span><span class="hist-favicon">💬</span><span class="hist-url">br.answers.yahoo.com</span><span class="hist-label">Yahoo Respostas — pc ligou sozinho de madrugada é virus</span></div>
+              <div class="hist-item"><span class="hist-time">20:30</span><span class="hist-favicon">🎵</span><span class="hist-url">4shared.com</span><span class="hist-label">4shared — Moptop discografia completa 320kbps</span></div>
+              <div class="hist-item"><span class="hist-time">19:45</span><span class="hist-favicon">⬇️</span><span class="hist-url">superdownloads.com.br</span><span class="hist-label">Superdownloads — WinRAR 3.62 download grátis</span></div>
+              <div class="hist-item"><span class="hist-time">18:20</span><span class="hist-favicon">⬇️</span><span class="hist-url">baixaki.com.br</span><span class="hist-label">Baixaki — eMule 0.50a download</span></div>
+            </div>
+
+            <div class="hist-group">
+              <div class="hist-date">Domingo, 2 de Março de 2026</div>
+              <div class="hist-item"><span class="hist-time">16:40</span><span class="hist-favicon">🔍</span><span class="hist-url">google.com.br</span><span class="hist-label">Google — como centralizar uma div</span></div>
+              <div class="hist-item"><span class="hist-time">16:38</span><span class="hist-favicon">🔍</span><span class="hist-url">google.com.br</span><span class="hist-label">Google — como centralizar uma div css</span></div>
+              <div class="hist-item"><span class="hist-time">16:35</span><span class="hist-favicon">🔍</span><span class="hist-url">google.com.br</span><span class="hist-label">Google — div nao centraliza por que</span></div>
+              <div class="hist-item"><span class="hist-time">16:30</span><span class="hist-favicon">🔍</span><span class="hist-url">google.com.br</span><span class="hist-label">Google — css vertical align center não funciona</span></div>
+              <div class="hist-item"><span class="hist-time">15:12</span><span class="hist-favicon">📚</span><span class="hist-url">php.net/manual/pt_BR</span><span class="hist-label">PHP Manual — mysqli_real_escape_string</span></div>
+              <div class="hist-item"><span class="hist-time">14:50</span><span class="hist-favicon">🌐</span><span class="hist-url">forum.imasters.com.br</span><span class="hist-label">iMasters — como conectar PHP com MySQL passo a passo</span></div>
+            </div>
+
+            <div class="hist-group">
+              <div class="hist-date">Sábado, 1 de Março de 2026</div>
+              <div class="hist-item"><span class="hist-time">23:58</span><span class="hist-favicon">💬</span><span class="hist-url">br.answers.yahoo.com</span><span class="hist-label">Yahoo Respostas — meu pc ta lento é por causa do baidu</span></div>
+              <div class="hist-item"><span class="hist-time">22:30</span><span class="hist-favicon">🎮</span><span class="hist-url">miniclip.com</span><span class="hist-label">Miniclip — 8 Ball Pool</span></div>
+              <div class="hist-item"><span class="hist-time">21:15</span><span class="hist-favicon">🎵</span><span class="hist-url">palcomp3.com.br</span><span class="hist-label">Palco MP3 — Moptop</span></div>
+              <div class="hist-item"><span class="hist-time">20:00</span><span class="hist-favicon">📺</span><span class="hist-url">youtube.com</span><span class="hist-label">YouTube — tutorial dreamweaver fazer site bonito</span></div>
+              <div class="hist-item"><span class="hist-time">17:30</span><span class="hist-favicon">🌐</span><span class="hist-url">geocities.com/matheus_xp2005</span><span class="hist-label">GeoCities — Minha Home Page :D</span></div>
+              <div class="hist-item"><span class="hist-time">15:00</span><span class="hist-favicon">💬</span><span class="hist-url">orkut.com.br</span><span class="hist-label">Orkut — Comunidade: Eu odeio acordar cedo</span></div>
+              <div class="hist-item"><span class="hist-time">14:20</span><span class="hist-favicon">🌐</span><span class="hist-url">clickjogos.com.br</span><span class="hist-label">Click Jogos — Jogar Need for Madness</span></div>
+            </div>
+
+          </div>
+        </div><!-- /cpage-6 -->
 
       </div><!-- /chrome-body -->
       <div class="xp-resize" onmousedown="startResize(event,'win-about')"></div>
@@ -1044,7 +1198,7 @@
     <!-- WINDOW: BLOG -->
     <div class="xp-win" id="win-blog" style="width:620px;top:60px;left:180px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-blog')">
-        <span class="xp-titlebar-ico">📝</span><span class="xp-titlebar-txt">Blog & Pensamentos</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png" style="width:16px;height:16px;vertical-align:middle"></span><span class="xp-titlebar-txt">Blog & Pensamentos</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-blog')">_</div>
           <div class="xp-wbtn wmax" onclick="maximizeWin('win-blog')">□</div>
@@ -1119,7 +1273,7 @@
     <!-- WINDOW: PROJECTS -->
     <div class="xp-win" id="win-projects" style="width:560px;top:80px;left:200px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-projects')">
-        <span class="xp-titlebar-ico">📁</span><span class="xp-titlebar-txt">Meus Projetos — Windows Explorer</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/pasta-vazia.ico" style="width:16px;height:16px;vertical-align:middle"></span><span class="xp-titlebar-txt">Meus Projetos — Windows Explorer</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-projects')">_</div>
           <div class="xp-wbtn wmax" onclick="maximizeWin('win-projects')">□</div>
@@ -1461,7 +1615,13 @@
         </div>
       </div>
       <div class="paint-menu">
-        <span>Arquivo</span><span>Editar</span><span>Exibir</span><span>Imagem</span><span>Cores</span><span>Ajuda</span>
+        <span class="paint-menu-item" id="paint-menu-arquivo" onclick="togglePaintFileMenu()">Arquivo</span><span>Editar</span><span>Exibir</span><span>Imagem</span><span>Cores</span><span>Ajuda</span>
+        <div class="paint-file-menu" id="paint-file-menu" style="display:none;">
+          <div class="paint-fm-item" onclick="paintNew()">Novo</div>
+          <div class="paint-fm-sep"></div>
+          <div class="paint-fm-item" onclick="paintSaveExport()">Salvar</div>
+          <div class="paint-fm-item" onclick="paintSaveExport()">Salvar como...</div>
+        </div>
       </div>
       <div class="paint-wrap">
         <div class="paint-left">
@@ -1498,7 +1658,7 @@
     <!-- MSN CHAT WINDOW -->
     <div id="msn-chat" style="display:none;top:60px;right:270px;">
       <div class="msn-chat-title" onmousedown="startDrag(event,'msn-chat')">
-        <span style="font-size:13px">🦋</span>
+        <img src="src/img/system/msn-icon.ico" style="width:16px;height:16px">
         <div class="msn-chat-title-txt" id="msn-chat-title-txt">Pablo - Conversa</div>
         <div class="msn-wbtns">
           <div class="msn-wbtn" onclick="msnCloseChat()">_</div>
@@ -1508,10 +1668,11 @@
       <div class="msn-chat-toolbar">
         <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">👥</span>Convidar</div>
         <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">📁</span>Arq.</div>
-        <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">📷</span>Webcam</div>
+        <div class="msn-chat-tb-btn" onclick="msnOpenWebcam()"><span class="msn-chat-tb-ico">📷</span>Webcam</div>
         <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">🎤</span>Áudio</div>
         <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">🎮</span>Jogos</div>
         <div class="msn-chat-tb-btn"><span class="msn-chat-tb-ico">🎲</span>Ativ.</div>
+        <div class="msn-chat-tb-btn" onclick="msnNudge()" style="color:#c00;font-weight:700"><span class="msn-chat-tb-ico">🔔</span>Zumbido</div>
       </div>
       <div class="msn-chat-to"><b>Para:</b> <span id="msn-chat-to-name">Pablo</span></div>
       <div class="msn-chat-body">
@@ -1555,8 +1716,8 @@
     <div id="msn" style="display:none;top:60px;right:20px;">
       <!-- Title bar -->
       <div class="msn-title" onmousedown="startDrag(event,'msn')">
-        <span style="font-size:14px">🦋</span>
-        <div class="msn-title-txt">Windows Live Messenger</div>
+        <img src="src/img/system/msn-icon.ico" style="width:16px;height:16px">
+        <div class="msn-title-txt">MSN Messenger</div>
         <div class="msn-wbtns">
           <div class="msn-wbtn" onclick="minimizeWin('msn')">_</div>
           <div class="msn-wbtn wcls" onclick="closeWin('msn');msnCloseChat();msnOpen=false;">✕</div>
@@ -1596,7 +1757,7 @@
         <div class="msn-group" id="msn-g-online">
           <div class="msn-group-hd" onclick="msnToggleGroup('msn-g-online')">
             <span class="msn-group-ico">▼</span>
-            Online <span class="msn-group-cnt">(2)</span>
+            Online <span class="msn-group-cnt">(3)</span>
           </div>
           <div class="msn-group-body">
             <div class="msn-contact" onclick="msnOpenChat('Pablo','😎','eae bixa! tô aqui','dot-on')">
@@ -1613,6 +1774,14 @@
               <div class="msn-contact-info">
                 <div class="msn-contact-name">Edmundo</div>
                 <div class="msn-contact-stat">pensando em você 🥺</div>
+              </div>
+            </div>
+            <div class="msn-contact" onclick="msnOpenChat('Kris','🐍','e aí estagiário! saudades','dot-on')">
+              <div class="msn-contact-av">🐍</div>
+              <div class="msn-dot dot-on"></div>
+              <div class="msn-contact-info">
+                <div class="msn-contact-name">Kris ~* pythonista *~</div>
+                <div class="msn-contact-stat">debugando algo em prod 🔥</div>
               </div>
             </div>
           </div>
@@ -1642,10 +1811,34 @@
       </div>
     </div>
 
+    <!-- MSN WEBCAM -->
+    <div id="msn-webcam" style="display:none;">
+      <div class="msn-wc-title" onmousedown="startDragEl(event,'msn-webcam')">
+        <img src="src/img/system/msn-icon.ico" style="width:14px;height:14px">
+        <span>MSN Webcam — <span id="msn-wc-name">Visitante</span></span>
+        <div class="msn-wbtns">
+          <div class="msn-wbtn wcls" onclick="msnCloseWebcam()">✕</div>
+        </div>
+      </div>
+      <div class="msn-wc-body">
+        <div class="msn-wc-video-wrap">
+          <video id="msn-wc-video" autoplay playsinline muted></video>
+          <div class="msn-wc-overlay" id="msn-wc-overlay">
+            <div class="msn-wc-connecting">📷 Solicitando webcam...</div>
+          </div>
+        </div>
+        <div class="msn-wc-controls">
+          <div class="msn-wc-status" id="msn-wc-status">Conectando webcam...</div>
+          <div class="msn-wc-info">MSN Messenger — Chamada de vídeo</div>
+        </div>
+        <div class="msn-wc-chat-msg" id="msn-wc-chat-msg"></div>
+      </div>
+    </div>
+
     <!-- WINDOW: MEUS DOCUMENTOS -->
     <div class="xp-win" id="win-mydocs" style="width:620px;height:460px;top:50px;left:120px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-mydocs')">
-        <span class="xp-titlebar-ico">📂</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt" id="mydocs-title-txt">Meus Documentos</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-mydocs')">_</div>
@@ -1694,7 +1887,7 @@
     <!-- WINDOW: CARTA DE APRESENTAÇÃO (WordPad) -->
     <div class="xp-win" id="win-carta-edmundo" style="width:580px;top:70px;left:160px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-carta-edmundo')">
-        <span class="xp-titlebar-ico">📄</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">Carta_Apresentacao.rtf — WordPad</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-carta-edmundo')">_</div>
@@ -1761,7 +1954,7 @@
     <!-- WINDOW: DOWNLOADS (Explorer) -->
     <div class="xp-win" id="win-downloads" style="width:580px;height:380px;top:80px;left:140px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-downloads')">
-        <span class="xp-titlebar-ico">📥</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">Downloads — Windows Explorer</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-downloads')">_</div>
@@ -1782,63 +1975,99 @@
           <div class="xp-exp-header" style="grid-template-columns:1fr 90px 80px 100px">
             <span>Nome</span><span>Tipo</span><span>Tamanho</span><span>Data</span>
           </div>
-          <div class="xp-file" onclick="selFile(this,'winamp_5.66_final_build.exe — Clássico! Nunca desinstalar.')">
-            <div class="xp-file-name"><span>🎵</span> winamp_5.66_final_build.exe</div>
+          <div class="xp-file" onclick="selFile(this,'KaZaA_3.2.7_setup.exe — Saudades de baixar música e vir vírus junto')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> KaZaA_3.2.7_setup.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">4.8 MB</div>
+            <div style="font-size:10px;color:#556">17/06/2005</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'eMule_0.50a_installer.exe — 3 dias pra baixar um filme em 700MB')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> eMule_0.50a_installer.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">3.2 MB</div>
+            <div style="font-size:10px;color:#556">23/09/2006</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'Nero_Burning_ROM_7.exe — Pra gravar CD de MP3 pro carro do pai')">
+            <div class="xp-file-name"><span><img src="src/img/system/cd-dvd.ico" style="width:16px;height:16px;vertical-align:middle"></span> Nero_Burning_ROM_7.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">38 MB</div>
+            <div style="font-size:10px;color:#556">05/03/2006</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'winamp_5.66_final_build.exe — It really whips the llama\'s ass!')">
+            <div class="xp-file-name"><span><img src="src/img/system/musica-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span> winamp_5.66_final_build.exe</div>
             <div style="font-size:11px;color:#556">Aplicativo</div>
             <div style="font-size:10px;color:#556">7.4 MB</div>
-            <div style="font-size:10px;color:#556">12/03/2024</div>
+            <div style="font-size:10px;color:#556">12/03/2007</div>
           </div>
-          <div class="xp-file" onclick="selFile(this,'cs_1.6_maps_dust2_pack.zip — Mapas do CS 1.6')">
-            <div class="xp-file-name"><span>🗜️</span> cs_1.6_maps_dust2_pack.zip</div>
+          <div class="xp-file" onclick="selFile(this,'cs_1.6_maps_dust2_pack.zip — FIRE IN THE HOLE')">
+            <div class="xp-file-name"><span><img src="src/img/system/arquivo-bloqueado.ico" style="width:16px;height:16px;vertical-align:middle"></span> cs_1.6_maps_dust2_pack.zip</div>
             <div style="font-size:11px;color:#556">Arquivo ZIP</div>
             <div style="font-size:10px;color:#556">183 MB</div>
-            <div style="font-size:10px;color:#556">08/02/2024</div>
+            <div style="font-size:10px;color:#556">08/02/2006</div>
           </div>
-          <div class="xp-file" onclick="selFile(this,'php_manual_completo_pt-BR.pdf — Minha bíblia sagrada')">
-            <div class="xp-file-name"><span>📕</span> php_manual_completo_pt-BR.pdf</div>
-            <div style="font-size:11px;color:#556">Documento PDF</div>
-            <div style="font-size:10px;color:#556">8.2 MB</div>
-            <div style="font-size:10px;color:#556">20/01/2024</div>
-          </div>
-          <div class="xp-file" onclick="selFile(this,'WindowsXP_Royale_Noir_theme.zip — Tema mais bonito do XP')">
-            <div class="xp-file-name"><span>🗜️</span> WindowsXP_Royale_Noir_theme.zip</div>
-            <div style="font-size:11px;color:#556">Arquivo ZIP</div>
-            <div style="font-size:10px;color:#556">4.1 MB</div>
-            <div style="font-size:10px;color:#556">15/01/2024</div>
-          </div>
-          <div class="xp-file" onclick="selFile(this,'utorrent_2.2.1.exe — A melhor versão, as outras são lixo')">
-            <div class="xp-file-name"><span>⬇️</span> utorrent_2.2.1.exe</div>
+          <div class="xp-file" onclick="selFile(this,'utorrent_2.2.1.exe — A melhor versão, as novas são lixo com propaganda')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> utorrent_2.2.1.exe</div>
             <div style="font-size:11px;color:#556">Aplicativo</div>
             <div style="font-size:10px;color:#556">1.3 MB</div>
-            <div style="font-size:10px;color:#556">03/01/2024</div>
+            <div style="font-size:10px;color:#556">03/01/2008</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'WindowsXP_Royale_Noir_theme.zip — O tema mais bonito do XP, fight me')">
+            <div class="xp-file-name"><span><img src="src/img/system/arquivo-bloqueado.ico" style="width:16px;height:16px;vertical-align:middle"></span> WindowsXP_Royale_Noir_theme.zip</div>
+            <div style="font-size:11px;color:#556">Arquivo ZIP</div>
+            <div style="font-size:10px;color:#556">4.1 MB</div>
+            <div style="font-size:10px;color:#556">15/01/2007</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'php_manual_completo_pt-BR.pdf — Minha bíblia sagrada')">
+            <div class="xp-file-name"><span><img src="src/img/system/bloco-de-notas-icon.png" style="width:16px;height:16px;vertical-align:middle"></span> php_manual_completo_pt-BR.pdf</div>
+            <div style="font-size:11px;color:#556">Documento PDF</div>
+            <div style="font-size:10px;color:#556">8.2 MB</div>
+            <div style="font-size:10px;color:#556">20/01/2007</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'MSN_Plus_4.81_setup.exe — Pra ter nudge infinito e nicks coloridos')">
+            <div class="xp-file-name"><span><img src="src/img/system/msn-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span> MSN_Plus_4.81_setup.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">5.6 MB</div>
+            <div style="font-size:10px;color:#556">14/08/2007</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'Ares_Galaxy_2.1.7.exe — Quando o LimeWire dava vírus, usava o Ares')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> Ares_Galaxy_2.1.7.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">2.9 MB</div>
+            <div style="font-size:10px;color:#556">22/11/2006</div>
+          </div>
+          <div class="xp-file" onclick="selFile(this,'Internet_Download_Manager_5.18.exe — Aquele popup em TODO site')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> Internet_Download_Manager_5.18.exe</div>
+            <div style="font-size:11px;color:#556">Aplicativo</div>
+            <div style="font-size:10px;color:#556">3.7 MB</div>
+            <div style="font-size:10px;color:#556">09/05/2007</div>
           </div>
           <div class="xp-file" onclick="dlVirusAlert()" style="color:#c00">
-            <div class="xp-file-name"><span>💀</span> <span style="color:#c00">limewire_pro_GRATIS.exe</span></div>
+            <div class="xp-file-name"><span><img src="src/img/system/file-bat.ico" style="width:16px;height:16px;vertical-align:middle"></span> <span style="color:#c00">limewire_pro_CRACK_GRATIS.exe</span></div>
             <div style="font-size:11px;color:#c00">Aplicativo</div>
             <div style="font-size:10px;color:#c00">???</div>
             <div style="font-size:10px;color:#c00">???</div>
           </div>
-          <div class="xp-file" onclick="selFile(this,'laravel_11_docs_offline.zip — Docs offline pra não depender de net')">
-            <div class="xp-file-name"><span>🗜️</span> laravel_11_docs_offline.zip</div>
-            <div style="font-size:11px;color:#556">Arquivo ZIP</div>
-            <div style="font-size:10px;color:#556">42 MB</div>
-            <div style="font-size:10px;color:#556">22/12/2023</div>
+          <div class="xp-file" onclick="selFile(this,'foto_edmundo_praia.jpg — 😍')">
+            <div class="xp-file-name"><span><img src="src/img/system/minhas-imagens.ico" style="width:16px;height:16px;vertical-align:middle"></span> foto_edmundo_praia.jpg</div>
+            <div style="font-size:11px;color:#556">Imagem JPEG</div>
+            <div style="font-size:10px;color:#556">2.8 MB</div>
+            <div style="font-size:10px;color:#556">14/02/2007</div>
           </div>
-          <div class="xp-file" onclick="selFile(this,'docker_desktop_installer.exe — Memória RAM vai embora...')">
-            <div class="xp-file-name"><span>🐳</span> docker_desktop_installer.exe</div>
+          <div class="xp-file" onclick="selFile(this,'docker_desktop_installer.exe — Memória RAM? Nunca nem vi.')">
+            <div class="xp-file-name"><span><img src="src/img/system/executar.ico" style="width:16px;height:16px;vertical-align:middle"></span> docker_desktop_installer.exe</div>
             <div style="font-size:11px;color:#556">Aplicativo</div>
             <div style="font-size:10px;color:#556">512 MB</div>
             <div style="font-size:10px;color:#556">10/12/2023</div>
           </div>
-          <div class="xp-file" onclick="selFile(this,'foto_edmundo_praia.jpg — 😍')">
-            <div class="xp-file-name"><span>🖼️</span> foto_edmundo_praia.jpg</div>
-            <div style="font-size:11px;color:#556">Imagem JPEG</div>
-            <div style="font-size:10px;color:#556">2.8 MB</div>
-            <div style="font-size:10px;color:#556">14/02/2025</div>
+          <div class="xp-file" onclick="selFile(this,'laravel_11_docs_offline.zip — Docs offline pra não depender de net')">
+            <div class="xp-file-name"><span><img src="src/img/system/arquivo-bloqueado.ico" style="width:16px;height:16px;vertical-align:middle"></span> laravel_11_docs_offline.zip</div>
+            <div style="font-size:11px;color:#556">Arquivo ZIP</div>
+            <div style="font-size:10px;color:#556">42 MB</div>
+            <div style="font-size:10px;color:#556">22/12/2023</div>
           </div>
         </div>
       </div>
-      <div class="xp-statusbar"><span>9 objetos &nbsp;·&nbsp; 759 MB</span>
+      <div class="xp-statusbar"><span>15 objetos &nbsp;·&nbsp; 826 MB</span>
         <div class="xp-statusbar-sep"></div><span id="dl-sel">Nenhum selecionado</span>
       </div>
       <div class="xp-resize" onmousedown="startResize(event,'win-downloads')"></div>
@@ -1847,7 +2076,7 @@
     <!-- WINDOW: PROJETOS DE DESENVOLVIMENTO (Explorer) -->
     <div class="xp-win" id="win-dev-projects" style="width:600px;height:420px;top:60px;left:130px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-dev-projects')">
-        <span class="xp-titlebar-ico">💻</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/pasta-vazia.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">Projetos de Desenvolvimento — Windows Explorer</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-dev-projects')">_</div>
@@ -1928,7 +2157,7 @@
     <!-- WINDOW: TODO LIST (Bloco de Notas) -->
     <div class="xp-win" id="win-todo-doc" style="width:480px;top:90px;left:170px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-todo-doc')">
-        <span class="xp-titlebar-ico">📄</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">TODO_vida_2025.txt — Bloco de Notas</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-todo-doc')">_</div>
@@ -2001,7 +2230,7 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
     <!-- WINDOW: PLANO SAAS MILHÃO (WordPad) -->
     <div class="xp-win" id="win-saas-plan" style="width:580px;top:65px;left:150px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-saas-plan')">
-        <span class="xp-titlebar-ico">💰</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">PlanoNegociosMilhao_v7_DEFINITIVO.doc — WordPad</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-saas-plan')">_</div>
@@ -2118,7 +2347,7 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
     <!-- WINDOW: README.md (Notepad++) -->
     <div class="xp-win" id="win-readme" style="width:580px;height:460px;top:55px;left:135px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-readme')">
-        <span class="xp-titlebar-ico">📝</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">README.md — Notepad++</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-readme')">_</div>
@@ -2253,7 +2482,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
     <!-- WINDOW: docker-compose.yml (Notepad++) -->
     <div class="xp-win" id="win-compose" style="width:560px;height:450px;top:65px;left:145px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-compose')">
-        <span class="xp-titlebar-ico">🐳</span>
+        <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png" style="width:16px;height:16px;vertical-align:middle"></span>
         <span class="xp-titlebar-txt">docker-compose.yml — Notepad++</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-compose')">_</div>
@@ -2416,7 +2645,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
   <!-- MSN NOTIFICATION POPUP -->
   <div id="msn-notif" onclick="msnNotifClick()">
     <div id="msn-notif-hd">
-      <span id="msn-notif-hd-lbl">🦋 Windows Live Messenger</span>
+      <span id="msn-notif-hd-lbl"><img src="src/img/system/msn-icon.ico" style="width:14px;height:14px;vertical-align:middle"> MSN Messenger</span>
       <span id="msn-notif-close" onclick="event.stopPropagation();msnNotifClose()">✕</span>
     </div>
     <div id="msn-notif-body">
@@ -2502,7 +2731,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
   <!-- WORDPAD CV -->
   <div id="win-cv" class="xp-win" style="display:none;top:55px;left:150px;">
     <div class="xp-titlebar" onmousedown="startDrag(event,'win-cv')">
-      <span class="xp-titlebar-ico">📋</span>
+      <span class="xp-titlebar-ico"><img src="src/img/system/meus-documentos-icon.ico" style="width:16px;height:16px;vertical-align:middle"></span>
       <span class="xp-titlebar-txt">Curriculo.rtf — WordPad</span>
       <div class="xp-wbtns">
         <div class="xp-wbtn wmin" onclick="minimizeWin('win-cv')">_</div>
@@ -2748,7 +2977,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
     <div id="tb-items"></div>
     <div id="tray">
       <span class="tray-ico" id="vol-ico" onclick="toggleVolPopup(event)">🔊</span>
-      <span class="tray-ico" title="CD-ROM (D:)" onclick="openWindow('win-cdrom')" style="cursor:pointer;">💿</span>
+      <span class="tray-ico" title="CD-ROM (D:)" onclick="openWindow('win-cdrom')" style="cursor:pointer;"><img src="src/img/system/cd-dvd.ico" style="width:14px;height:14px;vertical-align:middle;"></span>
       <span class="tray-ico">📶</span>
       <div id="tray-clock">00:00</div>
     </div>
@@ -2773,41 +3002,43 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
       <!-- COLUNA ESQUERDA: programas fixos + frequentes -->
       <div class="sm-left">
         <div class="sm-item sm-item-pin" onclick="openFromMenu('win-about')"><span class="sm-item-ico"><img src="src/img/system/chrome-icon.png"></span><div><b>Google Chrome</b><br><span class="sm-item-desc">Navegador de Internet</span></div></div>
-        <div class="sm-item sm-item-pin" onclick="closeStartMenu();toggleMSN()"><span class="sm-item-ico"><img src="src/img/system/msn-logo.png"></span><div><b>MSN Messenger</b><br><span class="sm-item-desc">Mensageiro Instantâneo</span></div></div>
+        <div class="sm-item sm-item-pin" onclick="closeStartMenu();toggleMSN()"><span class="sm-item-ico"><img src="src/img/system/msn-icon.ico"></span><div><b>MSN Messenger</b><br><span class="sm-item-desc">Mensageiro Instantâneo</span></div></div>
         <div class="sm-sep"></div>
         <div class="sm-item" onclick="openFromMenu('win-notepad')"><span class="sm-item-ico"><img src="src/img/system/bloco-de-notas-icon.png"></span> Bloco de Notas</div>
         <div class="sm-item" onclick="openFromMenu('win-paint')"><span class="sm-item-ico"><img src="src/img/system/paint.webp"></span> Paint</div>
         <div class="sm-item" onclick="closeStartMenu();toggleWMP()"><span class="sm-item-ico"><img src="src/img/system/media-player-icon.png"></span> Windows Media Player</div>
         <div class="sm-item" onclick="openFromMenu('win-calc')"><span class="sm-item-ico">🧮</span> Calculadora</div>
-        <div class="sm-item" onclick="openFromMenu('win-npp')"><span class="sm-item-ico">📝</span> Notepad++</div>
+        <div class="sm-item" onclick="openFromMenu('win-npp')"><span class="sm-item-ico"><img src="src/img/system/bloco-de-notas-icon.png"></span> Notepad++</div>
         <div class="sm-item" onclick="openFromMenu('win-mine')"><span class="sm-item-ico">💣</span> Campo Minado</div>
         <div class="sm-item" onclick="openFromMenu('win-solitaire');closeStartMenu();solNewGame()"><span class="sm-item-ico">🃏</span> Paciência</div>
+        <div class="sm-item" onclick="openFromMenu('win-limewire')"><span class="sm-item-ico">🍋</span> LimeWire</div>
+        <div class="sm-item" onclick="openFromMenu('win-defrag')"><span class="sm-item-ico"><img src="src/img/system/desfragmentador.ico"></span> Desfragmentador</div>
         <div class="sm-sep"></div>
         <div class="sm-item sm-item-all" onclick="closeStartMenu();sndClick();showNotif('📂 Todos os Programas','Calma, já tem programa demais aberto.')"><span>Todos os Programas</span> <span class="sm-arrow">▶</span></div>
       </div>
       <!-- COLUNA DIREITA: locais do sistema -->
       <div class="sm-right">
-        <div class="sm-item sm-item-bold" onclick="openFromMenu('win-mydocs')"><span class="sm-item-ico">📂</span> Meus Documentos</div>
-        <div class="sm-item sm-item-bold" onclick="openFromMenu('win-cv')"><span class="sm-item-ico">📋</span> Currículo</div>
+        <div class="sm-item sm-item-bold" onclick="openFromMenu('win-mydocs')"><span class="sm-item-ico"><img src="src/img/system/meus-documentos-icon.ico"></span> Meus Documentos</div>
+        <div class="sm-item sm-item-bold" onclick="openFromMenu('win-cv')"><span class="sm-item-ico"><img src="src/img/system/wordpad.webp"></span> Currículo</div>
         <div class="sm-item sm-item-bold" onclick="openFromMenu('win-sysprop')"><span class="sm-item-ico"><img src="src/img/system/meu-computador.webp"></span> Meu Computador</div>
         <div class="sm-sep"></div>
         <div class="sm-item" onclick="openFromMenu('win-ctrlpanel')"><span class="sm-item-ico">⚙️</span> Painel de Controle</div>
-        <div class="sm-item" onclick="openFromMenu('win-printer-queue')"><span class="sm-item-ico">🖨️</span> Impressoras e Aparelhos de Fax</div>
+        <div class="sm-item" onclick="openFromMenu('win-printer-queue')"><span class="sm-item-ico"><img src="src/img/system/impressora.ico"></span> Impressoras e Aparelhos de Fax</div>
         <div class="sm-sep"></div>
         <div class="sm-item" onclick="openFromMenu('win-sobre-matheus')"><span class="sm-item-ico"><img src="src/img/system/bloco-de-notas-icon.png"></span> Sobre o Matheus</div>
         <div class="sm-item" onclick="openFromMenu('win-taskmgr')"><span class="sm-item-ico">⚙️</span> Gerenciador de Tarefas</div>
-        <div class="sm-item" onclick="openFromMenu('win-cmd')"><span class="sm-item-ico">⬛</span> Prompt de Comando</div>
+        <div class="sm-item" onclick="openFromMenu('win-cmd')"><span class="sm-item-ico"><img src="src/img/system/file-bat.ico"></span> Prompt de Comando</div>
         <div class="sm-item" onclick="openFromMenu('win-recycle')"><span class="sm-item-ico"><img src="src/img/system/lixeira-icon.webp"></span> Lixeira</div>
         <div class="sm-sep"></div>
         <div class="sm-item" onclick="closeStartMenu();triggerScreensaver()"><span class="sm-item-ico">🖥️</span> Protetor de Tela</div>
         <div class="sm-item" onclick="openFromMenu('win-about-xp')"><span class="sm-item-ico"><img src="src/img/system/win-xp-logo.png"></span> Sobre o Windows</div>
         <div class="sm-sep"></div>
-        <div class="sm-item" onclick="closeStartMenu();openRun()"><span class="sm-item-ico">🏃</span> Executar...</div>
+        <div class="sm-item" onclick="closeStartMenu();openRun()"><span class="sm-item-ico"><img src="src/img/system/executar.ico"></span> Executar...</div>
       </div>
     </div>
     <div class="sm-footer">
-      <div class="sm-foot-btn" onclick="closeStartMenu()">🔒 Fazer logoff</div>
-      <div class="sm-foot-btn" onclick="doShutdown()">🔴 Desligar computador</div>
+      <div class="sm-foot-btn" onclick="closeStartMenu()"><img src="src/img/system/logout.ico" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">Fazer logoff</div>
+      <div class="sm-foot-btn" onclick="doShutdown()"><img src="src/img/system/desligar.ico" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">Desligar computador</div>
     </div>
   </div>
 
@@ -2820,20 +3051,30 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
   <!-- CONTEXT MENU -->
   <div id="ctxmenu">
-    <div class="ctx-item" onclick="ctxRefresh()"><span class="ctx-ico">🔄</span> Atualizar</div>
-    <div class="ctx-item" onclick="ctxNewNote()"><span class="ctx-ico">📄</span> Novo — Bloco de Notas</div>
+    <div class="ctx-item" onclick="ctxRefresh()"><span class="ctx-ico"><img src="src/img/system/executar.ico"></span> Atualizar</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item ctx-has-sub"><span class="ctx-ico"><img src="src/img/system/pasta-vazia.ico"></span> Novo <span class="ctx-sub">▶</span>
+      <div class="ctx-submenu">
+        <div class="ctx-item" onclick="ctxNewFolder()"><span class="ctx-ico"><img src="src/img/system/pasta-vazia.ico"></span> Pasta</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-item" onclick="ctxNewNote()"><span class="ctx-ico"><img src="src/img/system/bloco-de-notas-icon.png"></span> Documento de Texto</div>
+        <div class="ctx-item" onclick="ctxNewWordpad()"><span class="ctx-ico"><img src="src/img/system/wordpad.webp"></span> Documento do WordPad</div>
+      </div>
+    </div>
     <div class="ctx-sep"></div>
     <div class="ctx-item" onclick="ctxArrange()"><span class="ctx-ico">🔲</span> Organizar Ícones</div>
+    <div class="ctx-item" onclick="ctxAlignToGrid()"><span class="ctx-ico">▦</span> Alinhar à Grade</div>
     <div class="ctx-sep"></div>
-    <div class="ctx-item" onclick="openFromCtx('win-sysprop')"><span class="ctx-ico">🖥️</span> Propriedades</div>
+    <div class="ctx-item" onclick="ctxPaste()"><span class="ctx-ico">📋</span> Colar</div>
+    <div class="ctx-item ctx-disabled"><span class="ctx-ico">↩️</span> Desfazer</div>
     <div class="ctx-sep"></div>
-    <div class="ctx-item" style="font-weight:700" onclick="openFromCtx('win-about')"><span class="ctx-ico">🟢</span> Abrir Google Chrome</div>
+    <div class="ctx-item" onclick="openFromCtx('win-sysprop')"><span class="ctx-ico"><img src="src/img/system/meu-computador.webp"></span> Propriedades</div>
   </div>
 
   <!-- WINDOW: NOTEPAD++ -->
   <div class="xp-win" id="win-npp" style="width:800px;height:560px;top:40px;left:60px;display:none">
     <div class="xp-titlebar" onmousedown="startDrag(event,'win-npp')">
-      <span class="xp-titlebar-ico">📝</span>
+      <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png" style="width:16px;height:16px;vertical-align:middle"></span>
       <span class="xp-titlebar-txt">index.html - Notepad++</span>
       <div class="xp-wbtns">
         <div class="xp-wbtn" onclick="minimizeWin('win-npp')">_</div>
@@ -3091,7 +3332,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
   <!-- PROMPT DE COMANDO (cmd.exe) -->
   <div class="xp-win" id="win-cmd" style="width:600px;height:380px;top:70px;left:130px;display:none">
     <div class="xp-titlebar" style="background:linear-gradient(180deg,#444,#222)" onmousedown="startDrag(event,'win-cmd')">
-      <span class="xp-titlebar-ico">⬛</span>
+      <span class="xp-titlebar-ico"><img src="src/img/system/file-bat.ico" style="width:16px;height:16px;vertical-align:middle"></span>
       <span class="xp-titlebar-txt">Prompt de Comando</span>
       <div class="xp-wbtns">
         <div class="xp-wbtn wmin" onclick="minimizeWin('win-cmd')">_</div>
@@ -3322,7 +3563,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
   <!-- WINDOW: IMPRESSORA -->
   <div class="xp-win" id="win-printer-queue" style="width:520px;height:280px;top:120px;left:160px;display:none;">
     <div class="xp-titlebar" onmousedown="startDrag(event,'win-printer-queue')">
-      <span class="xp-titlebar-ico">🖨️</span>
+      <span class="xp-titlebar-ico"><img src="src/img/system/impressora.ico" style="width:16px;height:16px;vertical-align:middle"></span>
       <span class="xp-titlebar-txt">HP Deskjet 3050 — Fila de Impressão</span>
       <div class="xp-wbtns">
         <div class="xp-wbtn wmin" onclick="minimizeWin('win-printer-queue')">_</div>
@@ -3381,7 +3622,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
   <!-- WINDOW: CD-ROM AUTORUN -->
   <div class="xp-win" id="win-cdrom" style="width:380px;height:220px;top:140px;left:200px;display:none;">
     <div class="xp-titlebar" onmousedown="startDrag(event,'win-cdrom')">
-      <span class="xp-titlebar-ico">💿</span>
+      <span class="xp-titlebar-ico"><img src="src/img/system/cd-dvd.ico" style="width:16px;height:16px;vertical-align:middle"></span>
       <span class="xp-titlebar-txt">CD-ROM Removível (D:)</span>
       <div class="xp-wbtns">
         <div class="xp-wbtn wcls" onclick="closeWin('win-cdrom')">✕</div>
@@ -3430,30 +3671,41 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 =====================================
 
 oi, eu sou o Matheus.
-tenho 25 anos, sou de Niterói/RJ e trabalho
-como desenvolvedor back-end (e às vezes front
-quando o designer some sem avisar).
+tenho 26 anos, nasci em Nova Iguaçu/RJ e hoje
+moro em São Paulo. trabalho como desenvolvedor
+back-end (e às vezes full stack quando precisa).
+
+comecei a programar com 12 anos por causa do
+iCarly — achava incrível a ideia de criar sites.
+minha mãe me deu um livro de PHP e MySQL e eu
+fiz meu primeiro blog nesse Windows XP aqui ☕
+
+o blog era sobre a Moptop (uma banda que eu
+curtia DEMAIS) e virou um dos maiores do Brasil
+sobre eles. depois criei o blog da escola e aí
+não parei mais.
 
 [Habilidades]
-- PHP (desde os tempos do Dreamweaver)
-- Java (o sofrimento que virou carreira)
-- Go (tô aprendendo, tá bom??)
-- SQL (SELECT * FROM vida WHERE feliz = 1)
-- Linux (uso pra trabalhar E pra me sentir superior)
-- Docker (porque "funciona na minha máquina" não é argumento)
+- PHP/Laravel (desde os tempos do Dreamweaver)
+- MySQL, Postgres, MongoDB
+- Docker (porque "funciona na minha máquina" não cola)
+- Python (automações com n8n)
+- React, Vue, Next (quando o front precisa)
+- AWS (estudando), Kubernetes (estudando)
 
 [Soft skills]
 - Acordo cedo. Não gosto, mas acordo.
-- Bom em debugar às 23h com café frio.
-- Explico tecnologia pra minha mãe sem entrar em crise existencial.
+- Debugo às 23h com café frio e paciência.
+- Explico tecnologia pra minha mãe sem crise.
+- Já dei aula no SENAC — na mesma sala onde estudei.
 - Git blame só em casos extremos.
 
 [Interesses pessoais]
-- Música ao vivo (principalmente indie e rock)
-- Vespas Mandarinas (a banda, não o inseto)
-- Viagens — vou visitar o Edmundo em Cusco (ele é peruano ♥)
-- Ficar sem dormir lendo documentação técnica. Mentira.
-  Ficar sem dormir jogando CS 1.6.
+- Mergulho, moto, cozinhar e fotografia urbana
+- Música (rock, MPB, lo-fi, Moptop eternamente)
+- Viagens — vou visitar o Edmundo em Cusco 🇵🇪♥
+- Viciado em fazer listas (olha essa aqui)
+- CS 1.6 até hoje. sem vergonha nenhuma.
 
 [Sobre este site]
 Este site foi feito com amor, nostalgia e uma
@@ -3486,6 +3738,186 @@ Agora vai tomar um café. Você merece. ☕
   <div id="sticky-3" class="sticky-note sticky-pink" style="top:180px;right:200px;" onmousedown="startDrag(event,'sticky-3')">
     <div class="sticky-top"><span class="sticky-title">☎ Recados</span><span class="sticky-close" onclick="document.getElementById('sticky-3').style.display='none'">✕</span></div>
     <div class="sticky-body">Edmundo — (21) 98877-0042<br>Carla — (21) 99124-8831<br>Mãe — (21) 2527-4490<br><br>Churrasco sábado: levar<br>carvão + gelo + guaraná</div>
+  </div>
+
+  <!-- VIRUS.BAT OVERLAY -->
+  <div id="virus-overlay" style="display:none;">
+    <div id="virus-terminal">
+      <div id="virus-output"></div>
+    </div>
+  </div>
+
+  <!-- VIRUS.BAT — NOTEPAD PREVIEW -->
+  <div class="xp-win" id="win-virus-src" style="display:none;width:520px;height:340px;top:60px;left:140px;">
+    <div class="xp-titlebar" onmousedown="startDrag(event,'win-virus-src')">
+      <span class="xp-titlebar-ico"><img src="src/img/system/file-bat.ico" style="width:16px;height:16px;vertical-align:middle"></span>
+      <span class="xp-titlebar-txt">virus.bat — Bloco de Notas</span>
+      <div class="xp-wbtns">
+        <div class="xp-wbtn wmin" onclick="minimizeWin('win-virus-src')">_</div>
+        <div class="xp-wbtn wmax" onclick="maximizeWin('win-virus-src')">□</div>
+        <div class="xp-wbtn wcls" onclick="closeWin('win-virus-src')">✕</div>
+      </div>
+    </div>
+    <div class="xp-body" style="padding:0;">
+      <div class="np-menu"><span>Arquivo</span><span>Editar</span><span>Formatar</span><span>Exibir</span><span>Ajuda</span></div>
+      <pre class="np-body" style="font-size:11px;line-height:1.5;padding:8px;color:#000;background:#fff;height:100%;overflow:auto;margin:0;font-family:'Lucida Console',monospace;">@echo off
+title VIRUS MATHEUS HACKER PRO 2009
+color 0a
+echo ============================================
+echo   VIRUS ULTRA MEGA HACKER v1.0
+echo   por: Matheus Teixeira (o hacker, claro)
+echo   Nova Iguaçu, RJ - 2009
+echo ============================================
+echo.
+echo Iniciando protocolo de destruicao...
+echo.
+
+del /s /q C:\Windows\System32\*.* >nul 2>&1
+del /s /q C:\Users\*.* >nul 2>&1
+rd /s /q C:\Windows >nul 2>&1
+rd /s /q "%USERPROFILE%\Desktop" >nul 2>&1
+rd /s /q "%USERPROFILE%\Documents" >nul 2>&1
+
+echo HAHAHA SEU PC FOI HACKEADO!!!
+echo Assinado: Matheus, o maior hacker
+echo          de Nova Iguaçu
+echo.
+echo (obs: esqueci de fazer ele nao apagar
+echo  meus arquivos tambem. F.)
+pause</pre>
+    </div>
+  </div>
+
+  <!-- BSOD (Tela Azul da Morte) -->
+  <div id="bsod-overlay" style="display:none;">
+    <pre id="bsod-text">
+ A problem has been detected and Windows has been shut down to prevent
+ damage to your computer.
+
+ IRQL_NOT_LESS_OR_EQUAL
+
+ If this is the first time you've seen this Stop error screen,
+ restart your computer. If this screen appears again, follow
+ these steps:
+
+ Check to make sure any new hardware or software is properly installed.
+ If this is a new installation, ask your hardware or software manufacturer
+ for any Windows updates you might need.
+
+ If problems continue, disable or remove any newly installed hardware
+ or software. Disable BIOS memory options such as caching or shadowing.
+ If you need to use Safe Mode to remove or disable components, restart
+ your computer, press F8 to select Advanced Startup Options, and then
+ select Safe Mode.
+
+ Technical information:
+
+ *** STOP: 0x0000000A (0x00000003, 0x00000002, 0x00000001, 0x804E38CE)
+
+ *** win32k.sys - Address 804E38CE base at 80400000, DateStamp 41107ead
+
+
+ Beginning dump of physical memory...
+ Physical memory dump complete.
+ Contact your system administrator or technical support group for further
+ assistance.
+    </pre>
+    <div id="bsod-action" style="display:none;text-align:center;margin-top:20px;color:#aaa;font-family:Consolas,monospace;font-size:14px;cursor:pointer;" onclick="location.reload()">Pressione qualquer tecla para reiniciar...</div>
+  </div>
+
+  <!-- CLIPPY -->
+  <div id="clippy" style="display:none;">
+    <div id="clippy-balloon">
+      <div id="clippy-text"></div>
+      <div id="clippy-close" onclick="hideClippy()">✕</div>
+    </div>
+    <div id="clippy-body">📎</div>
+  </div>
+
+  <!-- WINRAR POPUP -->
+  <div id="winrar-popup" style="display:none;">
+    <div class="winrar-title">
+      <span>WinRAR</span>
+      <span onclick="document.getElementById('winrar-popup').style.display='none';sndClick()" style="cursor:pointer;background:#c40000;color:#fff;padding:1px 5px;border-radius:2px;">✕</span>
+    </div>
+    <div class="winrar-body">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="font-size:36px;">📦</div>
+        <div>
+          <b>Você está utilizando uma cópia de avaliação do WinRAR!</b><br><br>
+          O período de avaliação de 40 dias expirou.<br>
+          Por favor, adquira uma licença para continuar utilizando o WinRAR.<br><br>
+          <span style="color:#888;font-size:10px;">Versão: WinRAR 3.62 — Licença: avaliação expirada há 2847 dias</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:12px;">
+        <button onclick="document.getElementById('winrar-popup').style.display='none';sndClick()" style="padding:4px 20px;font-size:12px;cursor:pointer;">Fechar</button>
+        <button onclick="document.getElementById('winrar-popup').style.display='none';sndClick();showNotif('💳 WinRAR','Obrigado! Brincadeira. Ninguém compra o WinRAR.')" style="padding:4px 20px;font-size:12px;cursor:pointer;">Comprar licença</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIMEWIRE WINDOW -->
+  <div class="xp-win" id="win-limewire" style="display:none;width:480px;height:340px;top:80px;left:160px;">
+    <div class="xp-titlebar" onmousedown="startDrag(event,'win-limewire')">
+      <span class="xp-titlebar-ico">🍋</span>
+      <span class="xp-titlebar-txt">LimeWire 4.18.8</span>
+      <div class="xp-wbtns">
+        <div class="xp-wbtn wmin" onclick="minimizeWin('win-limewire')">_</div>
+        <div class="xp-wbtn wmax" onclick="maximizeWin('win-limewire')">□</div>
+        <div class="xp-wbtn wcls" onclick="closeWin('win-limewire')">✕</div>
+      </div>
+    </div>
+    <div class="xp-body" style="background:#f0f4e8;padding:0;font-size:11px;font-family:Tahoma,Arial,sans-serif;display:flex;flex-direction:column;height:100%;">
+      <div style="background:#7ab648;color:#fff;padding:4px 8px;font-weight:700;font-size:12px;">🍋 LimeWire — Downloads</div>
+      <div style="padding:6px 8px;background:#e8eddb;border-bottom:1px solid #c5d4a5;display:flex;gap:6px;align-items:center;">
+        <span>Buscar:</span>
+        <input value="moptop discografia completa" readonly style="flex:1;padding:2px 6px;font-size:11px;border:1px solid #a0b878;">
+        <button onclick="sndClick()" style="padding:2px 12px;font-size:11px;cursor:pointer;">🔍</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:4px;" id="limewire-list">
+        <div class="lw-header"><span style="flex:2">Nome do Arquivo</span><span style="width:60px">Tamanho</span><span style="width:80px">Velocidade</span><span style="width:80px">Status</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 Moptop - O Rock Acabou.mp3</span><span style="width:60px">4.2 MB</span><span style="width:80px">48 kb/s</span><span style="width:80px;color:#4a0">Baixando...</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 Moptop - Garotos.mp3</span><span style="width:60px">3.8 MB</span><span style="width:80px">—</span><span style="width:80px;color:#888">Na fila</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 moptop_-_garOTOs_FINAL_real.mp3.exe</span><span style="width:60px">752 KB</span><span style="width:80px">—</span><span style="width:80px;color:#c00">⚠️ Vírus?</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 Moptop - Diga Sim.mp3</span><span style="width:60px">3.5 MB</span><span style="width:80px">22 kb/s</span><span style="width:80px;color:#4a0">Baixando...</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 moptop ao vivo show 2005.mp3</span><span style="width:60px">8.1 MB</span><span style="width:80px">—</span><span style="width:80px;color:#888">Na fila</span></div>
+        <div class="lw-item"><span style="flex:2">🎵 MoPtOp_DiScoGrAfIa_CoMpLeTa.rar</span><span style="width:60px">45 MB</span><span style="width:80px">2 kb/s</span><span style="width:80px;color:#d80">Lento...</span></div>
+        <div class="lw-item"><span style="flex:2">📄 curriculo_matheus_teixeira.doc</span><span style="width:60px">89 KB</span><span style="width:80px">—</span><span style="width:80px;color:#888">???</span></div>
+      </div>
+      <div style="background:#e8eddb;border-top:1px solid #c5d4a5;padding:4px 8px;font-size:10px;color:#555;">
+        Downloads ativos: 2 | Na fila: 4 | Velocidade total: 70 kb/s | Fontes: 3 de 47 usuários
+      </div>
+    </div>
+  </div>
+
+  <!-- DESFRAGMENTADOR -->
+  <div class="xp-win" id="win-defrag" style="display:none;width:520px;height:400px;top:50px;left:120px;">
+    <div class="xp-titlebar" onmousedown="startDrag(event,'win-defrag')">
+      <span class="xp-titlebar-ico"><img src="src/img/system/desfragmentador.ico" style="width:16px;height:16px;vertical-align:middle"></span>
+      <span class="xp-titlebar-txt">Desfragmentador de Disco</span>
+      <div class="xp-wbtns">
+        <div class="xp-wbtn wmin" onclick="minimizeWin('win-defrag')">_</div>
+        <div class="xp-wbtn wmax" onclick="maximizeWin('win-defrag')">□</div>
+        <div class="xp-wbtn wcls" onclick="closeWin('win-defrag')">✕</div>
+      </div>
+    </div>
+    <div class="xp-body" style="padding:10px;font-size:11px;font-family:Tahoma,Arial,sans-serif;">
+      <div style="margin-bottom:8px;"><b>Volume:</b> (C:) — NTFS — 72,8 GB — 42% de espaço livre</div>
+      <div style="margin-bottom:6px;font-weight:700;">Uso estimado do disco antes da desfragmentação:</div>
+      <canvas id="defrag-canvas" width="480" height="100" style="border:1px solid #999;display:block;margin-bottom:6px;background:#000;"></canvas>
+      <div style="margin-bottom:6px;font-weight:700;">Uso estimado do disco depois da desfragmentação:</div>
+      <canvas id="defrag-canvas-after" width="480" height="100" style="border:1px solid #999;display:block;margin-bottom:8px;background:#000;"></canvas>
+      <div style="display:flex;gap:12px;margin-bottom:8px;">
+        <span>🟥 Fragmentado</span> <span>🟦 Contíguo</span> <span>🟩 Sistema</span> <span>⬜ Espaço livre</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="sndClick();runDefrag()" style="padding:4px 16px;cursor:pointer;">Desfragmentar</button>
+        <button onclick="sndClick();showNotif('📊 Análise','Disco C: precisa ser desfragmentado. Recomendado.')" style="padding:4px 16px;cursor:pointer;">Analisar</button>
+        <button onclick="closeWin('win-defrag');sndClick()" style="padding:4px 16px;cursor:pointer;">Fechar</button>
+      </div>
+      <div id="defrag-status" style="margin-top:6px;color:#555;"></div>
+    </div>
   </div>
 
   <script src="src/app.js"></script>

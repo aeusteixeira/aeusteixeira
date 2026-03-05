@@ -4162,6 +4162,18 @@ a,
     background: #0a246a;
     color: #fff;
 }
+.paint-menu { position: relative; }
+.paint-file-menu {
+    position: absolute; top: 100%; left: 0; z-index: 50;
+    background: #fff; border: 1px solid #999; box-shadow: 2px 2px 4px rgba(0,0,0,.25);
+    min-width: 160px; padding: 2px 0;
+    font-size: 11px; font-family: Tahoma, Arial, sans-serif;
+}
+.paint-fm-item {
+    padding: 3px 20px; cursor: pointer; color: #000;
+}
+.paint-fm-item:hover { background: #0a246a; color: #fff; }
+.paint-fm-sep { height: 1px; background: #ccc; margin: 2px 4px; }
 
 .paint-wrap {
     display: flex;
@@ -4928,6 +4940,17 @@ a,
     flex: 1 !important;
     min-height: 0 !important;
 }
+.chrome-bookmarks {
+    background: #f1f3f4; border-bottom: 1px solid #dadce0;
+    padding: 2px 8px; display: flex; gap: 4px; flex-wrap: wrap;
+    font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px;
+}
+.chrome-bm {
+    padding: 2px 8px; border-radius: 10px; cursor: pointer;
+    color: #5f6368; white-space: nowrap;
+    transition: background .15s;
+}
+.chrome-bm:hover { background: #dee1e6; }
 .chrome-page {
     display: none;
     position: absolute;
@@ -5890,3 +5913,676 @@ a,
 .ok-rcomm-ico { width: 42px; height: 42px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; border: 1px solid #c0cde2; }
 .ok-rcomm-name { color: #315699; font-size: 10px; font-weight: 700; text-decoration: underline; line-height: 1.3; }
 .ok-rcomm-count { color: #888; font-size: 9px; }
+
+/* ═══════════════════════════════════════════════════════════
+   VIRUS.BAT — Terminal de destruição
+   ═══════════════════════════════════════════════════════════ */
+#virus-overlay {
+  position: fixed; inset: 0; z-index: 99998;
+  background: #000; color: #0f0;
+  font-family: 'Lucida Console', 'Courier New', monospace;
+  font-size: 14px; line-height: 1.6;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 30px;
+  cursor: default; user-select: none;
+  overflow-y: auto;
+}
+#virus-terminal {
+  width: 100%; max-width: 700px;
+  white-space: pre-wrap; word-break: break-all;
+}
+#virus-output .v-red { color: #f00; }
+#virus-output .v-yellow { color: #ff0; }
+#virus-output .v-white { color: #fff; }
+#virus-output .v-cyan { color: #0ff; }
+@keyframes virusBlink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+#virus-output .v-blink { animation: virusBlink 0.6s infinite; }
+
+/* ═══════════════════════════════════════════════════════════
+   BSOD — Tela Azul da Morte
+   ═══════════════════════════════════════════════════════════ */
+#bsod-overlay {
+  position: fixed; inset: 0; z-index: 999999;
+  background: #000080; color: #fff;
+  font-family: 'Lucida Console', 'Courier New', monospace;
+  font-size: 14px; line-height: 1.5;
+  padding: 40px 60px;
+  white-space: pre-wrap;
+  cursor: default; user-select: none;
+}
+#bsod-text { color: #c0c0c0; }
+#bsod-action { color: #aaa; font-family: 'Lucida Console', monospace; font-size: 14px; text-align: center; margin-top: 20px; cursor: pointer; }
+#bsod-action:hover { color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════
+   CLIPPY — Assistente do Office
+   ═══════════════════════════════════════════════════════════ */
+#clippy {
+  position: fixed; bottom: 50px; right: 20px; z-index: 10000;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  animation: clippyBounce 0.4s ease-out;
+}
+#clippy-body {
+  font-size: 64px; cursor: pointer;
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,.3));
+  transition: transform .2s;
+}
+#clippy-body:hover { transform: scale(1.1) rotate(-5deg); }
+#clippy-balloon {
+  position: relative;
+  background: #fefcd0; border: 2px solid #000; border-radius: 12px;
+  padding: 10px 28px 10px 12px; max-width: 240px;
+  font-family: 'Tahoma', Arial, sans-serif; font-size: 12px;
+  line-height: 1.4; color: #222;
+  box-shadow: 2px 2px 6px rgba(0,0,0,.2);
+}
+#clippy-balloon::after {
+  content: ''; position: absolute; bottom: -10px; right: 24px;
+  border-width: 10px 8px 0 8px;
+  border-style: solid; border-color: #fefcd0 transparent transparent transparent;
+}
+#clippy-balloon::before {
+  content: ''; position: absolute; bottom: -13px; right: 22px;
+  border-width: 12px 10px 0 10px;
+  border-style: solid; border-color: #000 transparent transparent transparent;
+}
+#clippy-close {
+  position: absolute; top: 2px; right: 6px;
+  cursor: pointer; font-size: 14px; color: #888;
+  font-weight: 700; line-height: 1;
+}
+#clippy-close:hover { color: #c00; }
+#clippy-text { white-space: pre-wrap; }
+
+@keyframes clippyBounce {
+  0% { transform: translateY(40px); opacity: 0; }
+  60% { transform: translateY(-6px); opacity: 1; }
+  100% { transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WINRAR POPUP
+   ═══════════════════════════════════════════════════════════ */
+#winrar-popup {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001; width: 420px;
+  border: 2px solid #0054e3; border-radius: 8px 8px 4px 4px;
+  background: #ece9d8;
+  box-shadow: 4px 4px 16px rgba(0,0,0,.4);
+  font-family: Tahoma, Arial, sans-serif; font-size: 12px;
+}
+.winrar-title {
+  background: linear-gradient(180deg, #0a78ee 0%, #0054d2 50%, #0042b0 100%);
+  color: #fff; font-weight: 700; padding: 4px 6px 4px 8px; font-size: 12px;
+  border-radius: 6px 6px 0 0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.winrar-body { padding: 14px 16px; }
+
+/* ═══════════════════════════════════════════════════════════
+   LIMEWIRE — Downloads
+   ═══════════════════════════════════════════════════════════ */
+.lw-header, .lw-item {
+  display: flex; align-items: center; padding: 3px 6px;
+  font-size: 11px; font-family: Tahoma, Arial, sans-serif;
+  border-bottom: 1px solid #c5d4a5;
+}
+.lw-header {
+  background: #d2deb9; font-weight: 700; color: #445;
+  position: sticky; top: 0;
+}
+.lw-item:hover { background: #dce8c4; }
+.lw-item span, .lw-header span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════════════════
+   DESFRAGMENTADOR — Canvas já é estilizado inline
+   Adicionando apenas #defrag-status
+   ═══════════════════════════════════════════════════════════ */
+#defrag-status { font-family: Tahoma, Arial, sans-serif; font-size: 11px; }
+
+/* ═══════════════════════════════════════════════════════════
+   MSN NUDGE — Zumbido / Screen Shake
+   ═══════════════════════════════════════════════════════════ */
+@keyframes msnNudge {
+  0%,100% { transform: translate(0,0); }
+  10% { transform: translate(-6px, 4px); }
+  20% { transform: translate(5px, -3px); }
+  30% { transform: translate(-4px, 5px); }
+  40% { transform: translate(6px, -4px); }
+  50% { transform: translate(-5px, 3px); }
+  60% { transform: translate(4px, -5px); }
+  70% { transform: translate(-3px, 4px); }
+  80% { transform: translate(5px, -3px); }
+  90% { transform: translate(-4px, 2px); }
+}
+.msn-nudge { animation: msnNudge 0.5s ease-in-out; }
+.screen-shake { animation: msnNudge 0.5s ease-in-out; }
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP ICON DRAG & DROP
+   ═══════════════════════════════════════════════════════════ */
+.desktop-icons {
+    position: relative !important;
+}
+.desktop-icons .d-icon {
+    transition: none;
+}
+.desktop-icons .d-icon[style*="position: absolute"],
+.desktop-icons .d-icon[style*="position:absolute"] {
+    margin: 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTEXT MENU — XP STYLE COMPLETO
+   ═══════════════════════════════════════════════════════════ */
+#ctxmenu {
+    min-width: 180px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+    padding: 3px 0;
+}
+.ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ctx-ico {
+    display: inline-flex;
+    width: 18px;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+}
+.ctx-ico img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+.ctx-sub {
+    margin-left: auto;
+    font-size: 10px;
+    color: #888;
+}
+.ctx-item:hover .ctx-sub {
+    color: #fff;
+}
+.ctx-disabled {
+    color: #999 !important;
+    pointer-events: none;
+}
+.ctx-submenu {
+    position: absolute;
+    left: 100%;
+    top: -3px;
+    background: #f5f4ea;
+    border: 1px solid #7a96bb;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    padding: 3px 0;
+    min-width: 150px;
+    display: none;
+    border-radius: 0 4px 4px 4px;
+}
+.ctx-has-sub {
+    position: relative;
+}
+.ctx-has-sub:hover .ctx-submenu {
+    display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHROME — MENU ⋮ (3 pontinhos)
+   ═══════════════════════════════════════════════════════════ */
+.chrome-menu-wrap {
+    position: relative;
+}
+.chrome-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 240px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    padding: 4px 0;
+    z-index: 500;
+    font-family: Tahoma, sans-serif;
+}
+.chrome-menu-item {
+    padding: 7px 16px;
+    font-size: 12px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.1s;
+}
+.chrome-menu-item:hover {
+    background: #e8f0fe;
+}
+.chrome-menu-key {
+    font-size: 10px;
+    color: #999;
+    margin-left: 12px;
+}
+.chrome-menu-sep {
+    height: 1px;
+    background: #e8e8e8;
+    margin: 4px 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHROME — ABA HISTÓRICO
+   ═══════════════════════════════════════════════════════════ */
+.hist-page {
+    padding: 20px 28px;
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: Tahoma, sans-serif;
+}
+.hist-title {
+    font-size: 22px;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 12px;
+}
+.hist-search {
+    margin-bottom: 18px;
+}
+.hist-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: Tahoma, sans-serif;
+    background: #f8f8f8;
+    color: #444;
+    outline: none;
+}
+.hist-search-input:focus {
+    border-color: #4a8af4;
+    background: #fff;
+}
+.hist-group {
+    margin-bottom: 16px;
+}
+.hist-date {
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a73e8;
+    padding: 6px 0;
+    border-bottom: 1px solid #e8e8e8;
+    margin-bottom: 4px;
+}
+.hist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: background 0.1s;
+    font-size: 12px;
+}
+.hist-item:hover {
+    background: #e8f0fe;
+}
+.hist-time {
+    width: 38px;
+    flex-shrink: 0;
+    color: #888;
+    font-size: 11px;
+}
+.hist-favicon {
+    width: 18px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 13px;
+}
+.hist-url {
+    color: #1a73e8;
+    font-size: 11px;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+.hist-label {
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DISCADOR DIAL-UP — Estilo iG / Click21
+   ═══════════════════════════════════════════════════════════ */
+#dialup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    background: linear-gradient(135deg, #0b1a3a 0%, #0d2b5e 40%, #0a1830 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#dialup-dialer {
+    position: relative;
+    filter: drop-shadow(0 8px 40px rgba(0,0,0,0.6));
+    animation: dialupAppear 0.5s ease-out;
+}
+.dialup-shape {
+    position: relative;
+    width: 360px;
+    padding: 28px 32px 20px;
+    background: linear-gradient(180deg,
+        #d8dce8 0%, #c0c8d8 8%, #b8c4d8 15%, #a8b8d0 30%,
+        #90a4c0 50%, #7890b0 70%, #6880a8 85%, #5870a0 100%);
+    border-radius: 50% / 12%;
+    border: 3px solid #4a6a9a;
+    box-shadow:
+        inset 0 2px 6px rgba(255,255,255,0.4),
+        inset 0 -2px 6px rgba(0,0,0,0.2),
+        0 4px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+.dialup-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50% / 12%;
+    border: 4px solid transparent;
+    border-image: linear-gradient(180deg, #6a9ad4 0%, #3a6aaa 50%, #2a5090 100%) 1;
+    pointer-events: none;
+    z-index: -1;
+}
+.dialup-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.dialup-logo-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+.dialup-brand {
+    font-size: 22px;
+    color: #1a3060;
+    letter-spacing: -0.5px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.dialup-brand strong {
+    color: #0050b0;
+    font-size: 24px;
+}
+.dialup-brand-sub {
+    display: block;
+    font-size: 9px;
+    color: #4a6080;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: -2px;
+}
+.dialup-fields {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.dialup-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.dialup-field label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #1a2a50;
+    width: 60px;
+    text-align: right;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
+.dialup-field input {
+    flex: 1;
+    height: 22px;
+    border: 2px inset #8a9ab0;
+    background: #f0f2f6;
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+    padding: 0 5px;
+    color: #222;
+    border-radius: 2px;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.15);
+}
+.dialup-field-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 2px;
+}
+.dialup-check {
+    font-size: 9px;
+    color: #1a2a50;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+.dialup-check input {
+    margin: 0;
+    width: 12px;
+    height: 12px;
+}
+.dialup-btn {
+    width: 180px;
+    height: 34px;
+    margin-top: 4px;
+    border: 2px outset #7a9ac0;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #5a8acc 0%, #3a6ab0 40%, #2a5a9a 100%);
+    color: #fff;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 2px 6px rgba(0,0,0,0.3);
+    transition: all 0.15s;
+}
+.dialup-btn:hover {
+    background: linear-gradient(180deg, #6a9adc 0%, #4a7ac0 40%, #3a6aaa 100%);
+}
+.dialup-btn:active {
+    border-style: inset;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.dialup-btn:disabled {
+    background: linear-gradient(180deg, #8a9aaa 0%, #6a7a88 100%);
+    color: #c0c8d0;
+    border-color: #6a7a88;
+}
+.dialup-status {
+    font-size: 11px;
+    color: #0a1a40;
+    text-align: center;
+    min-height: 16px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    font-weight: bold;
+}
+.dialup-status.connected { color: #006a00; }
+.dialup-progress {
+    width: 85%;
+    height: 14px;
+    border: 2px inset #8a9ab0;
+    border-radius: 2px;
+    background: #e0e4ec;
+    overflow: hidden;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.15);
+}
+.dialup-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0060d0 0px, #40a0ff 6px, #0060d0 12px);
+    background-size: 12px 100%;
+    animation: dialupBarAnim 0.5s linear infinite;
+    transition: width 0.5s ease-out;
+    border-radius: 1px;
+}
+@keyframes dialupBarAnim {
+    from { background-position: 0 0; }
+    to { background-position: 12px 0; }
+}
+.dialup-footer {
+    font-size: 8px;
+    color: #3a4a6a;
+    text-align: center;
+    margin-top: 2px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+}
+.dialup-footer strong { color: #1a2a50; }
+@keyframes dialupAppear {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MSN WEBCAM — Janela de vídeo
+   ═══════════════════════════════════════════════════════════ */
+#msn-webcam {
+    position: absolute;
+    top: 80px;
+    right: 60px;
+    width: 320px;
+    z-index: 800;
+    background: #e8e4d8;
+    border: 2px solid #0054e3;
+    border-radius: 8px 8px 4px 4px;
+    box-shadow: 2px 4px 16px rgba(0,0,0,0.35);
+    overflow: hidden;
+    font-family: Tahoma, sans-serif;
+}
+.msn-wc-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    background: linear-gradient(180deg, #0a78ee 0%, #0054cc 50%, #0042b0 100%);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+}
+.msn-wc-title span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.msn-wc-body {
+    display: flex;
+    flex-direction: column;
+}
+.msn-wc-video-wrap {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #000;
+    overflow: hidden;
+}
+#msn-wc-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+.msn-wc-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.7);
+    transition: opacity 0.5s;
+}
+.msn-wc-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.msn-wc-connecting {
+    color: #aaa;
+    font-size: 13px;
+    text-align: center;
+    animation: msnWcPulse 1.5s ease-in-out infinite;
+}
+@keyframes msnWcPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+.msn-wc-controls {
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, #e8e4d8 0%, #d4cfc0 100%);
+    border-top: 1px solid #c0b8a8;
+}
+.msn-wc-status {
+    font-size: 10px;
+    color: #006a00;
+    font-weight: bold;
+}
+.msn-wc-info {
+    font-size: 9px;
+    color: #888;
+}
+.msn-wc-chat-msg {
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #333;
+    background: #f4f0e8;
+    border-top: 1px solid #d0c8b8;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+}
+.msn-wc-chat-msg .them-c {
+    color: #0000cc;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+/* Efeito VHS/webcam antiga */
+@keyframes msnWcScanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+.msn-wc-video-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+}
+.msn-wc-video-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+    animation: msnWcScanline 4s linear infinite;
+}

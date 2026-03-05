@@ -69,6 +69,10 @@ function enterDesktop() {
     setTimeout(() => { paintInit(); }, 100);
     setTimeout(() => { showTrayBalloon(); setInterval(showTrayBalloon, 40000); }, 20000);
     startAutoConversations();
+    /* Clippy aparece depois de um tempo */
+    setTimeout(showClippy, 15000 + Math.random() * 10000);
+    /* WinRAR popup clássico */
+    setTimeout(showWinRAR, 25000 + Math.random() * 15000);
 }
 
 /* ══════════════════════════════════════
@@ -86,34 +90,48 @@ function updateClock() {
 ══════════════════════════════════════ */
 let zTop = 10;
 const recyclebin = [];
+function _ico(file) { return '<img src="src/img/system/' + file + '" style="width:16px;height:16px;vertical-align:middle">'; }
 const winMeta = {
-    'win-about': { ico: '🟢', lbl: 'Google Chrome' },
-    'win-sysprop': { ico: '🖥️', lbl: 'Meu Computador' },
-    'win-notepad': { ico: '📄', lbl: 'Bloco de Notas' },
-    'win-cv': { ico: '📋', lbl: 'Curriculo.rtf — WordPad' },
-    'win-recycle': { ico: '🗑️', lbl: 'Lixeira' },
-    'msn': { ico: '🦋', lbl: 'Windows Live Messenger' },
-    'msn-chat': { ico: '💬', lbl: 'MSN — Conversa' },
-    'wmp': { ico: '🎵', lbl: 'Windows Media Player' },
-    'win-blog': { ico: '📝', lbl: 'Blog' },
-    'win-projects': { ico: '📁', lbl: 'Projetos' },
+    'win-about': { ico: _ico('chrome-icon.png'), lbl: 'Google Chrome' },
+    'win-sysprop': { ico: _ico('meu-computador.webp'), lbl: 'Meu Computador' },
+    'win-notepad': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'Bloco de Notas' },
+    'win-cv': { ico: _ico('wordpad.webp'), lbl: 'Curriculo.rtf — WordPad' },
+    'win-recycle': { ico: _ico('lixeira-icon.webp'), lbl: 'Lixeira' },
+    'msn': { ico: _ico('msn-icon.ico'), lbl: 'MSN Messenger' },
+    'msn-chat': { ico: _ico('msn-icon.ico'), lbl: 'MSN — Conversa' },
+    'wmp': { ico: _ico('media-player-icon.png'), lbl: 'Windows Media Player' },
+    'win-blog': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'Blog' },
+    'win-projects': { ico: _ico('pasta-vazia.ico'), lbl: 'Projetos' },
     'win-stack': { ico: '⚙️', lbl: 'Painel de Controle' },
     'win-contact': { ico: '✉️', lbl: 'Contato' },
     'win-calc': { ico: '🧮', lbl: 'Calculadora' },
-    'win-paint': { ico: '🎨', lbl: 'Paint' },
+    'win-paint': { ico: _ico('paint.webp'), lbl: 'Paint' },
     'win-mine': { ico: '💣', lbl: 'Campo Minado' },
-    'win-npp': { ico: '📝', lbl: 'Notepad++' },
-    'win-mydocs': { ico: '📂', lbl: 'Meus Documentos' },
-    'win-carta-edmundo': { ico: '📄', lbl: 'Carta_Apresentacao.rtf — WordPad' },
-    'win-downloads': { ico: '📥', lbl: 'Downloads' },
-    'win-dev-projects': { ico: '💻', lbl: 'Projetos de Desenvolvimento' },
-    'win-todo-doc': { ico: '📄', lbl: 'TODO_vida_2025.txt' },
-    'win-saas-plan': { ico: '💰', lbl: 'PlanoNegociosMilhao — WordPad' },
-    'win-readme': { ico: '📝', lbl: 'README.md — Notepad++' },
-    'win-compose': { ico: '🐳', lbl: 'docker-compose.yml — Notepad++' },
-    'win-doc': { ico: '📝', lbl: 'WordPad' },
+    'win-npp': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'Notepad++' },
+    'win-mydocs': { ico: _ico('meus-documentos-icon.ico'), lbl: 'Meus Documentos' },
+    'win-carta-edmundo': { ico: _ico('wordpad.webp'), lbl: 'Carta_Apresentacao.rtf — WordPad' },
+    'win-downloads': { ico: _ico('meus-documentos-icon.ico'), lbl: 'Downloads' },
+    'win-dev-projects': { ico: _ico('pasta-vazia.ico'), lbl: 'Projetos de Desenvolvimento' },
+    'win-todo-doc': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'TODO_vida_2025.txt' },
+    'win-saas-plan': { ico: _ico('wordpad.webp'), lbl: 'PlanoNegociosMilhao — WordPad' },
+    'win-readme': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'README.md — Notepad++' },
+    'win-compose': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'docker-compose.yml — Notepad++' },
+    'win-doc': { ico: _ico('wordpad.webp'), lbl: 'WordPad' },
     'win-taskmgr': { ico: '⚙️', lbl: 'Gerenciador de Tarefas' },
-    'win-cmd': { ico: '⬛', lbl: 'Prompt de Comando' },
+    'win-cmd': { ico: _ico('file-bat.ico'), lbl: 'Prompt de Comando' },
+    'win-solitaire': { ico: '🃏', lbl: 'Paciência' },
+    'win-about-xp': { ico: _ico('win-xp-logo.png'), lbl: 'Sobre o Windows' },
+    'win-ctrlpanel': { ico: '⚙️', lbl: 'Painel de Controle' },
+    'win-printer-queue': { ico: _ico('impressora.ico'), lbl: 'Impressoras' },
+    'win-cdrom': { ico: _ico('cd-dvd.ico'), lbl: 'CD-ROM (D:)' },
+    'win-sobre-matheus': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'sobre_o_matheus.txt' },
+    'win-virus-src': { ico: _ico('file-bat.ico'), lbl: 'virus.bat' },
+    'win-cp-addremove': { ico: '📦', lbl: 'Adicionar/Remover Programas' },
+    'win-cp-datetime': { ico: '📅', lbl: 'Data e Hora' },
+    'win-cp-usuarios': { ico: '👤', lbl: 'Contas de Usuário' },
+    'win-receita': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'receitas_bacalhau_mae.txt' },
+    'win-limewire': { ico: '🍋', lbl: 'LimeWire 4.18.8' },
+    'win-defrag': { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' },
 };
 
 const gtaPageUrls = {
@@ -173,6 +191,7 @@ const chromeTabUrls = [
     'pudim.com.br',
     'www.clubedohardware.com.br/forums/topic/1098432-como-desinstalar-o-baidu-pc-faster-completamente',
     'www.orkut.com.br/Main#Profile?uid=5841029374',
+    'chrome://history',
 ];
 const chromeTitles = [
     'Matheus Teixeira — Google Chrome',
@@ -181,7 +200,60 @@ const chromeTitles = [
     'Pudim — Google Chrome',
     'Como desinstalar o Baidu PC Faster completamente - Clube do Hardware',
     'Orkut - Matheus Teixeira — Google Chrome',
+    'Histórico — Google Chrome',
 ];
+/* ══════════════════════════════════════
+    CHROME MENU (⋮)
+══════════════════════════════════════ */
+function toggleChromeMenu() {
+    sndClick();
+    const m = document.getElementById('chrome-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+    const m = document.getElementById('chrome-menu');
+    if (m && m.style.display === 'block' && !e.target.closest('.chrome-menu-wrap')) {
+        m.style.display = 'none';
+    }
+});
+function chromeMenuAction(action) {
+    document.getElementById('chrome-menu').style.display = 'none';
+    sndClick();
+    switch (action) {
+        case 'history':
+            document.getElementById('ctab-6').style.display = '';
+            chromeTab(6);
+            break;
+        case 'downloads':
+            openWindow('win-downloads');
+            break;
+        case 'bookmarks':
+            showNotif('⭐ Favoritos', 'Barra de favoritos já está visível!');
+            break;
+        case 'newtab':
+            showNotif('🌐 Nova aba', 'Calma, já tem aba demais aberta.');
+            break;
+        case 'newwin':
+            showNotif('🌐 Nova janela', 'Uma janela já é suficiente pra esse PC.');
+            break;
+        case 'zoom':
+            showNotif('🔍 Zoom', 'Zoom: 100%. Seus óculos estão aí do lado.');
+            break;
+        case 'print':
+            showNotif('🖨️ Imprimir', 'A impressora tá sem tinta. Como sempre.');
+            break;
+        case 'config':
+            showNotif('⚙️ Configurações', 'Não mexa nas configurações! Já tá funcionando.');
+            break;
+        case 'help':
+            showNotif('❓ Ajuda', 'Google: "como usar o Google Chrome". Recursão infinita.');
+            break;
+        case 'exit':
+            closeWin('win-about');
+            break;
+    }
+}
+
 function gm_toggleSpam() {
     const sl = document.getElementById('gm-spam-list');
     if (sl) sl.style.display = sl.style.display === 'none' ? 'block' : 'none';
@@ -268,6 +340,7 @@ function addTbItem(id) {
     el.addEventListener('click', () => {
     const w = document.getElementById(id);
     if (w.classList.contains('minimized')) {
+        w.style.display = 'flex';
         w.classList.remove('minimized');
         w.classList.add('win-opening');
         setTimeout(() => w.classList.remove('win-opening'), 220);
@@ -281,7 +354,6 @@ function addTbItem(id) {
 function removeTbItem(id) { const el = document.getElementById('tbi-' + id); if (el) el.remove(); }
 function updateTbItem(id, active) { const el = document.getElementById('tbi-' + id); if (!el) return; active ? el.classList.add('tb-active') : el.classList.remove('tb-active'); }
 function openFromMenu(id) { closeStartMenu(); openWindow(id); }
-function openFromCtx(id) { hideCtxMenu(); openWindow(id); }
 
 /* click anywhere in a window to bring it to front */
 document.addEventListener('mousedown', e => {
@@ -336,7 +408,69 @@ document.addEventListener('mousemove', e => {
     if (resize.dir.includes('n')) { const nh = Math.max(minH, resize.oh - dy); w.style.height = nh + 'px'; w.style.top = Math.max(0, resize.ot + resize.oh - nh) + 'px'; }
     }
 });
-document.addEventListener('mouseup', () => { drag = null; resize = null; });
+document.addEventListener('mouseup', () => { drag = null; resize = null; iconDrag = null; });
+
+/* ══════════════════════════════════════
+    DESKTOP ICON DRAG & DROP
+══════════════════════════════════════ */
+let iconDrag = null;
+function initDesktopIconDrag() {
+    const icons = document.querySelectorAll('.desktop-icons .d-icon');
+    icons.forEach(ico => {
+        ico.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            const r = ico.getBoundingClientRect();
+            iconDrag = {
+                el: ico,
+                ox: e.clientX - r.left,
+                oy: e.clientY - r.top,
+                startX: e.clientX,
+                startY: e.clientY,
+                moved: false
+            };
+        });
+    });
+}
+document.addEventListener('mousemove', e => {
+    if (!iconDrag) return;
+    const dx = e.clientX - iconDrag.startX;
+    const dy = e.clientY - iconDrag.startY;
+    if (!iconDrag.moved && Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+    if (!iconDrag.moved) {
+        iconDrag.moved = true;
+        iconDrag.el.style.position = 'absolute';
+        iconDrag.el.style.zIndex = '50';
+        iconDrag.el.style.opacity = '0.8';
+    }
+    const desk = document.getElementById('desktop').getBoundingClientRect();
+    let x = e.clientX - iconDrag.ox - desk.left;
+    let y = e.clientY - iconDrag.oy - desk.top;
+    x = Math.max(0, Math.min(x, desk.width - 75));
+    y = Math.max(0, Math.min(y, desk.height - 80));
+    iconDrag.el.style.left = x + 'px';
+    iconDrag.el.style.top = y + 'px';
+});
+document.addEventListener('mouseup', e => {
+    if (!iconDrag) return;
+    iconDrag.el.style.zIndex = '';
+    iconDrag.el.style.opacity = '';
+    if (!iconDrag.moved) {
+        iconDrag = null;
+        return;
+    }
+    /* snap to grid 75x80 */
+    const desk = document.getElementById('desktop').getBoundingClientRect();
+    let x = parseInt(iconDrag.el.style.left) || 0;
+    let y = parseInt(iconDrag.el.style.top) || 0;
+    x = Math.round(x / 75) * 75;
+    y = Math.round(y / 80) * 80;
+    x = Math.max(0, Math.min(x, desk.width - 75));
+    y = Math.max(0, Math.min(y, desk.height - 80));
+    iconDrag.el.style.left = x + 'px';
+    iconDrag.el.style.top = y + 'px';
+    iconDrag = null;
+});
+document.addEventListener('DOMContentLoaded', () => setTimeout(initDesktopIconDrag, 100));
 
 /* ══════════════════════════════════════
     START MENU
@@ -364,10 +498,48 @@ function ctxRefresh() { hideCtxMenu(); sndOpen(); showNotif('🔄 Atualizado', '
 function ctxNewNote() { hideCtxMenu(); openWindow('win-notepad'); }
 function ctxArrange() {
     hideCtxMenu(); sndClick();
-    const icons = document.querySelectorAll('.d-icon');
-    icons.forEach((ic, i) => { ic.style.transform = `translateY(${i * 2}px)`; setTimeout(() => ic.style.transform = '', 300); });
+    const icons = document.querySelectorAll('.desktop-icons .d-icon');
+    icons.forEach(ic => {
+        ic.style.position = '';
+        ic.style.left = '';
+        ic.style.top = '';
+    });
     showNotif('🔲 Ícones', 'Ícones organizados automaticamente.');
 }
+function ctxAlignToGrid() {
+    hideCtxMenu(); sndClick();
+    const icons = document.querySelectorAll('.desktop-icons .d-icon');
+    icons.forEach(ic => {
+        if (ic.style.position === 'absolute') {
+            let x = parseInt(ic.style.left) || 0;
+            let y = parseInt(ic.style.top) || 0;
+            ic.style.left = Math.round(x / 75) * 75 + 'px';
+            ic.style.top = Math.round(y / 80) * 80 + 'px';
+        }
+    });
+    showNotif('▦ Grade', 'Ícones alinhados à grade.');
+}
+function ctxNewFolder() {
+    hideCtxMenu(); sndClick();
+    const container = document.querySelector('.desktop-icons');
+    const folder = document.createElement('div');
+    folder.className = 'd-icon';
+    folder.setAttribute('data-tip', 'Nova Pasta');
+    folder.ondblclick = () => showNotif('📂 Nova Pasta', 'Essa pasta está vazia. Igual a sua geladeira.');
+    folder.innerHTML = '<div class="d-icon-img"><img src="src/img/system/pasta-vazia.ico" alt="Pasta" style="width:32px;height:32px;"></div><div class="d-icon-lbl">Nova Pasta</div>';
+    container.appendChild(folder);
+    initDesktopIconDrag();
+    showNotif('📁 Nova Pasta', 'Pasta criada na área de trabalho.');
+}
+function ctxNewWordpad() {
+    hideCtxMenu();
+    openWindow('win-notepad');
+}
+function ctxPaste() {
+    hideCtxMenu(); sndClick();
+    showNotif('📋 Colar', 'Não tem nada na área de transferência. Tenta Ctrl+C antes.');
+}
+function openFromCtx(id) { hideCtxMenu(); openWindow(id); }
 
 /* ══════════════════════════════════════
     NOTIFICATIONS
@@ -397,10 +569,10 @@ function updateRecycleBin() {
     list.innerHTML = '';
     if (recyclebin.length === 0) {
     list.innerHTML = '<div class="recyclebin-empty">🗑️<br>Lixeira vazia</div>';
-    document.getElementById('recycle-ico').textContent = '🗑️';
+    document.getElementById('recycle-ico').innerHTML = '<img src="src/img/system/lixeira-icon.webp" alt="Lixeira" style="width:32px;height:32px;">';
     return;
     }
-    document.getElementById('recycle-ico').textContent = '🗑️';
+    document.getElementById('recycle-ico').innerHTML = '<img src="src/img/system/lixeira-icon.webp" alt="Lixeira" style="width:32px;height:32px;">';
     recyclebin.forEach((item, i) => {
     const row = document.createElement('div');
     row.className = 'recyclebin-item';
@@ -481,6 +653,7 @@ const msnContactReplies = {
     'Pablo': ['cara isso foi sinistro mesmo', 'bora resolver isso? manda o código', 'hahaha exato 🔥', 'to pensando aqui... acho que é um bug no state', 'amor é complicado 😔', 'bora tomar um açaí depois?', '🔥🔥🔥', 'que foi kkkk'],
     'Edmundo': ['ai você tá fofo hj 🥰', 'te extraño mucho 🥺', 'se te quieres, criança', 'ven acá gordito 🥰', 'oye para com isso jaja', 'linda 😘', 'se te quieres 🥺'],
     'Carla': ['oi', 'quando vc vem aqui em casa?', 'mãe perguntou de vc', 'ok, te falo depois', 'kkkkk que isso', '🙄', 'tá sumido hein'],
+    'Kris': ['estagiário!!! saudade de vc', 'bota um try/catch nisso aí pelo amor 😤', 'vc tá usando Python pra isso? pq não tá?', 'manda o traceback que eu olho', 'lembra quando vc derrubou o banco no segundo dia? KKKK', 'orgulho de vc garoto 🥹', 'para de usar PHP pra tudo desgraça 🐍', 'eu te ensinei melhor que isso', 'quer que eu faça um code review?', 'bora um pair programming qualquer dia'],
 };
 let msnReplyIdxMap = {};
 const chatLogs = {}; // {name:[{from,text,time}]}
@@ -617,9 +790,26 @@ const autoScripts = {
         { from: 'them', text: 'se te quieres, criança', d: 2000 },
     ]
     },
+    'Kris': {
+    ico: '🐍', msgs: [
+        { from: 'them', text: 'ESTAGIÁRIO!! tá vivo??', d: 0 },
+        { from: 'me', text: 'KRIS!! to sim!! que saudade', d: 1800 },
+        { from: 'them', text: 'saudade vc!! vi que vc tá mexendo com Laravel né', d: 2600 },
+        { from: 'me', text: 'sim!! tô amando. mas Python tem um lugar no meu coração tbm', d: 2000 },
+        { from: 'them', text: 'BOM MESMO. se vc largar Python eu vou aí te buscar 😤', d: 2400 },
+        { from: 'me', text: 'kkkkk jamais!! vc me ensinou bem demais', d: 1600 },
+        { from: 'them', text: 'lembra do teu segundo dia de estágio?', d: 2200 },
+        { from: 'me', text: 'quando eu derrubei o banco de dev? 😰', d: 1800 },
+        { from: 'them', text: 'KKKKKKKK eu quase te mandei embora naquele dia', d: 2800 },
+        { from: 'me', text: 'ainda bem que não mandou 🙏', d: 1400 },
+        { from: 'them', text: 'vc era o pior estagiário do mundo. agora é o melhor dev que eu conheço', d: 3000 },
+        { from: 'me', text: 'para com isso que eu vou chorar 🥹', d: 1600 },
+        { from: 'them', text: 'verdade. orgulho de vc, garoto. de verdade. ♥', d: 2400 },
+    ]
+    },
 };
 // delays iniciais após entrar no desktop (ms)
-const autoStartAt = { 'Pablo': 12000, 'Carla': 24000, 'Edmundo': 38000 };
+const autoStartAt = { 'Pablo': 12000, 'Carla': 24000, 'Edmundo': 38000, 'Kris': 50000 };
 const scriptIdx = {};
 function startAutoConversations() {
     Object.keys(autoScripts).forEach(name => {
@@ -793,6 +983,35 @@ function paintInit() {
     cv.addEventListener('mouseup', pUp);
     cv.addEventListener('mouseleave', pUp);
 }
+/* Paint — Menu Arquivo + Export */
+function togglePaintFileMenu() {
+    const m = document.getElementById('paint-file-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+function paintNew() {
+    document.getElementById('paint-file-menu').style.display = 'none';
+    const cv = document.getElementById('paint-canvas');
+    if (pCtx) { pCtx.fillStyle = '#ffffff'; pCtx.fillRect(0, 0, cv.width, cv.height); }
+    sndClick();
+}
+function paintSaveExport() {
+    document.getElementById('paint-file-menu').style.display = 'none';
+    const cv = document.getElementById('paint-canvas');
+    const link = document.createElement('a');
+    link.download = 'minha_obra_de_arte.png';
+    link.href = cv.toDataURL('image/png');
+    link.click();
+    sndClick();
+    showNotif('💾 Paint', 'Imagem salva com sucesso! Confere a pasta de downloads.');
+}
+/* Fechar menu ao clicar fora */
+document.addEventListener('click', e => {
+    const m = document.getElementById('paint-file-menu');
+    if (m && m.style.display === 'block' && !e.target.closest('.paint-file-menu') && !e.target.closest('#paint-menu-arquivo')) {
+        m.style.display = 'none';
+    }
+});
+
 function paintUpdCurs() {
     const fg = document.getElementById('paint-fg-sw'), bg = document.getElementById('paint-bg-sw');
     if (fg) fg.style.background = pColor; if (bg) bg.style.background = pBgColor;
@@ -1783,17 +2002,19 @@ const mydocsTree = {
     root: {
         addr: 'C:\\Documents and Settings\\Matheus\\Meus Documentos\\',
         label: 'Meus Documentos',
-        detail: 'Meus Documentos<br>Pasta do sistema<br><br>8 objetos',
-        count: '8 objetos',
+        detail: 'Meus Documentos<br>Pasta do sistema<br><br>10 objetos',
+        count: '10 objetos',
         items: [
-            { ico: '📁', name: 'Downloads',                type: 'Pasta de arquivos', size: '',      action: () => openWindow('win-downloads') },
-            { ico: '📁', name: 'Projetos de Desenvolvimento', type: 'Pasta de arquivos', size: '',   action: () => openWindow('win-dev-projects') },
-            { ico: '📁', name: 'Minhas Músicas',           type: 'Pasta do sistema',   size: '',      action: () => { showNotif('🎵 Minhas Músicas', 'Pasta vazia. Tudo está no Winamp.'); sndClick(); } },
-            { ico: '📁', name: 'Minhas Imagens',           type: 'Pasta do sistema',   size: '',      action: () => mydocsNav('imagens') },
-            { ico: '📄', name: 'Carta_Apresentacao.rtf', type: 'Documento RTF', size: '12 KB', action: () => openWindow('win-carta-edmundo') },
-            { ico: '📄', name: 'TODO_vida_2025.txt',       type: 'Arquivo de Texto',   size: '3 KB',  action: () => openWindow('win-todo-doc') },
-            { ico: '💰', name: 'PlanoNegociosMilhao_v7_DEFINITIVO.doc', type: 'Documento Word', size: '28 KB', action: () => openWindow('win-saas-plan') },
-            { ico: '📄', name: 'receitas_bacalhau_mae.txt',type: 'Arquivo de Texto',   size: '2 KB',  action: () => openReceitaDoc() },
+            { ico: _ico('pasta-vazia.ico'), name: 'Downloads',                type: 'Pasta de arquivos', size: '',      action: () => openWindow('win-downloads') },
+            { ico: _ico('pasta-vazia.ico'), name: 'Projetos de Desenvolvimento', type: 'Pasta de arquivos', size: '',   action: () => openWindow('win-dev-projects') },
+            { ico: _ico('minhas-musicas.ico'), name: 'Minhas Músicas',           type: 'Pasta do sistema',   size: '',      action: () => { showNotif('🎵 Minhas Músicas', 'Pasta vazia. Tudo está no Winamp.'); sndClick(); } },
+            { ico: _ico('minhas-imagens.ico'), name: 'Minhas Imagens',           type: 'Pasta do sistema',   size: '',      action: () => mydocsNav('imagens') },
+            { ico: _ico('wordpad.webp'), name: 'Carta_Apresentacao.rtf', type: 'Documento RTF', size: '12 KB', action: () => openWindow('win-carta-edmundo') },
+            { ico: _ico('bloco-de-notas-icon.png'), name: 'TODO_vida_2025.txt',       type: 'Arquivo de Texto',   size: '3 KB',  action: () => openWindow('win-todo-doc') },
+            { ico: _ico('wordpad.webp'), name: 'PlanoNegociosMilhao_v7_DEFINITIVO.doc', type: 'Documento Word', size: '28 KB', action: () => openWindow('win-saas-plan') },
+            { ico: _ico('bloco-de-notas-icon.png'), name: 'receitas_bacalhau_mae.txt',type: 'Arquivo de Texto',   size: '2 KB',  action: () => openReceitaDoc() },
+            { ico: '🌐', name: 'primeiro_site.html',       type: 'Documento HTML',     size: '4 KB',  action: () => { showNotif('🌐 primeiro_site.html','<marquee>Bem vindo ao site do Matheus!!</marquee><br>Feito em 2012 com Notepad e muito amor. Tabelas dentro de tabelas dentro de tabelas.'); sndClick(); } },
+            { ico: _ico('bloco-de-notas-icon.png'), name: 'plano_mestre_oficina.txt', type: 'Arquivo de Texto',   size: '6 KB',  action: () => { showNotif('🔧 Mestre Oficina','Plano de Negócio v12 — SaaS para gestão de oficinas mecânicas. Laravel + MySQL + n8n. Meta: 100 oficinas até 2026.'); sndClick(); } },
         ]
     },
     imagens: {
@@ -1802,9 +2023,9 @@ const mydocsTree = {
         detail: 'Minhas Imagens<br>Pasta do sistema<br><br>3 pastas',
         count: '3 pastas',
         items: [
-            { ico: '📁', name: 'Família',   type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-familia') },
-            { ico: '📁', name: 'Edmundo',   type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-edmundo') },
-            { ico: '📁', name: 'Palestras', type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-palestras') },
+            { ico: _ico('pasta-vazia.ico'), name: 'Família',   type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-familia') },
+            { ico: _ico('pasta-vazia.ico'), name: 'Edmundo',   type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-edmundo') },
+            { ico: _ico('pasta-vazia.ico'), name: 'Palestras', type: 'Pasta de arquivos', size: '', action: () => mydocsNav('img-palestras') },
         ]
     },
     'img-familia': {
@@ -1813,13 +2034,13 @@ const mydocsTree = {
         detail: 'Família<br>Pasta de arquivos<br><br>7 objetos',
         count: '7 objetos',
         items: [
-            { ico: '🖼️', name: 'carla_e_eu_macae.jpg',       type: 'Imagem JPEG', size: '2,4 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'manu_e_matheus.jpg',          type: 'Imagem JPEG', size: '1,8 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'celo_e_matheus.jpg',          type: 'Imagem JPEG', size: '2,1 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'natal_familia_2024.jpg',      type: 'Imagem JPEG', size: '3,6 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'ferias_ilha_grande.jpg',      type: 'Imagem JPEG', size: '4,2 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'churrasco_domingo.jpg',       type: 'Imagem JPEG', size: '2,9 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'aniversario_carla_2023.jpg',  type: 'Imagem JPEG', size: '1,6 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'carla_e_eu_macae.jpg',       type: 'Imagem JPEG', size: '2,4 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'manu_e_matheus.jpg',          type: 'Imagem JPEG', size: '1,8 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'celo_e_matheus.jpg',          type: 'Imagem JPEG', size: '2,1 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'natal_familia_2024.jpg',      type: 'Imagem JPEG', size: '3,6 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'ferias_ilha_grande.jpg',      type: 'Imagem JPEG', size: '4,2 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'churrasco_domingo.jpg',       type: 'Imagem JPEG', size: '2,9 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'aniversario_carla_2023.jpg',  type: 'Imagem JPEG', size: '1,6 MB', action: () => sndClick() },
         ]
     },
     'img-edmundo': {
@@ -1828,12 +2049,12 @@ const mydocsTree = {
         detail: 'Edmundo<br>Pasta de arquivos<br><br>6 objetos',
         count: '6 objetos',
         items: [
-            { ico: '🖼️', name: 'show_vespas_mandarinas.jpg',  type: 'Imagem JPEG', size: '3,1 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'rua_bento_sp.jpg',             type: 'Imagem JPEG', size: '2,7 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'feijoada_do_edmundo.jpg',      type: 'Imagem JPEG', size: '1,4 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'bar_sagarana_rj.jpg',          type: 'Imagem JPEG', size: '2,2 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'trilha_pedra_bonita.jpg',      type: 'Imagem JPEG', size: '3,8 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'anos_novos_copacabana.jpg',    type: 'Imagem JPEG', size: '4,1 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'show_vespas_mandarinas.jpg',  type: 'Imagem JPEG', size: '3,1 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'rua_bento_sp.jpg',             type: 'Imagem JPEG', size: '2,7 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'feijoada_do_edmundo.jpg',      type: 'Imagem JPEG', size: '1,4 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'bar_sagarana_rj.jpg',          type: 'Imagem JPEG', size: '2,2 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'trilha_pedra_bonita.jpg',      type: 'Imagem JPEG', size: '3,8 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'anos_novos_copacabana.jpg',    type: 'Imagem JPEG', size: '4,1 MB', action: () => sndClick() },
         ]
     },
     'img-palestras': {
@@ -1842,12 +2063,12 @@ const mydocsTree = {
         detail: 'Palestras<br>Pasta de arquivos<br><br>6 objetos',
         count: '6 objetos',
         items: [
-            { ico: '🖼️', name: 'palestra_senac_php_2024.jpg',  type: 'Imagem JPEG', size: '2,8 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'turma_web_design_senac.jpg',   type: 'Imagem JPEG', size: '3,4 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'workshop_laravel_rj.jpg',       type: 'Imagem JPEG', size: '2,1 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'phpconf_brasil_2024.jpg',       type: 'Imagem JPEG', size: '3,9 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'eu_no_palco_phpconf.jpg',       type: 'Imagem JPEG', size: '2,6 MB', action: () => sndClick() },
-            { ico: '🖼️', name: 'certificado_instrutor.jpg',     type: 'Imagem JPEG', size: '0,8 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'palestra_senac_php_2024.jpg',  type: 'Imagem JPEG', size: '2,8 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'turma_web_design_senac.jpg',   type: 'Imagem JPEG', size: '3,4 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'workshop_laravel_rj.jpg',       type: 'Imagem JPEG', size: '2,1 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'phpconf_brasil_2024.jpg',       type: 'Imagem JPEG', size: '3,9 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'eu_no_palco_phpconf.jpg',       type: 'Imagem JPEG', size: '2,6 MB', action: () => sndClick() },
+            { ico: _ico('minhas-imagens.ico'), name: 'certificado_instrutor.jpg',     type: 'Imagem JPEG', size: '0,8 MB', action: () => sndClick() },
         ]
     },
 };
@@ -2234,6 +2455,13 @@ const cmdHandlers = {
   artisan          Comandos do Artisan
   sudo             Você sabe por que não.
   shutdown         Desliga o computador
+  about            Sobre o Matheus
+  skills           Skills e tecnologias
+  projects         Projetos principais
+  history          Histórico profissional
+  contact          Informações de contato
+  limewire         Abre o LimeWire
+  defrag           Abre o Desfragmentador
   bsod             ??? (use com cautela)
   exit             Fecha o prompt
 `,
@@ -2574,7 +2802,17 @@ Available commands:
     'ls': () => `<span style="color:#fff">Use <span style="color:#0ff">dir</span> — você está no Windows.</span>`,
 });
 
-/* cmdRun already dispatches through cmdHandlers — new keys added via Object.assign above */
+/* Comandos extras do portfólio */
+Object.assign(cmdHandlers, {
+    'about': () => `<span style="color:#0ff;white-space:pre">${_cmdExtras.about}</span>`,
+    'skills': () => `<span style="color:#0ff;white-space:pre">${_cmdExtras.skills}</span>`,
+    'projects': () => `<span style="color:#0ff;white-space:pre">${_cmdExtras.projects}</span>`,
+    'history': () => `<span style="color:#0ff;white-space:pre">${_cmdExtras.history}</span>`,
+    'contact': () => `<span style="color:#0ff;white-space:pre">${_cmdExtras.contact}</span>`,
+    'limewire': () => { openWindow('win-limewire'); return `<span style="color:#0f0;white-space:pre">${_cmdExtras.limewire}</span>`; },
+    'defrag': () => { openWindow('win-defrag'); _drawDefrag('defrag-canvas', true); return `<span style="color:#0f0;white-space:pre">${_cmdExtras.defrag}</span>`; },
+    'bsod': () => { setTimeout(triggerBSOD, 500); return `<span style="color:#f00;white-space:pre">${_cmdExtras.bsod}</span>`; },
+});
 
 /* ══════════════════════════════════════
     KONAMI CODE EASTER EGG
@@ -2990,6 +3228,16 @@ function gmRefresh() {
     sndClick();
 }
 
+/* Orkut — abas social/profissional/pessoal */
+function orkutTab(tab, el) {
+    sndClick();
+    document.querySelectorAll('.ok-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.ok-tab-content').forEach(c => c.style.display = 'none');
+    const target = document.getElementById('ok-tab-' + tab);
+    if (target) target.style.display = '';
+}
+
 function chromeTab(n) {
     document.querySelectorAll('.chrome-tab').forEach((t, i) => {
         t.classList.toggle('active', i === n);
@@ -3022,7 +3270,9 @@ function closeTab(n) {
 }
 
 function reopenAllTabs() {
-    document.querySelectorAll('.chrome-tab').forEach(t => t.style.display = '');
+    document.querySelectorAll('.chrome-tab').forEach((t, i) => {
+        t.style.display = i <= 5 ? '' : 'none'; /* abas 0-5 sempre, 6+ só pelo menu */
+    });
     chromeTab(0);
 }
 
@@ -3148,6 +3398,9 @@ openWindow = function(id) {
     if(id==='win-cp-addremove') setTimeout(cpOpenAddRemove,0);
     if(id==='win-cp-datetime') setTimeout(cpDateTimeUpdate,0);
     if(id==='win-solitaire'&&solTab[0].length===0) setTimeout(solNewGame,0);
+    /* BSOD: se abrir janelas demais */
+    const openCount = document.querySelectorAll('.xp-win[style*="display: flex"], .xp-win[style*="display:flex"]').length;
+    if (openCount >= 10) { setTimeout(triggerBSOD, 1500); }
 };
 
 /* ══════════════════════════════════════
@@ -3277,3 +3530,465 @@ function closeErrDlg(id) {
         setTimeout(_spawnError, 180);
     }
 }
+
+/* ══════════════════════════════════════
+    BSOD — TELA AZUL DA MORTE
+══════════════════════════════════════ */
+/* ══════════════════════════════════════
+    VIRUS.BAT — A HISTÓRIA REAL
+══════════════════════════════════════ */
+function runVirusBat() {
+    sndClick();
+    /* Primeiro abre o "código fonte" no bloco de notas por 3s */
+    openWindow('win-virus-src');
+    setTimeout(() => {
+        closeWin('win-virus-src');
+        _startVirusSequence();
+    }, 3500);
+}
+
+function _startVirusSequence() {
+    const overlay = document.getElementById('virus-overlay');
+    const output = document.getElementById('virus-output');
+    overlay.style.display = 'flex';
+    output.innerHTML = '';
+
+    const lines = [
+        { t: 0,     txt: '<span class="v-yellow">============================================</span>' },
+        { t: 200,   txt: '<span class="v-yellow">  VIRUS ULTRA MEGA HACKER v1.0</span>' },
+        { t: 400,   txt: '<span class="v-yellow">  por: Matheus Teixeira (o hacker, claro)</span>' },
+        { t: 600,   txt: '<span class="v-yellow">  Nova Iguaçu, RJ - 2009</span>' },
+        { t: 800,   txt: '<span class="v-yellow">============================================</span>' },
+        { t: 1200,  txt: '' },
+        { t: 1500,  txt: 'C:\\> virus.bat' },
+        { t: 2000,  txt: '' },
+        { t: 2300,  txt: 'Iniciando protocolo de destruicao...' },
+        { t: 2800,  txt: '' },
+        { t: 3200,  txt: '<span class="v-red">del /s /q C:\\Windows\\System32\\*.*</span>' },
+        { t: 3500,  txt: '  Apagando kernel32.dll ...... OK' },
+        { t: 3800,  txt: '  Apagando ntoskrnl.exe ...... OK' },
+        { t: 4100,  txt: '  Apagando explorer.exe ...... OK' },
+        { t: 4400,  txt: '  Apagando svchost.exe ....... OK' },
+        { t: 4700,  txt: '  Apagando win32k.sys ........ OK' },
+        { t: 5100,  txt: '' },
+        { t: 5400,  txt: '<span class="v-red">del /s /q C:\\Users\\Matheus\\*.*</span>' },
+        { t: 5700,  txt: '  Apagando Meus Documentos ... OK' },
+        { t: 6000,  txt: '  Apagando fotos_familia.zip . OK' },
+        { t: 6300,  txt: '  Apagando trabalho_escola.doc OK' },
+        { t: 6600,  txt: '  Apagando musicas_limewire .. OK' },
+        { t: 6900,  txt: '  Apagando saves_gta_sa ..... <span class="v-red">OK  ← NÃO!!!!</span>' },
+        { t: 7300,  txt: '' },
+        { t: 7600,  txt: '<span class="v-red">rd /s /q C:\\Windows</span>' },
+        { t: 7900,  txt: '<span class="v-red">rd /s /q C:\\Users</span>' },
+        { t: 8200,  txt: '<span class="v-red">rd /s /q D:\\Jogos</span>' },
+        { t: 8500,  txt: '' },
+        { t: 9000,  txt: '<span class="v-yellow">========================================</span>' },
+        { t: 9300,  txt: '<span class="v-white">  HAHAHA SEU PC FOI HACKEADO!!!</span>' },
+        { t: 9600,  txt: '<span class="v-white">  Assinado: Matheus, o maior hacker</span>' },
+        { t: 9800,  txt: '<span class="v-white">           de Nova Iguaçu</span>' },
+        { t: 10100, txt: '<span class="v-yellow">========================================</span>' },
+        { t: 10500, txt: '' },
+        { t: 11000, txt: '...' },
+        { t: 11500, txt: '...espera.' },
+        { t: 12200, txt: '' },
+        { t: 12800, txt: '<span class="v-cyan">Peraí. Eu apaguei o WINDOWS?</span>' },
+        { t: 13500, txt: '<span class="v-cyan">Tipo... O MEU Windows???</span>' },
+        { t: 14200, txt: '<span class="v-cyan">O Windows que TÁ NESSE PC???</span>' },
+        { t: 15000, txt: '' },
+        { t: 15500, txt: '<span class="v-red">Meu save do GTA San Andreas...</span>' },
+        { t: 16200, txt: '<span class="v-red">Minhas músicas do LimeWire...</span>' },
+        { t: 16900, txt: '<span class="v-red">Meu trabalho de geografia que vale NOTA...</span>' },
+        { t: 17600, txt: '<span class="v-red">As fotos da família no Natal...</span>' },
+        { t: 18400, txt: '' },
+        { t: 19000, txt: '<span class="v-yellow">TUDO.</span>' },
+        { t: 19500, txt: '' },
+        { t: 20200, txt: '<span class="v-white">O vírus funcionou perfeitamente.</span>' },
+        { t: 21000, txt: '<span class="v-white">No meu próprio PC.</span>' },
+        { t: 21800, txt: '<span class="v-white">No único PC da casa.</span>' },
+        { t: 22600, txt: '' },
+        { t: 23200, txt: '<span class="v-cyan">Eu tinha 12 anos.</span>' },
+        { t: 23800, txt: '<span class="v-cyan">Achei que ia ser hacker.</span>' },
+        { t: 24400, txt: '<span class="v-cyan">Virei dev.</span>' },
+        { t: 25000, txt: '' },
+        { t: 25600, txt: '<span class="v-yellow">Moral da história:</span>' },
+        { t: 26200, txt: '<span class="v-white">sempre teste em ambiente de desenvolvimento.</span>' },
+        { t: 27000, txt: '' },
+        { t: 27800, txt: '<span class="v-cyan v-blink">Clique em qualquer lugar para reiniciar o PC...</span>' },
+    ];
+
+    lines.forEach(l => {
+        setTimeout(() => {
+            output.innerHTML += l.txt + '\n';
+            overlay.scrollTop = overlay.scrollHeight;
+        }, l.t);
+    });
+
+    /* Depois da última linha, permite fechar */
+    setTimeout(() => {
+        overlay.onclick = () => {
+            overlay.onclick = null;
+            overlay.style.display = 'none';
+            /* Simula reboot — vai pro boot */
+            localStorage.setItem('xp_dirty', '1');
+            location.reload();
+        };
+    }, 28000);
+}
+
+function triggerBSOD() {
+    const bsod = document.getElementById('bsod-overlay');
+    bsod.style.display = 'flex';
+    setTimeout(() => { document.getElementById('bsod-action').style.display = 'block'; }, 4000);
+    document.addEventListener('keydown', function _bsodKey() {
+        document.removeEventListener('keydown', _bsodKey);
+        location.reload();
+    });
+}
+
+/* ══════════════════════════════════════
+    CLIPPY — ASSISTENTE DO OFFICE
+══════════════════════════════════════ */
+const clippyPhrases = [
+    'Parece que você está tentando me contratar... Posso ajudar? 📎',
+    'Dica: esse dev também faz café. ☕',
+    'Você sabia que o Matheus começou a programar com 12 anos por causa do iCarly?',
+    'Ei! Já viu o currículo dele? Tá em Curriculo.rtf no desktop!',
+    'Esse site roda em um único arquivo HTML. Não me julgue.',
+    'Psiu... tenta digitar "about" no Prompt de Comando. 😉',
+    'O Matheus já deu aula de PHP no SENAC. Na mesma sala onde estudou!',
+    'Fun fact: ele criou um dos maiores blogs da Moptop no Brasil.',
+    'Quer uma dica? Abre o LimeWire. Confia.',
+    'Se quiser contratar ele, manda um e-mail. Eu sou só um clipe de papel.',
+];
+let _clippyTimer = null;
+function showClippy() {
+    const el = document.getElementById('clippy');
+    const txt = document.getElementById('clippy-text');
+    txt.textContent = clippyPhrases[Math.floor(Math.random() * clippyPhrases.length)];
+    el.style.display = 'block';
+    if (_clippyTimer) clearTimeout(_clippyTimer);
+    _clippyTimer = setTimeout(hideClippy, 12000);
+}
+function hideClippy() {
+    document.getElementById('clippy').style.display = 'none';
+    if (_clippyTimer) { clearTimeout(_clippyTimer); _clippyTimer = null; }
+    /* agenda próxima aparição */
+    setTimeout(showClippy, 30000 + Math.random() * 40000);
+}
+
+/* ══════════════════════════════════════
+    WINRAR — POPUP DE LICENÇA EXPIRADA
+══════════════════════════════════════ */
+function showWinRAR() {
+    document.getElementById('winrar-popup').style.display = 'block';
+    sndClick();
+}
+
+/* ══════════════════════════════════════
+    LIMEWIRE
+══════════════════════════════════════ */
+winMeta['win-limewire'] = { ico: '🍋', lbl: 'LimeWire' };
+
+/* ══════════════════════════════════════
+    DESFRAGMENTADOR DE DISCO
+══════════════════════════════════════ */
+winMeta['win-defrag'] = { ico: '🟦', lbl: 'Desfragmentador de Disco' };
+function _drawDefrag(canvasId, fragmented) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const cols = 60, rows = 12, bw = 8, bh = 8;
+    ctx.clearRect(0, 0, c.width, c.height);
+    for (let r = 0; r < rows; r++) {
+        for (let col = 0; col < cols; col++) {
+            const x = col * bw, y = r * bh;
+            let color;
+            const pct = (r * cols + col) / (rows * cols);
+            if (pct > 0.58) { color = '#111'; } /* espaço livre */
+            else if (fragmented && Math.random() < 0.25) { color = '#e00'; } /* fragmentado */
+            else if (Math.random() < 0.08) { color = '#0a0'; } /* sistema */
+            else { color = '#22e'; } /* contíguo */
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, bw - 1, bh - 1);
+        }
+    }
+}
+function runDefrag() {
+    const status = document.getElementById('defrag-status');
+    const c = document.getElementById('defrag-canvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const cols = 60, rows = 12, bw = 8, bh = 8;
+    let step = 0, total = cols * rows;
+    status.textContent = 'Desfragmentando... 0%';
+    function _step() {
+        if (step >= total * 0.58) {
+            status.textContent = 'Desfragmentação concluída com sucesso!';
+            _drawDefrag('defrag-canvas-after', false);
+            showNotif('🟦 Desfragmentador', 'Disco C: desfragmentado com sucesso!');
+            return;
+        }
+        const r = Math.floor(step / cols), col = step % cols;
+        const x = col * bw, y = r * bh;
+        ctx.fillStyle = '#22e';
+        ctx.fillRect(x, y, bw - 1, bh - 1);
+        step += 1 + Math.floor(Math.random() * 3);
+        status.textContent = 'Desfragmentando... ' + Math.min(100, Math.round(step / (total * 0.58) * 100)) + '%';
+        setTimeout(_step, 20 + Math.random() * 30);
+    }
+    _drawDefrag('defrag-canvas', true);
+    setTimeout(_step, 500);
+}
+
+/* ══════════════════════════════════════
+    MSN ZUMBIDO (NUDGE)
+══════════════════════════════════════ */
+function msnNudge() {
+    sndClick();
+    const chat = document.getElementById('msn-chat');
+    if (!chat || chat.style.display === 'none') return;
+    chat.classList.add('msn-nudge');
+    /* treme a tela toda também */
+    document.body.classList.add('screen-shake');
+    setTimeout(() => {
+        chat.classList.remove('msn-nudge');
+        document.body.classList.remove('screen-shake');
+    }, 600);
+    /* adiciona msg no chat */
+    const log = document.getElementById('msn-chat-log');
+    if (log) {
+        const div = document.createElement('div');
+        div.style.cssText = 'color:#888;font-style:italic;font-size:11px;padding:4px 0;';
+        div.textContent = '🔔 Você enviou um zumbido!';
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+    }
+}
+
+/* ══════════════════════════════════════
+    MSN WEBCAM
+══════════════════════════════════════ */
+let _webcamStream = null;
+let _webcamMsgTimer = null;
+const _webcamReactions = [
+    { msg: 'oi!! to te vendo!! 😍' },
+    { msg: 'hahaha sua cara tá engraçada 😂' },
+    { msg: 'arruma esse cabelo mds' },
+    { msg: 'webcam de 2005 era assim mesmo, pixelada kk' },
+    { msg: 'faz uma careta!!! 😜', screenshot: true },
+    { msg: 'eita, tá bonito(a) hein 👀' },
+    { msg: 'puts a qualidade tá péssima, parece MSN real kkk' },
+    { msg: 'acena pra mim!! 👋' },
+    { msg: 'saudades de quando webcam era evento' },
+    { msg: 'mãe tá te vendo atrás de vc? kkkk' },
+];
+
+function msnOpenWebcam() {
+    sndClick();
+    const contact = msnChatContact.name || 'Contato';
+    document.getElementById('msn-wc-name').textContent = contact;
+    document.getElementById('msn-webcam').style.display = 'block';
+    document.getElementById('msn-wc-overlay').classList.remove('hidden');
+    document.getElementById('msn-wc-status').textContent = 'Conectando webcam...';
+    document.getElementById('msn-wc-chat-msg').innerHTML = '';
+
+    /* Adicionar mensagem no chat */
+    const log = document.getElementById('msn-chat-msgs');
+    const block = document.createElement('div');
+    block.className = 'msn-msg-block';
+    block.innerHTML = '<span class="msn-msg-name them-c">' + contact + '</span> diz:<br>aceita ver minha webcam? 📷';
+    log.appendChild(block);
+    log.scrollTop = log.scrollHeight;
+
+    /* Solicitar câmera do visitante */
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+            _webcamStream = stream;
+            const video = document.getElementById('msn-wc-video');
+            video.srcObject = stream;
+            video.play().catch(() => {});
+            /* Esconder overlay após conectar */
+            setTimeout(() => {
+                document.getElementById('msn-wc-overlay').classList.add('hidden');
+                document.getElementById('msn-wc-status').textContent = '● Webcam ativa';
+                /* Mensagem de reação do contato */
+                _wcSendReaction(contact, _webcamReactions[0]);
+                /* Iniciar mensagens periódicas */
+                _startWebcamMessages(contact);
+            }, 1500);
+        })
+        .catch(() => {
+            document.getElementById('msn-wc-overlay').innerHTML = '<div class="msn-wc-connecting" style="animation:none;color:#f66;">❌ Webcam não autorizada<br><span style="font-size:10px;color:#888;">O contato não vai conseguir te ver!</span></div>';
+            document.getElementById('msn-wc-status').textContent = '● Sem webcam';
+        });
+}
+
+function _wcSendReaction(contact, reaction) {
+    const text = reaction.msg;
+    /* Mostrar na janela da webcam */
+    document.getElementById('msn-wc-chat-msg').innerHTML = '<span class="them-c">' + contact + ' diz: ' + text + '</span>';
+
+    /* Sincronizar com o chat do MSN */
+    const log = document.getElementById('msn-chat-msgs');
+    const block = document.createElement('div');
+    block.className = 'msn-msg-block';
+    block.innerHTML = '<span class="msn-msg-name them-c">' + contact + '</span> diz:<br>' + text;
+    log.appendChild(block);
+    log.scrollTop = log.scrollHeight;
+    sndMsg();
+
+    /* Se é a mensagem de careta, tira screenshot após 3s */
+    if (reaction.screenshot) {
+        setTimeout(() => _wcTakeScreenshot(contact), 3000);
+    }
+}
+
+function _wcTakeScreenshot(contact) {
+    const video = document.getElementById('msn-wc-video');
+    if (!video || !video.srcObject) return;
+
+    /* Capturar frame do vídeo num canvas */
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 320;
+    canvas.height = video.videoHeight || 240;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+
+    sndNotif();
+
+    /* Mandar a "foto" no chat do MSN */
+    const log = document.getElementById('msn-chat-msgs');
+
+    /* Mensagem do contato avisando que tirou print */
+    const msgBlock = document.createElement('div');
+    msgBlock.className = 'msn-msg-block';
+    msgBlock.innerHTML = '<span class="msn-msg-name them-c">' + contact + '</span> diz:<br>HAHAHA PRINTEI!! 📸 olha sua cara:';
+    log.appendChild(msgBlock);
+
+    /* A imagem capturada */
+    const imgBlock = document.createElement('div');
+    imgBlock.className = 'msn-msg-block msn-msg-screenshot';
+    imgBlock.innerHTML = '<img src="' + dataUrl + '" alt="Screenshot da webcam" style="max-width:200px;border:2px solid #7a96bb;border-radius:3px;margin-top:4px;box-shadow:1px 1px 4px rgba(0,0,0,0.2);">';
+    log.appendChild(imgBlock);
+    log.scrollTop = log.scrollHeight;
+
+    /* Mostrar na webcam também */
+    document.getElementById('msn-wc-chat-msg').innerHTML = '<span class="them-c">' + contact + ' diz: HAHAHA PRINTEI!! 📸</span>';
+}
+
+function _startWebcamMessages(contact) {
+    let idx = 1;
+    _webcamMsgTimer = setInterval(() => {
+        if (idx >= _webcamReactions.length) idx = 1;
+        _wcSendReaction(contact, _webcamReactions[idx]);
+        idx++;
+    }, 6000 + Math.random() * 4000);
+}
+
+function msnCloseWebcam() {
+    sndClick();
+    document.getElementById('msn-webcam').style.display = 'none';
+    if (_webcamStream) {
+        _webcamStream.getTracks().forEach(t => t.stop());
+        _webcamStream = null;
+    }
+    if (_webcamMsgTimer) {
+        clearInterval(_webcamMsgTimer);
+        _webcamMsgTimer = null;
+    }
+    document.getElementById('msn-wc-video').srcObject = null;
+}
+
+/* ══════════════════════════════════════
+    CMD — COMANDOS EXTRAS DO PORTFÓLIO
+══════════════════════════════════════ */
+const _cmdExtras = {
+    'about': `
+    Matheus Teixeira dos Santos, 26 anos
+    Natural de Nova Iguaçu/RJ | Mora em São Paulo/SP
+    Desenvolvedor Full Stack | PHP/Laravel specialist
+
+    Comecei a programar aos 12 anos, inspirado pelo iCarly.
+    Minha mãe me deu um livro de PHP e MySQL e eu criei
+    meu primeiro blog nesse Windows XP.
+
+    Hoje sou fundador do Mestre Oficina (SaaS) e atuo como
+    dev pleno na MUPER, trabalhando com Laravel, Docker,
+    Python, React e integrações com IA.
+`,
+    'skills': `
+    ═══════════════════════════════════════
+    HABILIDADES TÉCNICAS
+    ═══════════════════════════════════════
+    Backend:    PHP, Laravel, NodeJS, Python
+    Frontend:   React, Vue, Next, Livewire
+    Banco:      MySQL, Postgres, MongoDB, SQL Server
+    DevOps:     Docker, GitHub Actions, Ubuntu Server
+    Cloud:      AWS (em estudo), Kubernetes (em estudo)
+    Automação:  n8n, webhooks, filas/jobs
+    Conceitos:  SOLID, Clean Code, REST, CI/CD
+    Normas:     LGPD, ISO 27001
+`,
+    'projects': `
+    ═══════════════════════════════════════
+    PROJETOS
+    ═══════════════════════════════════════
+    [1] Mestre Oficina (SaaS)
+        Plataforma de gestão para oficinas mecânicas.
+        Laravel + MySQL + APIs WhatsApp + NF-e (945 municípios)
+        → mestreoficina.com.br
+
+    [2] Orquestrador (BPO Innova → Agilizza)
+        Plataforma de automação com robôs fiscais/contábeis.
+        Economizou milhares de horas de trabalho manual.
+
+    [3] Targon (BPO Innova)
+        Sistema de controle financeiro e gestão de horas.
+        Trouxe transparência e eficiência para a operação.
+
+    [4] Este site (Windows XP Portfolio)
+        Simulação completa do Windows XP em HTML/CSS/JS.
+        Um único arquivo. Nostalgia pura.
+`,
+    'history': `
+    ═══════════════════════════════════════
+    TRAJETÓRIA PROFISSIONAL
+    ═══════════════════════════════════════
+    2018     SC Brasil — Estagiário de Suporte
+    2019-20  CEBRAT Educação — Suporte & Dev
+    2020-22  BPO Innova — Dev Backend Júnior → Pleno
+    2023-24  SENAC Rio — Instrutor de Programação
+    2023-24  Agilizza — Dev Full Stack Pleno
+    2024+    MUPER — Dev Full Stack Pleno
+    2024+    Mestre Oficina — Fundador & Dev Principal
+
+    Formação:
+    • ADS — Estácio de Sá (2023)
+    • Pós-grad Cloud Computing — Gran (em andamento)
+`,
+    'contact': `
+    ═══════════════════════════════════════
+    CONTATO
+    ═══════════════════════════════════════
+    Email:    contato.matheusteixeira@gmail.com
+    Site:     matheusteixeira.com.br
+    LinkedIn: linkedin.com/in/aeusteixeira
+    Tel:      (21) 99428-2445
+`,
+    'limewire': `
+    Iniciando LimeWire 4.18.8...
+    Conectando à rede Gnutella...
+    Conectado! 47 fontes encontradas.
+`,
+    'defrag': `
+    Iniciando Desfragmentador de Disco...
+`,
+    'bsod': `
+    *** AVISO: executando diagnóstico do sistema...
+    *** ERRO CRITICO DETECTADO
+`,
+};
+
+/* Hook no processador de comandos do CMD */
+const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
