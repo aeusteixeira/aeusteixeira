@@ -3390,40 +3390,48 @@ a,
     background: #000;
     display: none;
     overflow: hidden;
+    cursor: none;
 }
-
-.pipe {
-    position: absolute;
-    background: var(--c);
-    box-shadow: 0 0 6px var(--c);
-    border-radius: 1px;
+#ss-canvas {
+    width: 100%;
+    height: 100%;
 }
-
-.ss-text {
+#ss-hint {
     position: absolute;
-    font-size: 18px;
-    font-weight: bold;
-    color: #0f0;
-    text-shadow: 0 0 10px #0f0;
-    white-space: nowrap;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.2);
+    font-size: 11px;
     font-family: monospace;
-    animation: sstext var(--d, 8s) linear infinite;
+}
+#ss-mode-label {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    color: rgba(255,255,255,0.08);
+    font-size: 10px;
+    font-family: monospace;
 }
 
-@keyframes sstext {
-    0% {
-    transform: translate(var(--sx), var(--sy));
-    opacity: 1
-    }
+/* ═══════════════════════════════════════════════════════════
+   MATRIX RAIN (Konami Code)
+   ═══════════════════════════════════════════════════════════ */
+#matrix-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9700;
+    background: #000;
+    cursor: none;
+}
 
-    80% {
-    opacity: 1
-    }
-
-    100% {
-    transform: translate(var(--ex), var(--ey));
-    opacity: 0
-    }
+/* ═══════════════════════════════════════════════════════════
+   GHOST TRAIL (Window drag effect)
+   ═══════════════════════════════════════════════════════════ */
+.ghost-trail {
+    border: 2px solid rgba(0,55,200,0.3) !important;
+    background: rgba(0,55,200,0.06) !important;
+    box-shadow: none !important;
 }
 
 /* ── SHUTDOWN ───────────────────────────────── */
@@ -3459,6 +3467,32 @@ a,
 
     50% {
     opacity: 0.4
+    }
+}
+
+/* Efeito CRT desligando */
+#shutdown.crt-off {
+    animation: crtOff 0.8s ease-in forwards;
+}
+#shutdown.crt-off * {
+    animation: none !important;
+}
+@keyframes crtOff {
+    0% {
+        transform: scale(1, 1);
+        filter: brightness(1);
+    }
+    40% {
+        transform: scale(1.02, 0.005);
+        filter: brightness(2);
+    }
+    70% {
+        transform: scale(0.8, 0.003);
+        filter: brightness(3);
+    }
+    100% {
+        transform: scale(0, 0);
+        filter: brightness(0);
     }
 }
 
@@ -5966,7 +6000,7 @@ a,
   animation: clippyBounce 0.4s ease-out;
 }
 #clippy-body {
-  font-size: 64px; cursor: pointer;
+  cursor: pointer;
   filter: drop-shadow(2px 4px 6px rgba(0,0,0,.3));
   transition: transform .2s;
 }
@@ -6585,4 +6619,104 @@ a,
     pointer-events: none;
     z-index: 1;
     animation: msnWcScanline 4s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INSTALADOR NEXT NEXT NEXT
+   ═══════════════════════════════════════════════════════════ */
+#installer-wizard {
+    position: fixed;
+    inset: 0;
+    z-index: 9800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+}
+.inst-window {
+    width: 500px;
+    background: #ece9d8;
+    border: 2px solid #0054e3;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.inst-titlebar {
+    background: linear-gradient(180deg, #0a246a 0%, #3a6ea5 8%, #0a246a 100%);
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.inst-close {
+    cursor: pointer;
+    background: #c40000;
+    color: #fff;
+    padding: 0 5px;
+    border-radius: 2px;
+    font-size: 11px;
+}
+.inst-close:hover { background: #e00; }
+.inst-body {
+    display: flex;
+    min-height: 220px;
+}
+.inst-sidebar {
+    width: 140px;
+    background: linear-gradient(180deg, #1b5baa, #2a6eba, #0a4690);
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 12px;
+}
+.inst-sidebar-img {
+    width: 100px;
+    height: 100px;
+    background: url('img/system/executar.ico') center/contain no-repeat;
+    opacity: 0.8;
+}
+.inst-content {
+    flex: 1;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-left: 1px solid #999;
+    line-height: 1.5;
+    overflow-y: auto;
+}
+.inst-content h3 {
+    color: #003399;
+    font-size: 13px;
+}
+.inst-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 8px 12px;
+    border-top: 1px solid #999;
+    background: #ece9d8;
+}
+.inst-btn {
+    padding: 4px 16px;
+    font-size: 11px;
+    font-family: Tahoma, Arial, sans-serif;
+    cursor: pointer;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #ece9d8 100%);
+    border-radius: 3px;
+}
+.inst-btn:hover { background: linear-gradient(180deg, #fff 0%, #ddd 100%); }
+.inst-btn:disabled { opacity: 0.5; cursor: default; }
+.inst-btn-primary {
+    font-weight: 700;
+    border-color: #003399;
 }

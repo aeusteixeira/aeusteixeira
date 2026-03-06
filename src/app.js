@@ -73,6 +73,8 @@ function enterDesktop() {
     setTimeout(showClippy, 15000 + Math.random() * 10000);
     /* WinRAR popup clássico */
     setTimeout(showWinRAR, 25000 + Math.random() * 15000);
+    /* Pen drive detectado */
+    setTimeout(showPendrivePopup, 40000 + Math.random() * 10000);
 }
 
 /* ══════════════════════════════════════
@@ -132,6 +134,8 @@ const winMeta = {
     'win-receita': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'receitas_bacalhau_mae.txt' },
     'win-limewire': { ico: '🍋', lbl: 'LimeWire 4.18.8' },
     'win-defrag': { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' },
+    'win-pendrive': { ico: _ico('pasta-vazia.ico'), lbl: 'Disco removível (E:)' },
+    'win-pinball': { ico: '🏓', lbl: '3D Pinball — Space Cadet' },
 };
 
 const gtaPageUrls = {
@@ -272,6 +276,7 @@ function openWindow(id) {
     if (id === 'win-mydocs') mydocsInit();
     if (id === 'win-taskmgr') taskmgrInit();
     if (id === 'win-cmd') cmdInit();
+    if (id === 'win-pinball') pinballInit();
 }
 function printCV() {
     const page = document.getElementById('cv-page');
@@ -1873,38 +1878,149 @@ function nppZoom(dir) {
 }
 
 /* ══════════════════════════════════════
-    SCREENSAVER
+    SCREENSAVER 3D — STARFIELD + PIPES
 ══════════════════════════════════════ */
 let idleTimer = null;
-function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(triggerScreensaver, 30000); }
+let _ssRAF = null;
+let _ssMode = 0; /* 0=starfield, 1=pipes */
+function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(triggerScreensaver, 60000); }
 ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(ev => {
-    document.addEventListener(ev, () => { if (document.getElementById('screensaver').style.display === 'block') { exitScreensaver(); return; } resetIdleTimer(); });
+    document.addEventListener(ev, () => {
+        if (document.getElementById('screensaver').style.display === 'block') { exitScreensaver(); return; }
+        resetIdleTimer();
+    });
 });
+
+/* === STARFIELD === */
+const _stars = [];
+const NUM_STARS = 400;
+function initStars(w, h) {
+    _stars.length = 0;
+    for (let i = 0; i < NUM_STARS; i++) {
+        _stars.push({ x: (Math.random() - 0.5) * w * 2, y: (Math.random() - 0.5) * h * 2, z: Math.random() * 1600 });
+    }
+}
+function drawStarfield(ctx, w, h) {
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2;
+    for (const s of _stars) {
+        s.z -= 8;
+        if (s.z <= 0) { s.x = (Math.random() - 0.5) * w * 2; s.y = (Math.random() - 0.5) * h * 2; s.z = 1600; }
+        const sx = (s.x / s.z) * 300 + cx;
+        const sy = (s.y / s.z) * 300 + cy;
+        const r = Math.max(0.5, (1 - s.z / 1600) * 3);
+        const bright = 1 - s.z / 1600;
+        if (sx < 0 || sx > w || sy < 0 || sy > h) { s.z = 0; continue; }
+        ctx.beginPath();
+        ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${bright})`;
+        ctx.fill();
+        /* trail */
+        const px = (s.x / (s.z + 8)) * 300 + cx;
+        const py = (s.y / (s.z + 8)) * 300 + cy;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(sx, sy);
+        ctx.strokeStyle = `rgba(180,200,255,${bright * 0.5})`;
+        ctx.lineWidth = r * 0.6;
+        ctx.stroke();
+    }
+}
+
+/* === 3D PIPES === */
+const _pipes = [];
+let _pipeTimer = 0;
+const PIPE_COLORS = ['#ff3333', '#33ff33', '#3333ff', '#ffff33', '#ff33ff', '#33ffff', '#ff8833', '#33ff88'];
+function initPipes() {
+    _pipes.length = 0;
+    _pipeTimer = 0;
+    for (let i = 0; i < 6; i++) spawnPipe();
+}
+function spawnPipe() {
+    _pipes.push({
+        segments: [{ x: Math.random() * 0.8 + 0.1, y: Math.random() * 0.8 + 0.1 }],
+        color: PIPE_COLORS[Math.floor(Math.random() * PIPE_COLORS.length)],
+        dir: Math.floor(Math.random() * 4),
+        speed: 0.003 + Math.random() * 0.003,
+        thickness: 4 + Math.random() * 6,
+        alive: true,
+    });
+}
+function drawPipes(ctx, w, h) {
+    ctx.fillStyle = 'rgba(0,0,0,0.02)';
+    ctx.fillRect(0, 0, w, h);
+    _pipeTimer++;
+    if (_pipeTimer % 300 === 0 && _pipes.filter(p => p.alive).length < 12) spawnPipe();
+    for (const p of _pipes) {
+        if (!p.alive) continue;
+        const last = p.segments[p.segments.length - 1];
+        const dx = [0, 0, -1, 1][p.dir] * p.speed;
+        const dy = [-1, 1, 0, 0][p.dir] * p.speed;
+        const nx = last.x + dx, ny = last.y + dy;
+        if (nx < 0 || nx > 1 || ny < 0 || ny > 1 || Math.random() < 0.02) {
+            p.dir = Math.floor(Math.random() * 4);
+            /* joint sphere */
+            ctx.beginPath();
+            ctx.arc(last.x * w, last.y * h, p.thickness * 0.8, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else {
+            p.segments.push({ x: nx, y: ny });
+            if (p.segments.length > 2) {
+                const prev = p.segments[p.segments.length - 2];
+                ctx.beginPath();
+                ctx.moveTo(prev.x * w, prev.y * h);
+                ctx.lineTo(nx * w, ny * h);
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = p.thickness;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                /* highlight */
+                ctx.beginPath();
+                ctx.moveTo(prev.x * w, prev.y * h);
+                ctx.lineTo(nx * w, ny * h);
+                ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+                ctx.lineWidth = p.thickness * 0.3;
+                ctx.stroke();
+            }
+        }
+        if (p.segments.length > 600) p.alive = false;
+    }
+}
+
 function triggerScreensaver() {
     closeStartMenu();
-    const ss = document.getElementById('screensaver'); ss.style.display = 'block'; ss.innerHTML = '';
-    const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff', '#fa0', '#aff'];
-    for (let i = 0; i < 18; i++) {
-    const p = document.createElement('div'); p.className = 'pipe';
-    const h = Math.random() > 0.5, c = colors[Math.floor(Math.random() * colors.length)];
-    const x = Math.random() * 100, y = Math.random() * 100, l = 80 + Math.random() * 200, th = 6 + Math.random() * 8;
-    p.style.setProperty('--c', c);
-    p.style.cssText += (h ? `left:${x}%;top:${y}%;width:${l}px;height:${th}px` : `left:${x}%;top:${y}%;width:${th}px;height:${l}px`) + ';';
-    ss.appendChild(p);
+    _ssMode = Math.random() > 0.5 ? 0 : 1;
+    const ss = document.getElementById('screensaver');
+    const canvas = document.getElementById('ss-canvas');
+    const label = document.getElementById('ss-mode-label');
+    ss.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    label.textContent = _ssMode === 0 ? 'Starfield' : '3D Pipes';
+    if (_ssMode === 0) initStars(canvas.width, canvas.height);
+    else initPipes();
+    function loop() {
+        if (ss.style.display !== 'block') return;
+        if (_ssMode === 0) drawStarfield(ctx, canvas.width, canvas.height);
+        else drawPipes(ctx, canvas.width, canvas.height);
+        _ssRAF = requestAnimationFrame(loop);
     }
-    const msgs = ['PHP 8.3', 'Laravel', 'MySQL', 'Docker', 'n8n', 'Redis', 'REST API', 'CI/CD', 'matheusteixeira.com.br'];
-    msgs.forEach(m => {
-    const t = document.createElement('div'); t.className = 'ss-text';
-    const sx = Math.random() * 80 + 'vw', sy = Math.random() * 80 + 'vh', ex = Math.random() * 80 + 'vw', ey = Math.random() * 80 + 'vh';
-    t.textContent = m; t.style.cssText = `--sx:${sx};--sy:${sy};--ex:${ex};--ey:${ey};--d:${6 + Math.random() * 10}s;animation-delay:${Math.random() * 5}s;left:0;top:0;`;
-    ss.appendChild(t);
-    });
-    const hint = document.createElement('div');
-    hint.style.cssText = 'position:absolute;bottom:60px;width:100%;text-align:center;color:#444;font-size:11px;font-family:monospace;';
-    hint.textContent = 'Clique ou pressione qualquer tecla para sair';
-    ss.appendChild(hint);
+    loop();
 }
-function exitScreensaver() { document.getElementById('screensaver').style.display = 'none'; resetIdleTimer(); sndClick(); }
+function exitScreensaver() {
+    const ss = document.getElementById('screensaver');
+    ss.style.display = 'none';
+    if (_ssRAF) { cancelAnimationFrame(_ssRAF); _ssRAF = null; }
+    resetIdleTimer();
+}
 
 /* ══════════════════════════════════════
     EXPLORER FILE SELECT
@@ -1944,14 +2060,13 @@ function showDesktop() {
 ══════════════════════════════════════ */
 function doShutdown() {
     closeStartMenu();
-    localStorage.removeItem('xp_dirty'); // clean shutdown
+    localStorage.removeItem('xp_dirty');
     const shutSnd = new Audio('src/sounds/windows-xp-desligando.mp3');
     shutSnd.volume = 0.65;
     shutSnd.play().catch(() => sndShutdown());
     setTimeout(() => {
         const sd = document.getElementById('shutdown');
         sd.style.display = 'flex';
-        // Add a small force-close X button to simulate dirty shutdown on reload
         if (!document.getElementById('sd-force-x')) {
             const btn = document.createElement('div');
             btn.id = 'sd-force-x';
@@ -1961,6 +2076,10 @@ function doShutdown() {
             btn.onclick = () => { localStorage.setItem('xp_dirty', '1'); location.reload(); };
             sd.appendChild(btn);
         }
+        /* Efeito CRT: depois de mostrar "desligando...", encolhe a tela */
+        setTimeout(() => {
+            sd.classList.add('crt-off');
+        }, 2500);
     }, 600);
 }
 
@@ -2812,6 +2931,8 @@ Object.assign(cmdHandlers, {
     'limewire': () => { openWindow('win-limewire'); return `<span style="color:#0f0;white-space:pre">${_cmdExtras.limewire}</span>`; },
     'defrag': () => { openWindow('win-defrag'); _drawDefrag('defrag-canvas', true); return `<span style="color:#0f0;white-space:pre">${_cmdExtras.defrag}</span>`; },
     'bsod': () => { setTimeout(triggerBSOD, 500); return `<span style="color:#f00;white-space:pre">${_cmdExtras.bsod}</span>`; },
+    'pinball': () => { openWindow('win-pinball'); return '<span style="color:#0f0">Iniciando 3D Pinball — Space Cadet...</span>'; },
+    'matrix': () => { startMatrix(); return '<span style="color:#0f0">Wake up, Neo...</span>'; },
 });
 
 /* ══════════════════════════════════════
@@ -3989,6 +4110,591 @@ const _cmdExtras = {
     *** ERRO CRITICO DETECTADO
 `,
 };
+
+/* ══════════════════════════════════════
+    PEN DRIVE DETECTADO
+══════════════════════════════════════ */
+function showPendrivePopup() {
+    showNotif('🔌 Novo Hardware', 'Dispositivo USB Mass Storage detectado.');
+    setTimeout(() => {
+        showNotif('💾 Disco Removível (E:)', 'Pen drive Kingston DataTraveler 512MB pronto para uso.');
+    }, 3000);
+    setTimeout(() => {
+        showNotif('🛡️ Windows Defender', 'Verificando disco removível (E:)... 3 ameaças encontradas. Ignorando.');
+    }, 7000);
+}
+
+/* ══════════════════════════════════════
+    INSTALADOR NEXT NEXT NEXT
+══════════════════════════════════════ */
+let _instStep = 0;
+let _instName = '';
+let _instSteps = [];
+let _instBloatChecked = true;
+
+const _installerData = {
+    'KaZaA': { name: 'KaZaA Media Desktop 3.2.7', bloat: 'MySearch Toolbar + Cydoor Spyware' },
+    'eMule': { name: 'eMule 0.50a', bloat: 'Ask Toolbar + WeatherBug' },
+    'Nero': { name: 'Nero Burning ROM 7.0', bloat: 'Nero Scout + Nero StartSmart' },
+    'winamp': { name: 'Winamp 5.66', bloat: 'AOL Toolbar + Winamp Remote' },
+    'utorrent': { name: 'uTorrent 2.2.1', bloat: 'Conduit Toolbar + Browser Defender' },
+    'MSN_Plus': { name: 'MSN Plus! 4.81', bloat: 'Sponsor Master + Lop.com' },
+    'Ares': { name: 'Ares Galaxy 2.1.7', bloat: 'Baidu Antivirus + Ask Toolbar' },
+    'IDM': { name: 'Internet Download Manager 5.18', bloat: 'IDM Toolbar + ShopperReports' },
+    'docker': { name: 'Docker Desktop Installer', bloat: 'Docker CLI + WSL Integration' },
+};
+
+function openInstaller(fileLabel) {
+    let key = null;
+    if (fileLabel.includes('KaZaA')) key = 'KaZaA';
+    else if (fileLabel.includes('eMule')) key = 'eMule';
+    else if (fileLabel.includes('Nero')) key = 'Nero';
+    else if (fileLabel.includes('winamp')) key = 'winamp';
+    else if (fileLabel.includes('utorrent')) key = 'utorrent';
+    else if (fileLabel.includes('MSN_Plus')) key = 'MSN_Plus';
+    else if (fileLabel.includes('Ares')) key = 'Ares';
+    else if (fileLabel.includes('Internet_Download')) key = 'IDM';
+    else if (fileLabel.includes('docker')) key = 'docker';
+    if (!key) {
+        showNotif('⚠️ Erro', 'Não foi possível executar este arquivo.');
+        return;
+    }
+    const data = _installerData[key];
+    _instName = data.name;
+    _instStep = 0;
+    _instBloatChecked = true;
+    _instSteps = [
+        /* 0 - Boas-vindas */
+        `<h3 style="margin:0 0 8px">Bem-vindo ao Assistente de Instalação</h3>
+         <p>Este assistente irá guiá-lo na instalação do <b>${data.name}</b> no seu computador.</p>
+         <p style="margin-top:12px;color:#555">Recomenda-se fechar todos os outros programas antes de continuar.</p>
+         <p style="margin-top:auto;font-size:10px;color:#888">Clique em Avançar para continuar.</p>`,
+        /* 1 - Licença */
+        `<h3 style="margin:0 0 8px">Contrato de Licença</h3>
+         <div style="border:1px solid #999;padding:6px;height:120px;overflow-y:auto;font-size:10px;background:#fff;font-family:Courier New,monospace;line-height:1.4">
+         CONTRATO DE LICENÇA DE USUÁRIO FINAL\n\nAo instalar este software, você concorda em:\n\n1. Não ler este contrato (como todo mundo).\n2. Aceitar que ninguém nunca leu isso.\n3. Permitir que coletemos cookies (de chocolate).\n4. Concordar que o dev deste site merece uma vaga.\n5. Reconhecer que PHP é a melhor linguagem.\n\nArt. 42 - O usuário concorda que Matheus Teixeira\né um excelente desenvolvedor e merece ser contratado\nimediatamente.\n\n§1 - Em caso de discordância, releia o Art. 42.\n\n© 2007 Software Gratuito™ Ltda.\nTodos os direitos reservados. Ou não.\n</div>
+         <label style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer">
+           <input type="radio" name="lic" checked> Eu aceito os termos do contrato
+         </label>
+         <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer">
+           <input type="radio" name="lic"> Eu não aceito
+         </label>`,
+        /* 2 - Pasta de destino */
+        `<h3 style="margin:0 0 8px">Pasta de Destino</h3>
+         <p>O ${data.name} será instalado na seguinte pasta:</p>
+         <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
+           <input value="C:\\Arquivos de Programas\\${data.name.split(' ')[0]}\\" readonly style="flex:1;padding:3px 6px;font-size:11px;border:1px solid #999">
+           <button onclick="sndClick();showNotif('📂 Procurar','Não, instala ali mesmo.')" style="padding:3px 12px;font-size:11px;cursor:pointer">Procurar...</button>
+         </div>
+         <p style="margin-top:10px;font-size:10px;color:#555">Espaço necessário: 47.3 MB<br>Espaço disponível: 28.4 GB</p>`,
+        /* 3 - Componentes extras (BLOATWARE) */
+        `<h3 style="margin:0 0 8px">Componentes Adicionais</h3>
+         <p style="font-size:11px">Selecione os componentes adicionais que deseja instalar:</p>
+         <div style="border:1px solid #999;padding:8px;background:#fff;margin-top:8px;">
+           <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;margin-bottom:6px" id="inst-bloat-label">
+             <input type="checkbox" checked id="inst-bloat-check" onchange="_instBloatChecked=this.checked"> Instalar ${data.bloat}
+           </label>
+           <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;margin-bottom:6px">
+             <input type="checkbox" checked disabled> Definir como página inicial do navegador
+           </label>
+           <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer">
+             <input type="checkbox" checked disabled> Enviar dados anônimos de uso
+           </label>
+         </div>
+         <p style="margin-top:6px;font-size:10px;color:#c00">(Recomendado: desmarque tudo, mas quem faz isso?)</p>`,
+        /* 4 - Instalando */
+        `<h3 style="margin:0 0 8px">Instalando...</h3>
+         <p id="inst-progress-label">Copiando arquivos...</p>
+         <div style="border:1px solid #999;height:20px;background:#fff;margin-top:10px;position:relative;overflow:hidden">
+           <div id="inst-progress-bar" style="height:100%;background:linear-gradient(180deg,#3a6ea5,#2d5f8a);width:0%;transition:width 0.3s"></div>
+         </div>
+         <p id="inst-progress-file" style="margin-top:6px;font-size:10px;color:#555">Preparando...</p>`,
+        /* 5 - Concluído */
+        `<h3 style="margin:0 0 8px">Instalação Concluída!</h3>
+         <p>O ${data.name} foi instalado com sucesso no seu computador.</p>
+         <div id="inst-bloat-result" style="margin-top:8px"></div>
+         <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;margin-top:12px">
+           <input type="checkbox" checked> Executar ${data.name.split(' ')[0]} agora
+         </label>
+         <p style="margin-top:auto;font-size:10px;color:#888">Clique em Concluir para sair do assistente.</p>`,
+    ];
+    document.getElementById('inst-title-txt').textContent = _instName + ' — Instalação';
+    renderInstStep();
+    document.getElementById('installer-wizard').style.display = 'flex';
+    sndOpen();
+}
+
+function renderInstStep() {
+    document.getElementById('inst-content').innerHTML = _instSteps[_instStep];
+    const btnBack = document.getElementById('inst-btn-back');
+    const btnNext = document.getElementById('inst-btn-next');
+    btnBack.style.visibility = _instStep <= 0 || _instStep >= 4 ? 'hidden' : 'visible';
+    if (_instStep === 4) {
+        btnNext.disabled = true;
+        btnNext.textContent = 'Aguarde...';
+        runInstProgress();
+    } else if (_instStep === 5) {
+        btnNext.disabled = false;
+        btnNext.textContent = 'Concluir ✔';
+        const res = document.getElementById('inst-bloat-result');
+        if (_instBloatChecked) {
+            res.innerHTML = '<p style="color:#c00;font-size:11px">⚠️ Parabéns! Você instalou a toolbar junto. Seu navegador nunca mais será o mesmo.</p>';
+        } else {
+            res.innerHTML = '<p style="color:#080;font-size:11px">✅ Você desmarcou o bloatware! Isso é raro. Parabéns, pessoa consciente.</p>';
+        }
+    } else {
+        btnNext.disabled = false;
+        btnNext.textContent = 'Avançar ▶';
+    }
+}
+
+function instNext() {
+    sndClick();
+    if (_instStep >= 5) { closeInstaller(); return; }
+    if (_instStep < 4) _instStep++;
+    else if (_instStep === 4) { _instStep = 5; }
+    renderInstStep();
+}
+
+function instBack() {
+    sndClick();
+    if (_instStep > 0 && _instStep < 4) { _instStep--; renderInstStep(); }
+}
+
+function closeInstaller() {
+    sndClose();
+    document.getElementById('installer-wizard').style.display = 'none';
+    _instStep = 0;
+}
+
+function runInstProgress() {
+    const bar = document.getElementById('inst-progress-bar');
+    const label = document.getElementById('inst-progress-label');
+    const fileEl = document.getElementById('inst-progress-file');
+    const fakeFiles = [
+        'C:\\WINDOWS\\system32\\toolbar_helper.dll',
+        'C:\\Arquivos de Programas\\setup_cache.tmp',
+        'C:\\WINDOWS\\Temp\\~inst0034.dat',
+        'C:\\Arquivos de Programas\\main.exe',
+        'C:\\WINDOWS\\system32\\msvcrt71.dll',
+        'C:\\Arquivos de Programas\\uninstall.exe',
+        'C:\\WINDOWS\\system32\\config.ini',
+        'C:\\Arquivos de Programas\\lang\\pt-BR.dll',
+        'C:\\Arquivos de Programas\\plugins\\codec.dll',
+        'C:\\WINDOWS\\system32\\drivers\\net_hook.sys',
+    ];
+    let prog = 0;
+    const iv = setInterval(() => {
+        prog += 5 + Math.random() * 10;
+        if (prog >= 100) prog = 100;
+        bar.style.width = prog + '%';
+        fileEl.textContent = fakeFiles[Math.floor(Math.random() * fakeFiles.length)];
+        if (prog < 30) label.textContent = 'Copiando arquivos...';
+        else if (prog < 60) label.textContent = 'Registrando componentes...';
+        else if (prog < 85) label.textContent = 'Criando atalhos...';
+        else label.textContent = 'Finalizando instalação...';
+        if (prog >= 100) {
+            clearInterval(iv);
+            setTimeout(() => { _instStep = 5; renderInstStep(); }, 500);
+        }
+    }, 400);
+}
+
+/* ══════════════════════════════════════
+    PINBALL SPACE CADET
+══════════════════════════════════════ */
+let _pbRAF = null, _pbRunning = false;
+let _pbBall = null, _pbScore = 0, _pbBalls = 3, _pbHigh = 0;
+let _pbFlipL = 0, _pbFlipR = 0; /* 0=down, 1=up */
+let _pbLaunching = false, _pbLaunchPower = 0;
+const PB_W = 400, PB_H = 520;
+const PB_GRAVITY = 0.15;
+const PB_BUMPERS = [
+    { x: 120, y: 140, r: 22 },
+    { x: 200, y: 100, r: 22 },
+    { x: 280, y: 140, r: 22 },
+    { x: 160, y: 220, r: 18 },
+    { x: 240, y: 220, r: 18 },
+    { x: 200, y: 300, r: 16 },
+];
+const PB_TARGETS = [
+    { x: 60, y: 180, w: 6, h: 40, hit: false, pts: 500 },
+    { x: 334, y: 180, w: 6, h: 40, hit: false, pts: 500 },
+    { x: 100, y: 80, w: 6, h: 30, hit: false, pts: 750 },
+    { x: 300, y: 80, w: 6, h: 30, hit: false, pts: 750 },
+];
+
+function pinballInit() {
+    _pbScore = 0; _pbBalls = 3;
+    PB_TARGETS.forEach(t => t.hit = false);
+    document.getElementById('pb-score').textContent = '0';
+    document.getElementById('pb-ball').textContent = '3';
+    document.getElementById('pb-high').textContent = _pbHigh;
+    _pbBall = null;
+    pinballSpawnBall();
+    if (!_pbRunning) { _pbRunning = true; pinballLoop(); }
+}
+
+function pinballSpawnBall() {
+    _pbBall = { x: 375, y: 450, vx: 0, vy: 0, r: 7, active: false };
+    _pbLaunching = false; _pbLaunchPower = 0;
+}
+
+function pinballLoop() {
+    if (!_pbRunning) return;
+    const canvas = document.getElementById('pinball-canvas');
+    if (!canvas || canvas.offsetParent === null) { _pbRunning = false; return; }
+    const ctx = canvas.getContext('2d');
+    pinballUpdate();
+    pinballDraw(ctx);
+    _pbRAF = requestAnimationFrame(pinballLoop);
+}
+
+function pinballUpdate() {
+    if (!_pbBall) return;
+    /* Launcher */
+    if (_pbLaunching) {
+        _pbLaunchPower = Math.min(_pbLaunchPower + 0.4, 18);
+        return;
+    }
+    if (!_pbBall.active) return;
+    /* Physics */
+    _pbBall.vy += PB_GRAVITY;
+    _pbBall.x += _pbBall.vx;
+    _pbBall.y += _pbBall.vy;
+    /* Walls */
+    if (_pbBall.x - _pbBall.r < 20) { _pbBall.x = 20 + _pbBall.r; _pbBall.vx = Math.abs(_pbBall.vx) * 0.8; }
+    if (_pbBall.x + _pbBall.r > 360) { _pbBall.x = 360 - _pbBall.r; _pbBall.vx = -Math.abs(_pbBall.vx) * 0.8; }
+    /* Launch lane wall */
+    if (_pbBall.x + _pbBall.r > 365 && _pbBall.y < 420) { _pbBall.x = 365 - _pbBall.r; _pbBall.vx = -Math.abs(_pbBall.vx) * 0.8; }
+    if (_pbBall.y - _pbBall.r < 10) { _pbBall.y = 10 + _pbBall.r; _pbBall.vy = Math.abs(_pbBall.vy) * 0.6; }
+    /* Bumpers */
+    for (const b of PB_BUMPERS) {
+        const dx = _pbBall.x - b.x, dy = _pbBall.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < _pbBall.r + b.r) {
+            const angle = Math.atan2(dy, dx);
+            const speed = Math.sqrt(_pbBall.vx * _pbBall.vx + _pbBall.vy * _pbBall.vy);
+            const bounce = Math.max(speed, 5);
+            _pbBall.vx = Math.cos(angle) * bounce;
+            _pbBall.vy = Math.sin(angle) * bounce;
+            _pbBall.x = b.x + Math.cos(angle) * (b.r + _pbBall.r + 1);
+            _pbBall.y = b.y + Math.sin(angle) * (b.r + _pbBall.r + 1);
+            b._flash = 8;
+            pbAddScore(100);
+        }
+        if (b._flash > 0) b._flash--;
+    }
+    /* Targets */
+    for (const t of PB_TARGETS) {
+        if (t.hit) continue;
+        if (_pbBall.x + _pbBall.r > t.x && _pbBall.x - _pbBall.r < t.x + t.w &&
+            _pbBall.y + _pbBall.r > t.y && _pbBall.y - _pbBall.r < t.y + t.h) {
+            t.hit = true;
+            t._flash = 15;
+            _pbBall.vx = -_pbBall.vx;
+            pbAddScore(t.pts);
+        }
+        if (t._flash > 0) t._flash--;
+    }
+    /* Flippers */
+    const flipY = 470;
+    /* Left flipper: pivot at (100, flipY), length 60 */
+    const flLA = _pbFlipL ? -0.45 : 0.35;
+    const flLEx = 100 + Math.cos(flLA) * 60, flLEy = flipY + Math.sin(flLA) * 60;
+    if (pbPointLineDist(_pbBall.x, _pbBall.y, 100, flipY, flLEx, flLEy) < _pbBall.r + 5) {
+        _pbBall.vy = -Math.abs(_pbBall.vy) - (_pbFlipL ? 6 : 1);
+        _pbBall.vx += (_pbFlipL ? 3 : 0.5) * (_pbBall.x > 200 ? 1 : -0.5);
+        _pbBall.y = Math.min(_pbBall.y, flipY - _pbBall.r - 6);
+        pbAddScore(10);
+    }
+    /* Right flipper: pivot at (300, flipY), length 60 */
+    const flRA = _pbFlipR ? Math.PI + 0.45 : Math.PI - 0.35;
+    const flREx = 300 + Math.cos(flRA) * 60, flREy = flipY + Math.sin(flRA) * 60;
+    if (pbPointLineDist(_pbBall.x, _pbBall.y, 300, flipY, flREx, flREy) < _pbBall.r + 5) {
+        _pbBall.vy = -Math.abs(_pbBall.vy) - (_pbFlipR ? 6 : 1);
+        _pbBall.vx -= (_pbFlipR ? 3 : 0.5) * (_pbBall.x < 200 ? 1 : -0.5);
+        _pbBall.y = Math.min(_pbBall.y, flipY - _pbBall.r - 6);
+        pbAddScore(10);
+    }
+    /* Drain */
+    if (_pbBall.y > PB_H + 10) {
+        _pbBalls--;
+        document.getElementById('pb-ball').textContent = _pbBalls;
+        if (_pbBalls <= 0) {
+            if (_pbScore > _pbHigh) { _pbHigh = _pbScore; document.getElementById('pb-high').textContent = _pbHigh; }
+            showNotif('🏓 Pinball', `Game Over! Score: ${_pbScore}`);
+            _pbBalls = 3; _pbScore = 0;
+            document.getElementById('pb-ball').textContent = '3';
+            document.getElementById('pb-score').textContent = '0';
+            PB_TARGETS.forEach(t => t.hit = false);
+        }
+        pinballSpawnBall();
+    }
+    /* Speed cap */
+    const maxV = 14;
+    if (Math.abs(_pbBall.vx) > maxV) _pbBall.vx = Math.sign(_pbBall.vx) * maxV;
+    if (Math.abs(_pbBall.vy) > maxV) _pbBall.vy = Math.sign(_pbBall.vy) * maxV;
+}
+
+function pbPointLineDist(px, py, x1, y1, x2, y2) {
+    const A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1;
+    const dot = A * C + B * D, lenSq = C * C + D * D;
+    let t = lenSq !== 0 ? Math.max(0, Math.min(1, dot / lenSq)) : 0;
+    const cx = x1 + t * C, cy = y1 + t * D;
+    return Math.sqrt((px - cx) * (px - cx) + (py - cy) * (py - cy));
+}
+
+function pbAddScore(pts) {
+    _pbScore += pts;
+    document.getElementById('pb-score').textContent = _pbScore;
+}
+
+function pinballDraw(ctx) {
+    /* Background — space theme */
+    ctx.fillStyle = '#0a0a2e';
+    ctx.fillRect(0, 0, PB_W, PB_H);
+    /* Stars bg */
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    for (let i = 0; i < 40; i++) {
+        const sx = (i * 97 + 13) % PB_W, sy = (i * 73 + 29) % PB_H;
+        ctx.fillRect(sx, sy, 1, 1);
+    }
+    /* Walls */
+    ctx.strokeStyle = '#3366cc';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(20, 10); ctx.lineTo(20, 490);
+    ctx.moveTo(360, 10); ctx.lineTo(360, 420);
+    ctx.moveTo(20, 10); ctx.lineTo(360, 10);
+    /* Launch lane */
+    ctx.moveTo(365, 420); ctx.lineTo(365, 10);
+    ctx.moveTo(395, 520); ctx.lineTo(395, 10);
+    ctx.stroke();
+    /* Gutters */
+    ctx.strokeStyle = '#224488';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(20, 490); ctx.lineTo(90, 490);
+    ctx.moveTo(310, 490); ctx.lineTo(360, 420);
+    ctx.stroke();
+    /* Bumpers */
+    for (const b of PB_BUMPERS) {
+        const flash = b._flash > 0;
+        const grad = ctx.createRadialGradient(b.x - 3, b.y - 3, 2, b.x, b.y, b.r);
+        grad.addColorStop(0, flash ? '#fff' : '#ff6644');
+        grad.addColorStop(1, flash ? '#ff4422' : '#882211');
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = flash ? '#fff' : '#ff8866';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        /* pts text */
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('100', b.x, b.y + 3);
+    }
+    /* Targets */
+    for (const t of PB_TARGETS) {
+        ctx.fillStyle = t.hit ? '#333' : (t._flash > 0 ? '#fff' : '#ffcc00');
+        ctx.fillRect(t.x, t.y, t.w, t.h);
+        if (!t.hit) {
+            ctx.fillStyle = '#ff0';
+            ctx.shadowColor = '#ff0';
+            ctx.shadowBlur = 6;
+            ctx.fillRect(t.x, t.y, t.w, t.h);
+            ctx.shadowBlur = 0;
+        }
+    }
+    /* Flippers */
+    const flipY = 470;
+    ctx.lineCap = 'round';
+    /* Left */
+    const flLA = _pbFlipL ? -0.45 : 0.35;
+    ctx.beginPath();
+    ctx.moveTo(100, flipY);
+    ctx.lineTo(100 + Math.cos(flLA) * 60, flipY + Math.sin(flLA) * 60);
+    ctx.strokeStyle = '#44aaff';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    /* Right */
+    const flRA = _pbFlipR ? Math.PI + 0.45 : Math.PI - 0.35;
+    ctx.beginPath();
+    ctx.moveTo(300, flipY);
+    ctx.lineTo(300 + Math.cos(flRA) * 60, flipY + Math.sin(flRA) * 60);
+    ctx.strokeStyle = '#44aaff';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    /* Ball */
+    if (_pbBall) {
+        const bGrad = ctx.createRadialGradient(_pbBall.x - 2, _pbBall.y - 2, 1, _pbBall.x, _pbBall.y, _pbBall.r);
+        bGrad.addColorStop(0, '#fff');
+        bGrad.addColorStop(0.5, '#ddd');
+        bGrad.addColorStop(1, '#888');
+        ctx.beginPath();
+        ctx.arc(_pbBall.x, _pbBall.y, _pbBall.r, 0, Math.PI * 2);
+        ctx.fillStyle = bGrad;
+        ctx.fill();
+    }
+    /* Launch power bar */
+    if (_pbLaunching && _pbBall && !_pbBall.active) {
+        ctx.fillStyle = '#333';
+        ctx.fillRect(378, 460, 12, -60);
+        const h = (_pbLaunchPower / 18) * 58;
+        ctx.fillStyle = `hsl(${120 - (_pbLaunchPower / 18) * 120}, 100%, 50%)`;
+        ctx.fillRect(379, 459, 10, -h);
+    }
+    ctx.lineCap = 'butt';
+}
+
+function pinballStop() {
+    _pbRunning = false;
+    if (_pbRAF) { cancelAnimationFrame(_pbRAF); _pbRAF = null; }
+}
+
+/* Pinball keyboard */
+document.addEventListener('keydown', e => {
+    const pbWin = document.getElementById('win-pinball');
+    if (!pbWin || pbWin.style.display === 'none') return;
+    if (e.key === 'z' || e.key === 'Z') { _pbFlipL = 1; e.preventDefault(); }
+    if (e.key === 'm' || e.key === 'M') { _pbFlipR = 1; e.preventDefault(); }
+    if (e.key === ' ' && _pbBall && !_pbBall.active) { _pbLaunching = true; e.preventDefault(); }
+});
+document.addEventListener('keyup', e => {
+    if (e.key === 'z' || e.key === 'Z') _pbFlipL = 0;
+    if (e.key === 'm' || e.key === 'M') _pbFlipR = 0;
+    if (e.key === ' ' && _pbLaunching) {
+        _pbLaunching = false;
+        if (_pbBall && !_pbBall.active) {
+            _pbBall.active = true;
+            _pbBall.vy = -_pbLaunchPower;
+            _pbBall.vx = -1 + Math.random() * 2;
+            _pbLaunchPower = 0;
+        }
+    }
+});
+
+/* ══════════════════════════════════════
+    KONAMI CODE — MATRIX RAIN
+══════════════════════════════════════ */
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let _konamiIdx = 0;
+let _matrixRAF = null;
+let _matrixActive = false;
+
+document.addEventListener('keydown', e => {
+    if (_matrixActive) { stopMatrix(); return; }
+    if (e.key === KONAMI[_konamiIdx]) {
+        _konamiIdx++;
+        if (_konamiIdx >= KONAMI.length) {
+            _konamiIdx = 0;
+            startMatrix();
+        }
+    } else {
+        _konamiIdx = e.key === KONAMI[0] ? 1 : 0;
+    }
+});
+
+function startMatrix() {
+    _matrixActive = true;
+    const canvas = document.getElementById('matrix-canvas');
+    canvas.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    const cols = Math.floor(canvas.width / 16);
+    const drops = new Array(cols).fill(0).map(() => Math.floor(Math.random() * -40));
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF<>{}[]|/\\matheus';
+    showNotif('🟢 MATRIX', 'The Matrix has you... (clique qualquer tecla para sair)');
+    function draw() {
+        if (!_matrixActive) return;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '15px monospace';
+        for (let i = 0; i < cols; i++) {
+            const ch = chars[Math.floor(Math.random() * chars.length)];
+            const x = i * 16;
+            const y = drops[i] * 16;
+            /* Head char — bright white/green */
+            ctx.fillStyle = '#aaffaa';
+            ctx.fillText(ch, x, y);
+            /* Trail chars */
+            ctx.fillStyle = '#00ff41';
+            const prevCh = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(prevCh, x, y - 16);
+            ctx.fillStyle = 'rgba(0, 255, 65, 0.6)';
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, y - 32);
+            drops[i]++;
+            if (drops[i] * 16 > canvas.height && Math.random() > 0.975) {
+                drops[i] = Math.floor(Math.random() * -10);
+            }
+        }
+        _matrixRAF = requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function stopMatrix() {
+    _matrixActive = false;
+    if (_matrixRAF) { cancelAnimationFrame(_matrixRAF); _matrixRAF = null; }
+    document.getElementById('matrix-canvas').style.display = 'none';
+    sndClick();
+}
+
+/* ══════════════════════════════════════
+    EFEITO FANTASMA — ARRASTAR JANELAS
+══════════════════════════════════════ */
+let _ghostEnabled = false;
+let _ghostTrails = [];
+let _ghostCheckTimer = null;
+
+function checkGhostMode() {
+    const wins = document.querySelectorAll('.xp-win');
+    let openCount = 0;
+    wins.forEach(w => { if (w.style.display !== 'none' && !w.classList.contains('minimized')) openCount++; });
+    const wasEnabled = _ghostEnabled;
+    _ghostEnabled = openCount >= 6;
+    if (_ghostEnabled && !wasEnabled) {
+        showNotif('⚠️ Sistema', 'Muitas janelas abertas! O sistema pode ficar instável...');
+    }
+}
+
+/* Patch the mousemove for ghost trails */
+const _origDragMove = document.onmousemove;
+document.addEventListener('mousemove', e => {
+    if (!drag || !_ghostEnabled) return;
+    const el = document.getElementById(drag.id);
+    if (!el) return;
+    const ghost = el.cloneNode(true);
+    ghost.className = 'ghost-trail';
+    ghost.style.cssText = el.style.cssText;
+    ghost.style.position = 'fixed';
+    ghost.style.opacity = '0.3';
+    ghost.style.pointerEvents = 'none';
+    ghost.style.zIndex = '1';
+    ghost.style.transition = 'opacity 0.6s';
+    document.getElementById('desktop').appendChild(ghost);
+    _ghostTrails.push(ghost);
+    setTimeout(() => { ghost.style.opacity = '0'; }, 50);
+    setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 700);
+    /* Limit trail count */
+    if (_ghostTrails.length > 30) {
+        const old = _ghostTrails.shift();
+        if (old.parentNode) old.parentNode.removeChild(old);
+    }
+});
+
+/* Check ghost mode periodically */
+setInterval(checkGhostMode, 3000);
 
 /* Hook no processador de comandos do CMD */
 const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
