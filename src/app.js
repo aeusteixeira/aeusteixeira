@@ -1,5 +1,26 @@
 
 /* ══════════════════════════════════════
+    CONSOLE EASTER EGG
+══════════════════════════════════════ */
+console.log('%c╔══════════════════════════════════════════════╗', 'color:#4fc3f7;font-family:monospace;font-size:13px;');
+console.log('%c║  C:\\Users\\Matheus> whoami                     ║', 'color:#4fc3f7;font-family:monospace;font-size:13px;');
+console.log('%c╚══════════════════════════════════════════════╝', 'color:#4fc3f7;font-family:monospace;font-size:13px;');
+console.log('%c  Matheus Teixeira', 'color:#fff;font-size:22px;font-weight:bold;text-shadow:1px 1px 2px #000;');
+console.log('%c  Back-End Developer | Especialista Laravel', 'color:#90caf9;font-size:14px;');
+console.log('');
+console.log('%c  E aí, dev? Tá inspecionando meu código?', 'color:#27ae60;font-size:13px;');
+console.log('%c  Fica à vontade. É tudo HTML, CSS e JS puro.', 'color:#aaa;font-size:12px;');
+console.log('%c  Sem framework, sem biblioteca, sem npm install.', 'color:#aaa;font-size:12px;');
+console.log('%c  Do jeito que eu aprendi num Windows XP igualzinho esse.', 'color:#aaa;font-size:12px;');
+console.log('');
+console.log('%c  Se curtiu, me chama:', 'color:#f1c40f;font-size:12px;');
+console.log('%c  💼 linkedin.com/in/aeusteixeira', 'color:#ccc;font-size:12px;');
+console.log('%c  🐙 github.com/aeusteixeira', 'color:#ccc;font-size:12px;');
+console.log('%c  📧 contato@matheusteixeira.com.br', 'color:#ccc;font-size:12px;');
+console.log('');
+console.log('%c  PS: tenta digitar "about" no CMD ali do desktop. ;)', 'color:#e74c3c;font-size:12px;font-style:italic;');
+
+/* ══════════════════════════════════════
     AUDIO
 ══════════════════════════════════════ */
 const AC = new (window.AudioContext || window.webkitAudioContext)();
