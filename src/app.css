@@ -41,216 +41,215 @@ a,
 }
 
 /* ── BOOT ───────────────────────────────────── */
-#boot {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-}
-
+/* ── Windows flag colors (shared) ──────────────── */
+.bf-r { background: #e84040; }
+.bf-g { background: #40c840; }
+.bf-b { background: #4040e8; }
+.bf-y { background: #e8e840; }
 .boot-flag {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
-    width: 56px;
-    height: 56px;
 }
+.boot-flag div { border-radius: 4px; }
 
-.boot-flag div {
-    border-radius: 4px;
-}
-
-.bf-r {
-    background: #e84040;
-}
-
-.bf-g {
-    background: #40c840;
-}
-
-.bf-b {
-    background: #4040e8;
-}
-
-.bf-y {
-    background: #e8e840;
-}
-
-.boot-logo {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.boot-logo-text .win {
-    font-size: 12px;
-    font-weight: normal;
-    color: rgba(255, 255, 255, 0.85);
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
-}
-
-.boot-logo-text .xp {
-    font-size: 44px;
-    font-weight: bold;
-    color: #fff;
-    letter-spacing: -1px;
-    line-height: 1;
-    text-shadow: 0 0 40px rgba(80, 160, 255, 0.5);
-}
-
-.boot-edition {
-    color: #a0c8ff;
-    font-size: 12px;
-    font-style: italic;
-    letter-spacing: 1px;
-}
-
-.boot-bar-wrap {
-    width: 200px;
-    height: 12px;
+/* ── POST (BIOS) ─────────────────────────────── */
+#post {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
     background: #000;
-    border: 1px solid #444;
-    border-radius: 2px;
+    padding: 20px 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.post-ami {
+    margin: 16px 24px 12px;
+}
+.post-ami-logo {
+    width: 320px;
+    height: auto;
+    display: block;
+    margin-bottom: 8px;
+}
+.post-ami .post-dim {
+    font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
+    font-size: 13px;
+    color: #666;
+}
+.post-text {
+    font-family: 'Perfect DOS VGA 437', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.35;
+    color: #aaa;
+    white-space: pre-wrap;
+    margin: 0;
+    flex: 1;
     overflow: hidden;
 }
-
-.boot-bar-track {
-    height: 100%;
-    background: repeating-linear-gradient(90deg, #1a60d0 0, #5ab0ff 13px, #1a50c0 13px, transparent 14px, transparent 18px);
-    background-size: 18px 100%;
-    animation: bootloop 0.7s linear infinite;
-}
-
-@keyframes bootloop {
-    from {
-    background-position: 0 0
-    }
-
-    to {
-    background-position: 18px 0
-    }
-}
-
-.boot-copy {
-    color: #555;
-    font-size: 10px;
+.post-cursor {
+    width: 8px;
+    height: 14px;
+    background: #ffaa00;
     position: absolute;
-    bottom: 20px;
+    bottom: 28px;
+    left: 28px;
+    animation: postBlink 0.6s step-end infinite;
 }
+@keyframes postBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.post-text .post-white { color: #fff; }
+.post-text .post-cyan { color: #55ffff; }
+.post-text .post-yellow { color: #ffff55; }
+.post-text .post-green { color: #55ff55; }
+.post-text .post-red { color: #ff5555; }
+.post-text .post-bold { color: #fff; font-weight: bold; }
 
 /* ── WELCOME ────────────────────────────────── */
+/* ── WELCOME SCREEN (Classic XP) ──────────── */
 #welcome {
     position: fixed;
     inset: 0;
     z-index: 9998;
     display: none;
-    background: linear-gradient(180deg, #06184c 0%, #0c2878 10%, #1040b8 35%, #0e3aaa 65%, #0a2880 90%, #061060 100%);
     flex-direction: column;
+    background: #5a7edc;
+    overflow: hidden;
 }
-
-.wc-top {
-    width: 100%;
-    background: rgba(0, 0, 20, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 14px 0;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.92);
-    font-size: 13px;
-    letter-spacing: 0.3px;
+/* Dark blue top bar */
+.wc-bar-top {
+    height: 44px;
+    background: linear-gradient(180deg, #0a246a 0%, #0a246a 60%, #2458b5 100%);
+    flex-shrink: 0;
 }
-
-.wc-center {
+/* Main body - the lighter blue area */
+.wc-body {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 8px;
-    padding: 20px;
+    background: linear-gradient(135deg, #7ea4e8 0%, #5a7edc 30%, #6a8ee4 60%, #5a7edc 100%);
+    position: relative;
 }
-
+/* Soft glow in top-left corner like real XP */
+.wc-glow {
+    position: absolute;
+    top: -80px;
+    left: -80px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(180,210,255,0.4) 0%, transparent 60%);
+    pointer-events: none;
+}
+/* Left side: logo + message */
+.wc-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+}
+.wc-logo {
+    width: 240px;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+.wc-msg {
+    color: #fff;
+    font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    text-align: center;
+    letter-spacing: 0.2px;
+}
+/* Vertical divider */
+.wc-divider {
+    width: 1px;
+    align-self: stretch;
+    margin: 40px 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.25) 20%, rgba(255,255,255,0.25) 80%, transparent 100%);
+}
+/* Right side: user cards */
+.wc-right {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 40px;
+}
 .wc-user {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 8px 28px 8px 8px;
-    border-radius: 2px;
-    transition: background 0.15s;
+    padding: 10px 16px;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    border: 2px solid transparent;
 }
-
 .wc-user:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.35);
+    box-shadow: 0 0 16px rgba(100,160,255,0.3);
 }
-
 .wc-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 3px;
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255,255,255,0.7);
     flex-shrink: 0;
     background: #1a4898;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
-
 .wc-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-
+.wc-user-info { flex: 1; }
 .wc-name {
     color: #fff;
     font-size: 15px;
     font-weight: bold;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
-
-.wc-role {
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 11px;
-    margin-top: 2px;
-}
-
-.wc-hint {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 10px;
-    font-style: italic;
-    margin-top: 6px;
-}
-
-.wc-bottom {
-    width: 100%;
-    background: rgba(0, 0, 20, 0.55);
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 12px 24px;
+/* Dark blue bottom bar */
+.wc-bar-bottom {
+    height: 44px;
+    background: linear-gradient(180deg, #2458b5 0%, #0a246a 40%, #0a246a 100%);
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
 }
-
-.wc-btn {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.75);
+.wc-shutdown {
+    color: #fff;
     font-size: 11px;
-    padding: 4px 0;
-    font-family: Tahoma, sans-serif;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: color 0.15s;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 2px;
+    transition: background 0.15s;
 }
-
-.wc-btn:hover {
-    color: #fff;
+.wc-shutdown:hover { background: rgba(255,255,255,0.1); }
+.wc-sd-ico {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+.wc-bottom-hint {
+    color: rgba(255,255,255,0.4);
+    font-size: 9px;
+    text-align: right;
+    line-height: 1.4;
 }
 
 /* ── DESKTOP ────────────────────────────────── */
@@ -3439,35 +3438,65 @@ a,
     position: fixed;
     inset: 0;
     z-index: 9998;
-    background: #000;
+    background: linear-gradient(180deg, #002060 0%, #001848 50%, #000c28 100%);
     display: none;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
-
-.sd-text {
+.sd-xp-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.sd-xp-flag {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    width: 36px;
+    height: 36px;
+    transform: rotate(-8deg);
+}
+.sd-xp-flag .bf-r { background: linear-gradient(135deg, #ff4040, #cc2020); border-radius: 1px; }
+.sd-xp-flag .bf-g { background: linear-gradient(135deg, #40cc40, #209020); border-radius: 1px; }
+.sd-xp-flag .bf-b { background: linear-gradient(135deg, #4060e8, #2040b8); border-radius: 1px; }
+.sd-xp-flag .bf-y { background: linear-gradient(135deg, #e8e840, #c8a020); border-radius: 1px; }
+.sd-xp-label {
     color: #fff;
-    font-size: 14px;
+    font-family: 'Franklin Gothic Medium', Tahoma, sans-serif;
+}
+.sd-xp-win { font-size: 14px; font-weight: normal; color: rgba(255,255,255,0.8); }
+.sd-xp-bold { font-size: 14px; font-weight: bold; }
+.sd-xp-tm { font-size: 22px; font-weight: bold; color: #fff; margin-left: 3px; letter-spacing: -0.5px; }
+.sd-text {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
     text-align: center;
 }
-
-.sd-logo {
-    font-size: 48px;
-    animation: sdp 1.5s ease-in-out infinite;
+.sd-sub {
+    color: rgba(255,255,255,0.45);
+    font-size: 11px;
+    text-align: center;
 }
-
-@keyframes sdp {
-
-    0%,
-    100% {
-    opacity: 1
-    }
-
-    50% {
-    opacity: 0.4
-    }
+.sd-dots {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+.sd-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    animation: sdDot 1.4s ease-in-out infinite;
+}
+.sd-dots span:nth-child(2) { animation-delay: 0.2s; }
+.sd-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes sdDot {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
 /* Efeito CRT desligando */

@@ -85,8 +85,8 @@
     },
     "knowsAbout": ["Laravel", "PHP", "MySQL", "API REST", "Livewire", "FilamentPHP", "Docker", "Node.js", "JavaScript", "Back-End Development", "PostgreSQL", "Redis", "n8n", "CI/CD"],
     "sameAs": [
-      "https://linkedin.com/in/matheusteixeira",
-      "https://github.com/matheusteixeira"
+      "https://linkedin.com/in/aeusteixeira",
+      "https://github.com/aeusteixeira"
     ]
   }
   </script>
@@ -133,63 +133,48 @@
   <div id="mobile-warn">
     <div class="mw-icon">🖥️</div>
     <div class="mw-title">Esse site foi feito pro computador</div>
-    <div class="mw-text">A experiência completa funciona melhor em uma tela maior. Mas se quiser continuar, vire o celular na horizontal.</div>
+    <div class="mw-text">A experiência completa funciona melhor em uma tela maior. Mas se quiser continuar, vire o
+      celular na horizontal.</div>
     <div class="mw-rotate">📱</div>
-    <button class="mw-btn" onclick="document.getElementById('mobile-warn').style.display='none'">Continuar mesmo assim</button>
+    <button class="mw-btn" onclick="document.getElementById('mobile-warn').style.display='none'">Continuar mesmo
+      assim</button>
   </div>
 
-  <!-- BOOT -->
-  <div id="boot">
-    <div class="boot-logo">
-      <div class="boot-flag">
-        <div class="bf-r"></div>
-        <div class="bf-g"></div>
-        <div class="bf-b"></div>
-        <div class="bf-y"></div>
-      </div>
-      <div class="boot-logo-text">
-        <div class="win">Microsoft <strong>Windows</strong></div>
-        <div class="xp">XP</div>
-        <div style="font-size:11px;color:#5090d0;letter-spacing:1.5px;margin-top:2px">Professional</div>
-      </div>
+  <!-- POST (BIOS) -->
+  <div id="post">
+    <div class="post-ami">
+      <img src="src/img/system/American_Megatrends_logo.svg" alt="American Megatrends" class="post-ami-logo">
+      <div class="post-dim">www.ami.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Copyright (C) 2017 American Megatrends, Inc.</div>
     </div>
-    <div class="boot-edition">matheusteixeira.com.br Edition</div>
-    <div class="boot-bar-wrap">
-      <div class="boot-bar-track" id="boot-bar"></div>
-    </div>
-    <div class="boot-copy">Copyright © 2025 Matheus Teixeira. Todos os direitos reservados.</div>
+    <pre id="post-output" class="post-text"></pre>
+    <div class="post-cursor" id="post-cursor"></div>
   </div>
 
   <!-- WELCOME -->
   <div id="welcome">
-    <div class="wc-top">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:5px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;width:22px;height:22px;">
-          <div style="background:#e84040;border-radius:1px"></div>
-          <div style="background:#40c840;border-radius:1px"></div>
-          <div style="background:#4040e8;border-radius:1px"></div>
-          <div style="background:#e8e840;border-radius:1px"></div>
-        </div>
-        <span style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:normal">Windows</span><span
-          style="font-size:20px;font-weight:bold;color:#fff;letter-spacing:-0.5px;line-height:1">XP</span>
+    <div class="wc-bar-top"></div>
+    <div class="wc-body">
+      <div class="wc-glow"></div>
+      <div class="wc-left">
+        <img src="src/img/xp-full-logo.png" alt="Windows XP" class="wc-logo">
+        <div class="wc-msg">Para começar, clique no seu nome de usuário</div>
       </div>
-      <div>Para começar, clique no seu usuário</div>
-    </div>
-    <div class="wc-center">
-      <div class="wc-user" id="wc-user-btn"
-        onclick="sndClick();document.getElementById('welcome').style.display='none';enterDesktop();">
-        <div class="wc-avatar"><img src="src/img/matheus.jpg" alt="Matheus Teixeira"></div>
-        <div>
-          <div class="wc-name">Matheus Teixeira</div>
-          <div class="wc-role">Back-End Developer</div>
+      <div class="wc-divider"></div>
+      <div class="wc-right">
+        <div class="wc-user" id="wc-user-btn"
+          onclick="sndClick();document.getElementById('welcome').style.display='none';enterDesktop();">
+          <div class="wc-avatar"><img src="src/img/matheus.jpg" alt="Matheus Teixeira"></div>
+          <div class="wc-user-info">
+            <div class="wc-name">Matheus Teixeira</div>
+          </div>
         </div>
       </div>
-      <div class="wc-hint">↑ Clique para entrar</div>
     </div>
-    <div class="wc-bottom">
-      <div class="wc-btn" onclick="doShutdown()">⏻ Desligar</div>
-      <div style="color:rgba(255,255,255,0.3);font-size:10px;">Windows XP · Matheus Edition</div>
-      <div class="wc-btn">🔄 Reiniciar</div>
+    <div class="wc-bar-bottom">
+      <div class="wc-shutdown" onclick="doShutdown()"><img src="src/img/system/desligar.ico" alt="Desligar"
+          class="wc-sd-ico"> Desligar computador</div>
+      <div class="wc-bottom-hint">Depois de fazer logon, você pode adicionar ou alterar contas.<br>Basta ir ao Painel de
+        controle e clicar em Contas de usuário.</div>
     </div>
   </div>
 
@@ -752,7 +737,7 @@
                     onclick="window.open('https://github.com/aeusteixeira','_blank')">
                     <div class="gta-xp-ico">🐙</div>
                     <div>
-                      <div class="gta-xp-co">github.com/matheusteixeira</div>
+                      <div class="gta-xp-co">github.com/aeusteixeira</div>
                       <div class="gta-xp-role">Repositórios e código aberto</div>
                     </div>
                   </div>
@@ -1235,7 +1220,8 @@
               <table class="ok-info-table ok-tab-content" id="ok-tab-social">
                 <tr>
                   <td class="ok-info-label">relacionamento:</td>
-                  <td class="ok-info-value"><b>é complicado</b></td>
+                  <td class="ok-info-value"><b>Como é bom poder estar vivo e sentir o amor que eu sinto pelo Edmundo</b>
+                  </td>
                 </tr>
                 <tr>
                   <td class="ok-info-label">aqui para:</td>
@@ -1519,7 +1505,8 @@
                     intentar jaja<br><br>vc apareceu na minha vida do nada e agora eu não consigo imaginar sem vc. vc é
                     a pessoa mais linda, mais engraçada e mais TEIMOSA que eu conheço kkkk<br><br>quando vc ri eu
                     esqueço de tudo. quando vc fica bravo parece un gatito enojado jajaja<br><br>eu tô contando os dias
-                    pra gente se ver de nuevo. cusco tá te esperando, gordito ♥ e EU тαмвéм<br><br>тє qυιєяσ мυcнσ мι
+                    pra gente viajar pro cusco juntos. já imaginou a gente lá, gordito? ♥ EU тαмвéм<br><br>тє qυιєяσ
+                    мυcнσ мι
                     αмσя ♥♥♥ s2 s2 s2<br>ρяα sємρяє є мαιѕ υм ρσυqυιиσ ♥<br><br>:* :* :* мυcнσѕ вєѕσѕ<br>~★~ є∂мυи∂σ ~★~
                     🇵🇪♥🇧🇷</div>
                 </div>
@@ -1951,9 +1938,9 @@
           <a class="contact-row" href="mailto:contato@matheusteixeira.com.br"><span class="contact-ico">✉️</span>
             contato@matheusteixeira.com.br</a>
           <a class="contact-row" href="https://github.com/aeusteixeira" target="_blank"><span
-              class="contact-ico">🐙</span> github.com/matheusteixeira</a>
-          <a class="contact-row" href="https://linkedin.com/in/matheusteixeira" target="_blank"><span
-              class="contact-ico">💼</span> linkedin.com/in/matheusteixeira</a>
+              class="contact-ico">🐙</span> github.com/aeusteixeira</a>
+          <a class="contact-row" href="https://linkedin.com/in/aeusteixeira" target="_blank"><span
+              class="contact-ico">💼</span> linkedin.com/in/aeusteixeira</a>
           <a class="contact-row" href="https://matheusteixeira.com.br" target="_blank"><span
               class="contact-ico">🌐</span> matheusteixeira.com.br</a>
         </div>
@@ -2816,7 +2803,7 @@
   [ ] Ligar pra mãe mais vezes
   [ ] Responder aquele email do amigo de 3 semanas atrás
       (sorry, eu sei, to péssimo nisso)
-  [ ] Viajar pra Lima visitar o Edmundo ??? (anotar)
+  [ ] Viagem pro Peru com o Edmundo — Cusco + Machu Picchu (pesquisar datas)
   [ ] Sair menos tarde do trabalho (haha, como se)
 
 [ ] SAÚDE
@@ -2828,9 +2815,9 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
 -------------------------------------------------
 - App de tracking de mergulhos em Laravel
 - Bot do MSN com GPT (isso seria muito anos 2000)
-- Cozinhar o ceviche do Edmundo aqui no Brasil
+- Aprender a fazer o ceviche do Edmundo direito
 - Podcast sobre PHP sem aquelas piadinhas de "PHP é morto"
-- Comprar domínio matheusehackermasdeficoemlima.com.br
+- Comprar domínio matheusehackermasnaoprogramodemadrugada.com.br
 
 ================================
 "O código perfeito é inimigo do código que roda em produção"
@@ -3441,7 +3428,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
           São Paulo &nbsp;·&nbsp; (21) 994282445 &nbsp;·&nbsp; contato.matheusteixeira@gmail.com<br>
           <a href="https://matheusteixeira.com.br" target="_blank">matheusteixeira.com.br</a>
           &nbsp;·&nbsp;
-          <a href="https://linkedin.com/in/matheusteixeira" target="_blank">LinkedIn</a>
+          <a href="https://linkedin.com/in/aeusteixeira" target="_blank">LinkedIn</a>
         </div>
 
         <div class="cv-section">Objetivo</div>
@@ -3576,9 +3563,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
         <div class="cv-section">Recomendações</div>
         <div class="cv-ref-block">
-          <b>Clayton Oliveira</b> — Coordenador Pedagógico, SENAC Nova Iguaçu<br>
-          ☎ (21) 96976-0801 &nbsp;·&nbsp; ✉ <a href="mailto:clayton.oliveira@rj.senac.br"
-            class="cv-contact">clayton.oliveira@rj.senac.br</a>
+          Disponíveis sob solicitação.
         </div>
 
       </div>
@@ -3843,9 +3828,21 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
     <!-- SHUTDOWN -->
     <div id="shutdown">
-      <div class="sd-logo">⏻</div>
-      <div class="sd-text">Windows está desligando...<br><span style="font-size:11px;color:#888">Obrigado por visitar
-          matheusteixeira.com.br</span></div>
+      <div class="sd-xp-box">
+        <div class="sd-xp-flag">
+          <div class="bf-r"></div>
+          <div class="bf-g"></div>
+          <div class="bf-b"></div>
+          <div class="bf-y"></div>
+        </div>
+        <div class="sd-xp-label">
+          <span class="sd-xp-win">Microsoft</span> <span class="sd-xp-bold">Windows</span><span
+            class="sd-xp-tm">XP</span>
+        </div>
+      </div>
+      <div class="sd-text">O Windows está sendo desligado...</div>
+      <div class="sd-sub">Salvando suas configurações...</div>
+      <div class="sd-dots"><span></span><span></span><span></span></div>
     </div>
 
     <!-- BSOD -->
@@ -4437,7 +4434,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
     <!-- WINDOW: ERROR.EXE (primeiro dialog; os subsequentes são criados por JS) -->
 
     <!-- WINDOW: SOBRE O MATHEUS -->
-    <div class="xp-win" id="win-sobre-matheus" style="width:560px;height:440px;top:60px;left:120px;display:none;">
+    <div class="xp-win" id="win-sobre-matheus" style="width:560px;height:520px;top:40px;left:120px;display:none;">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-sobre-matheus')">
         <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png"
             style="width:16px;height:16px"></span>
@@ -4485,6 +4482,18 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
         . . .
 
+        eu sou de Nova Iguaçu. não é o Rio que aparece no
+        cartão postal. é o Rio que acorda cedo, pega trem
+        lotado e não reclama.
+
+        cresci vendo gente trabalhar muito pra conquistar
+        pouco. aprendi que o que você constrói com as
+        próprias mãos ninguém tira.
+
+        talvez seja por isso que eu code.
+
+        . . .
+
         em 2018 eu era estagiário de suporte técnico.
         minha supervisora era a Kris Egidio. eu vivia
         mostrando programação pra ela, scripts que eu
@@ -4505,10 +4514,6 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
         a dona da agencia me odeia ate hoje. virei o inimigo
         numero 1 dela no dia que cheguei.
 
-        foi ali que eu cresci de verdade como desenvolvedor.
-        a empresa virou a Agilizza, e eu virei coordenador
-        de tecnologia.
-
         a Kris me ensinou que programar não é só código.
         é responsabilidade. é resolver o problema de
         alguém. é ter humildade pra pedir ajuda. é saber
@@ -4518,11 +4523,67 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
         . . .
 
-        com 23 anos eu saí de Nova Iguaçu, no Rio, e
-        vim pra São Paulo. sozinho. com duas malas, um
-        notebook e meu monitor numa bolsa de mercado do
-        meu pai. literalmente uma sacola de feira com um
-        monitor de 24 polegadas dentro.
+        com 23 anos, ainda na BPO Innova, eu saí de Nova
+        Iguaçu e vim pra São Paulo. sozinho. com duas
+        malas, um notebook e meu monitor numa bolsa de
+        mercado do meu pai. literalmente uma sacola de
+        feira com um monitor de 24 polegadas dentro.
+
+        quando o ônibus entrou na Rodoviária do Tietê,
+        eram umas seis da manhã. eu olhei pela janela
+        e pensei: "que cidade grande do inferno é essa."
+
+        uma semana depois de chegar, eu quebrei a costela.
+        bati de peito num poste andando de patins no
+        Ibirapuera.
+
+        sozinho, sem família, sem conhecer ninguém, entrei
+        num grupo de aluguel no Facebook e postei:
+        "gente, sou carioca, preciso de ajuda. quebrei
+        minha costela."
+
+        uma senhora chamada Dona Renata me chamou pra ir
+        morar com ela. e assim eu fui, na cara e na
+        coragem.
+
+        de início, acho que todo mundo é meu amigo até
+        que se prove o contrário. tem funcionado. não
+        tenho inimigos.
+
+        criamos uma rotina. feira, médico, mercado.
+        ela me ajudou até eu melhorar, do corpo e do resto.
+        viramos melhores amigos.
+
+        São Paulo não te recebe. mas às vezes ela te manda
+        exatamente a pessoa que você precisa.
+
+        . . .
+
+        foi na BPO que eu cresci de verdade como
+        desenvolvedor. tive muita liberdade pra implementar
+        e ensinar o que eu estudava, podia dar ideias pra
+        novas ferramentas e assim fui crescendo. foram
+        diversos sistemas e ferramentas pra empresa.
+
+        da BPO Innova nasceu a Agilizza, startup fiscal
+        que eu trabalho até hoje e sou dev senior com
+        muito orgulho.
+
+        fora isso, presto serviço pra outras empresas
+        também como desenvolvedor. sou igual o Julius de
+        Todo Mundo Odeia o Chris: trabalho, trabalho,
+        trabalho.
+
+        anos depois, quando surgiu a oportunidade, eu comprei
+        o meu próprio apartamento aqui em SP. na entrega das
+        chaves, chamei a Dona Renata pra vir comigo. foi um
+        momento importante. acho que foi quando entendi que
+        tinha ficado de vez.
+
+        hoje eu fotografo ela nas horas vagas. acho que
+        é minha forma de dizer obrigado.
+
+        . . .
 
         trabalho como desenvolvedor back-end. PHP e
         Laravel são meu chão. MySQL, Docker, Python,
@@ -4542,8 +4603,6 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
         - Debugo às 23h com café frio e paciência
         - Explico tecnologia pra minha mãe sem crise
         - Já dei aula no SENAC. na mesma sala onde estudei
-        - Sei trabalhar com gente difícil (já trabalhei
-        comigo mesmo, então...)
         - Git blame só em casos extremos
 
         . . .
@@ -4587,8 +4646,10 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
         =====================================
         arquivo salvo em 05/03/2026 às 14:32
-        tamanho: 3.2 KB
-        autor: um moleque de Nova Iguaçu que deu certo \(￣︶￣*\))
+        tamanho: 4.1 KB
+        autor: um moleque de Nova Iguaçu que deu certo
+
+        \(￣︶￣*\))
       </div>
     </div>
 
@@ -4941,7 +5002,7 @@ pause</pre>
           style="display:block;margin:0 auto;cursor:default;"></canvas>
         <div
           style="padding:4px 10px;background:#0a0a1a;color:#888;font-family:'Courier New',monospace;font-size:10px;text-align:center;">
-          Z = Flipper Esq &nbsp;|&nbsp; M = Flipper Dir &nbsp;|&nbsp; SPACE = Lançar
+          Z/← = Flipper Esq &nbsp;|&nbsp; M/→ = Flipper Dir &nbsp;|&nbsp; SPACE/↓ = Lançar
         </div>
       </div>
     </div>

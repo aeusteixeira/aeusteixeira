@@ -38,15 +38,59 @@ document.addEventListener('click', () => { if (AC.state === 'suspended') AC.resu
 (function boot() {
     if (localStorage.getItem('xp_dirty') === '1') {
         localStorage.removeItem('xp_dirty');
-        document.getElementById('boot').style.display = 'none';
+        document.getElementById('post').style.display = 'none';
         runChkdsk();
     } else {
-        setTimeout(showWelcome, 3500);
+        runPost();
     }
 })();
 
+function runPost() {
+    const el = document.getElementById('post-output');
+    const lines = [
+        { t: 'AMIBIOS (C) 2017 American Megatrends, Inc.', d: 120 },
+        { t: 'matheusteixeira.com.br BIOS Rev. 2026.03', d: 80 },
+        { t: '', d: 200 },
+        { t: 'Press <span class="post-cyan">DEL</span> to run Setup', d: 60 },
+        { t: 'Press <span class="post-cyan">&lt;F8&gt;</span> for BBS POPUP', d: 60 },
+        { t: 'Checking NVRAM...', d: 300 },
+        { t: 'Initializing USB Controllers .. Done.', d: 250 },
+        { t: '', d: 100 },
+        { t: '<span class="post-white">1024MB OK</span>', d: 400 },
+        { t: '', d: 80 },
+        { t: 'USB Device(s): 1 Keyboard, 2 Mice', d: 150 },
+        { t: 'Auto-Detecting Pri Master..<span class="post-yellow">IDE Hard Disk</span>', d: 200 },
+        { t: '  Pri Master: SAMSUNG SP0802N  TX200-04', d: 120 },
+        { t: 'Auto-Detecting Pri Slave...<span class="post-yellow">ATAPI CD-ROM</span>', d: 200 },
+        { t: '  Pri Slave : HL-DT-ST DVDROM GSA-4167B  DL13', d: 120 },
+        { t: '       Ultra DMA Mode-5, S.M.A.R.T. Capable and Status <span class="post-green">OK</span>', d: 200 },
+        { t: '', d: 80 },
+        { t: 'Detecting USB Mass Storage Devices ...', d: 300 },
+        { t: '1 mass storage devices found and configured.', d: 200 },
+        { t: '', d: 250 },
+        { t: '<span class="post-yellow">CMOS Settings Wrong</span>', d: 150 },
+        { t: '<span class="post-yellow">CMOS Date/Time Not Set</span>', d: 150 },
+        { t: '<span class="post-white">Press F1 to Run SETUP</span>', d: 100 },
+        { t: '<span class="post-white">Press F2 to load default values and continue</span>', d: 100 },
+        { t: '', d: 500 },
+        { t: 'Booting from Hard Disk...', d: 600 },
+    ];
+    let i = 0;
+    function nextLine() {
+        if (i >= lines.length) {
+            setTimeout(showWelcome, 300);
+            return;
+        }
+        const line = lines[i++];
+        el.innerHTML += line.t + '\n';
+        el.scrollTop = el.scrollHeight;
+        setTimeout(nextLine, line.d);
+    }
+    nextLine();
+}
+
 function showWelcome() {
-    document.getElementById('boot').style.display = 'none';
+    document.getElementById('post').style.display = 'none';
     document.getElementById('welcome').style.display = 'flex';
     sndBoot();
 }
@@ -67,7 +111,7 @@ function enterDesktop() {
     }, 300);
     resetIdleTimer();
     setTimeout(() => { paintInit(); }, 100);
-    setTimeout(() => { showTrayBalloon(); setInterval(showTrayBalloon, 40000); }, 20000);
+    setTimeout(() => { showTrayBalloon(); _trayBalloonTimer = setInterval(showTrayBalloon, 40000); }, 20000);
     startAutoConversations();
     /* Clippy aparece depois de um tempo */
     setTimeout(showClippy, 15000 + Math.random() * 10000);
@@ -296,6 +340,7 @@ function closeWin(id) {
     updateRecycleBin();
     w.style.display = 'none';
     removeTbItem(id);
+    if (id === 'win-taskmgr' && tmUpdateTimer) { clearInterval(tmUpdateTimer); tmUpdateTimer = null; }
 }
 function minimizeWin(id) {
     sndMinimize();
@@ -2381,7 +2426,7 @@ const runCommands = {
     'msn': () => toggleMSN(),
     'wmp': () => toggleWMP(),
     'shutdown': () => doShutdown(),
-    'bsod': () => triggerBsod(),
+    'bsod': () => triggerBSOD(),
 };
 
 function openRun() {
@@ -2648,7 +2693,7 @@ DNS: 8.8.8.8 (Google)</span>`,
         });
         return out + '</span>';
     },
-    'bsod': () => { setTimeout(triggerBsod, 300); return '<span style="color:#f00">Iniciando diagnóstico crítico do sistema...</span>'; },
+    'bsod': () => { setTimeout(triggerBSOD, 300); return '<span style="color:#f00">Iniciando diagnóstico crítico do sistema...</span>'; },
     'exit': () => { setTimeout(() => closeWin('win-cmd'), 300); return '<span style="color:#888">Saindo...</span>'; },
     'shutdown': () => { setTimeout(doShutdown, 1000); return '<span style="color:#fff">Desligando o sistema...</span>'; },
 };
@@ -3154,11 +3199,11 @@ const gmEmails = [
     { id:2,  folder:'inbox',   read:false, starred:false, from:'Carla Silva',         addr:'carlinha_rj@hotmail.com',     subj:'FW: FW: FW: FW: CUIDADO leia até o final!!!!',   date:'08:47', body:'REPASSE PARA TODOS OS SEUS CONTATOS!!!\n\n>>>Essa mensagem foi enviada por um funcionario do SERASA.\n>>>Se vc receber um email com o titulo "Voce foi sorteado" NAO ABRA!!!!\n>>>Ele formata seu computador inteiro e rouba todos os seus dados do banco.\n>>>A Globo ja confirmou ontem no Jornal Nacional.\n\n>>>REPASSE PARA PELO MENOS 10 PESSOAS OU SUA CONTA SERÁ DESATIVADA EM 48 HORAS.\n\n>>>Isso é serio gente!!!!\n\n---\nNão sei se é verdade mas to repassando por via das dúvidas kkkk\nBjs Carla' },
     { id:3,  folder:'inbox',   read:false, starred:true,  from:'Lucas Ferreira',     addr:'lucas@novapay.io',            subj:'Proposta: Tech Lead backend — NovaPay',           date:'08:42', body:'Oi Matheus! Tudo bem?\n\nSou co-fundador da NovaPay, uma fintech que estamos levantando da seed agora. Vi seu GitHub e achei seu trabalho com APIs muito sólido.\n\nEstamos construindo uma plataforma de pagamentos instantâneos B2B e precisamos de alguém pra arquitetar o backend do zero. Stack: Laravel + Go para o serviço de liquidação + Redis + Kafka.\n\nA ideia é você ser o primeiro dev contratado e ajudar a montar o time. Parte do salário + equity na empresa.\n\nPode bater um papo essa semana?\n\nAbraços,\nLucas Ferreira\nCo-fundador — NovaPay\n📱 (11) 98823-4401' },
     { id:4,  folder:'inbox',   read:false, starred:false, from:'Americanas.com',     addr:'noreply@americanas.com.br',   subj:'Pedido confirmado! 🛒 #AME-2026-8841923',        date:'07:55', body:'Olá Matheus!\n\nSeu pedido foi confirmado com sucesso!\n\n══════════════════════════\n📦 PEDIDO #AME-2026-8841923\n══════════════════════════\n\n1x Box DVD Lost - 1ª Temporada Completa\n   R$ 89,90\n\n1x Fone de Ouvido Philips SHP2500\n   R$ 49,90\n\n1x Mousepad Grande Speed 70x30cm\n   R$ 24,90\n\n══════════════════════════\nSubtotal: R$ 164,70\nFrete: GRÁTIS (Sedex)\nTotal: R$ 164,70\nPagamento: Boleto bancário\n══════════════════════════\n\nPrevisão de entrega: 12 a 18 dias úteis\nEndereço: Rua das Laranjeiras, 247 — Rio de Janeiro/RJ\n\nAcompanhe seu pedido em americanas.com.br/meus-pedidos\n\nBoas compras! 🎉\n— Equipe Americanas' },
-    { id:5,  folder:'inbox',   read:false, starred:false, from:'Edmundo',            addr:'edmundo.acf@gmail.com',       subj:'criança olha esse video jajaja',                  date:'02:38', body:'gordito!!\n\nson las 2 de la mañana y no puedo parar de reír jajajaja\n\nhttp://www.youtube.com/watch?v=dQw4w9WgXcQ\n\nesse cara tentando cantar no karaokê... eu tô chorando bicho kkkkkk\n\nassiste até o final que é a melhor parte\n\nps: tô com saudade. quando vc vem pra cá? ou eu vou pra aí? não aguento mais só msn 🥺\n\nte quiero mucho criança ♥\nedmundo\n\n---\nEnviado pelo MSN Hotmail Mobile' },
+    { id:5,  folder:'inbox',   read:false, starred:false, from:'Edmundo',            addr:'edmundo.acf@gmail.com',       subj:'criança olha esse video jajaja',                  date:'02:38', body:'gordito!!\n\nson las 2 de la mañana y no puedo parar de reír jajajaja\n\nhttp://www.youtube.com/watch?v=dQw4w9WgXcQ\n\nesse cara tentando cantar no karaokê... eu tô chorando bicho kkkkkk\n\nassiste até o final que é a melhor parte\n\nps: tô com saudade de vc. vem cá pro sofá assistir comigo 🥺 não aguento mais só msn\n\nte quiero mucho criança ♥\nedmundo\n\n---\nEnviado pelo MSN Hotmail Mobile' },
     // INBOX — lidos
     { id:6,  folder:'inbox',   read:true,  starred:false, from:'Orkut',              addr:'noreply@orkut.com',           subj:'Você tem 3 novos scraps e 1 depoimento!',         date:'27 fev', body:'Olá Matheus Teixeira!\n\nVocê tem novidades no orkut:\n\n📋 3 novos scraps no seu Álbum de Recados\n   • Carla Mendes deixou um scrap\n   • Edmundo Farias deixou um scrap\n   • Rafael_Dev deixou um scrap\n\n✍️ 1 novo depoimento\n   • Carla M. escreveu um depoimento sobre você\n\n👥 2 novos pedidos de amizade\n\nAcesse: www.orkut.com.br/Main#Home\n\n— Equipe orkut' },
-    { id:7,  folder:'inbox',   read:true,  starred:true,  from:'Edmundo',            addr:'edmundo.acf@gmail.com',       subj:'Cusco, mi amor — vem me visitar ❤️',             date:'24 fev', body:'Mi criança,\n\nYa no aguanto más de saudade. Preciso que vc venha pra cá. Cusco tá lindo demais e eu só consigo pensar: "o Matheus precisava ver isso".\n\nA Praça de Armas de manhã cedo, com o sol batendo nos muros de pedra inca, aquele cheiro de terra e eucalipto no ar... você ia amar, gordito. É um negócio que te parte o coração de beleza.\n\nE o Machu Picchu... eu vou levar vc lá. A gente sobe o Huayna Picchu de manhã cedo, antes da neblina abrir, e quando abre... meu Deus. Eu quero estar do teu lado nessa hora. Quero ver tua cara.\n\nJá pesquisei tudo: a melhor época é junho ou julho, céu limpo, sem chuva. Vc voa pra Lima, eu te busco lá, e a gente vai juntos de avião pra Cusco (uns 70 minutos). Passa dois dias aclimatando — porque a altitude bate, fica uns 3.400m — depois a gente pega o trem até Aguas Calientes.\n\nTô falando sério, criança. Reserva as datas. Eu organizo todo. Vc só precisa aparecer.\n\nTe quiero muchísimo. Más de lo que puedo decir por email.\n\nTu Edmundo 🏔️♥️🇵🇪' },
-    { id:18, folder:'inbox',   read:true,  starred:false, from:'Decolar.com',        addr:'reservas@decolar.com',        subj:'✈️ Reserva confirmada — GIG → CUZ | 14 jun',    date:'24 fev', body:'Olá, Matheus Teixeira!\n\nSua reserva foi confirmada com sucesso. Aqui estão os detalhes da sua viagem:\n\n══════════════════════════════\n✈️ VOO DE IDA\n══════════════════════════════\nOrigem: Rio de Janeiro — Galeão (GIG)\nDestino: Cusco — Alejandro Velasco Astete (CUZ)\nData: 14 de Junho de 2026\nPartida: 06h15 · Chegada: 13h40\nConexão: Lima (LIM) — 2h10 de espera\nCompanhia: LATAM Airlines\nVoo: LA3041 / LA2481\nClasse: Econômica\n\n══════════════════════════════\n✈️ VOO DE VOLTA\n══════════════════════════════\nOrigem: Cusco (CUZ)\nDestino: Rio de Janeiro — Galeão (GIG)\nData: 22 de Junho de 2026\nPartida: 15h50 · Chegada: 23h05\nConexão: Lima (LIM)\nCompanhia: LATAM Airlines\nVoo: LA2482 / LA3044\n\n══════════════════════════════\n👤 PASSAGEIRO\n══════════════════════════════\nNome: MATHEUS TEIXEIRA\nLocalizador: DCLBR-8842JK\nBagagem incluída: 1 mala 23kg + bagagem de mão\n\n══════════════════════════════\n💳 PAGAMENTO\n══════════════════════════════\nTotal pago: R$ 2.184,00\nCartão: **** **** **** 4821\n\nImportante: chegue ao aeroporto com 2h30 de antecedência.\nDúvidas? Acesse decolar.com ou ligue 0800 000 1500.\n\nBoa viagem! 🌎\n— Equipe Decolar.com' },
+    { id:7,  folder:'inbox',   read:true,  starred:true,  from:'Edmundo',            addr:'edmundo.acf@gmail.com',       subj:'Cusco, mi amor — vamos juntos ❤️',               date:'24 fev', body:'Mi criança,\n\nTô aqui planejando tudo da nossa viagem e não consigo parar de sorrir. Vc vai conhecer de onde eu vim, gordito. Eu quero tanto te mostrar Cusco.\n\nA Praça de Armas de manhã cedo, com o sol batendo nos muros de pedra inca, aquele cheiro de terra e eucalipto no ar... vc vai amar. É um negócio que te parte o coração de beleza.\n\nE o Machu Picchu... a gente sobe o Huayna Picchu de manhã cedo, antes da neblina abrir, e quando abre... meu Deus. Eu quero estar do teu lado nessa hora. Quero ver tua cara.\n\nJá pesquisei tudo: a melhor época é junho ou julho, céu limpo, sem chuva. A gente voa de SP pra Lima e de lá pra Cusco (uns 70 minutos). Passa dois dias aclimatando, porque a altitude bate, fica uns 3.400m, depois a gente pega o trem até Aguas Calientes.\n\nTô falando sério, criança. Reserva as férias. Eu organizo tudo. A gente vai junto.\n\nTe quiero muchísimo. Más de lo que puedo decir por email.\n\nTu Edmundo 🏔️♥️🇵🇪' },
+    { id:18, folder:'inbox',   read:true,  starred:false, from:'Decolar.com',        addr:'reservas@decolar.com',        subj:'✈️ Reserva confirmada — GRU → CUZ | 14 jun',    date:'24 fev', body:'Olá, Matheus Teixeira!\n\nSua reserva foi confirmada com sucesso. Aqui estão os detalhes da sua viagem:\n\n══════════════════════════════\n✈️ VOO DE IDA\n══════════════════════════════\nOrigem: São Paulo — Guarulhos (GRU)\nDestino: Cusco — Alejandro Velasco Astete (CUZ)\nData: 14 de Junho de 2026\nPartida: 06h15 · Chegada: 13h40\nConexão: Lima (LIM) — 2h10 de espera\nCompanhia: LATAM Airlines\nVoo: LA3041 / LA2481\nClasse: Econômica\n\n══════════════════════════════\n✈️ VOO DE VOLTA\n══════════════════════════════\nOrigem: Cusco (CUZ)\nDestino: São Paulo — Guarulhos (GRU)\nData: 22 de Junho de 2026\nPartida: 15h50 · Chegada: 23h05\nConexão: Lima (LIM)\nCompanhia: LATAM Airlines\nVoo: LA2482 / LA3044\n\n══════════════════════════════\n👤 PASSAGEIROS\n══════════════════════════════\n1. MATHEUS TEIXEIRA\n2. EDMUNDO A. CASTILLO FLORES\nLocalizador: DCLBR-8842JK\nBagagem incluída: 1 mala 23kg + bagagem de mão (por passageiro)\n\n══════════════════════════════\n💳 PAGAMENTO\n══════════════════════════════\nTotal pago: R$ 4.368,00 (2 passageiros)\nCartão: **** **** **** 4821\n\nImportante: chegue ao aeroporto com 2h30 de antecedência.\nDúvidas? Acesse decolar.com ou ligue 0800 000 1500.\n\nBoa viagem! 🌎\n— Equipe Decolar.com' },
     { id:8,  folder:'inbox',   read:true,  starred:false, from:'Mãe',               addr:'sonia.teixeira@yahoo.com.br', subj:'RE: RE: RE: como faz pra abrir aquele arquivo',  date:'25 fev', body:'Matheus\n\nFiz o que vc falou e agora apareceu uma janela pedindo pra instalar o java. Pode instalar? Seu pai disse que não é pra instalar nada.\n\nOutra coisa: a impressora não imprime mais. Aparece \"offline\" mas ela ta ligada. O fio ta conectado, eu verifiquei.\n\nAh e vou precisar que vc me ajude a mandar um email com anexo pro trabalho. Toda vez que tento anexar ele fala que o arquivo é muito grande. É uma foto de 15 mega.\n\nQdo vc vem?\n\nbeijo\nmãe\n\nPS: a lasanha é amanha, não esquece' },
     { id:9,  folder:'inbox',   read:true,  starred:false, from:'Rafael Moreira',     addr:'rafael@vendify.com.br',       subj:'Consultoria técnica — Vendify v2.0',             date:'23 fev', body:'Oi Matheus,\n\nSou CTO da Vendify, plataforma de gestão de vendas para pequenas empresas. Estamos em migração da v1 (monolito Laravel) para uma arquitetura de microsserviços.\n\nPrecisamos de um consultor técnico por 3 meses para:\n- Definir a nova arquitetura de serviços\n- Implementar o gateway de API\n- Treinar o time interno (4 devs)\n\nOrçamento disponível: R$15.000/mês.\n\nPodemos agendar uma call?\n\nRafael Moreira\nCTO — Vendify' },
     { id:10, folder:'inbox',   read:true,  starred:false, from:'NET Vírtua',         addr:'fatura@netcombo.com.br',      subj:'Sua fatura NET Vírtua — Vencimento 05/03',       date:'21 fev', body:'Olá MATHEUS TEIXEIRA,\n\nSua fatura do mês de Março já está disponível.\n\n══════════════════════════\n📋 DETALHES DA FATURA\n══════════════════════════\n\nNET Vírtua 10 Mega: R$ 119,90\nNET Fone (fixo ilimitado): R$ 29,90\nDesconto fidelidade: -R$ 15,00\n\nTotal: R$ 134,80\nVencimento: 05/03/2026\n\nCódigo de barras:\n23793.38128 60000.000003 00134.801016 1 92680000013480\n\nPague pelo Internet Banking ou em qualquer lotérica.\n\n— NET Combo' },
@@ -3781,6 +3826,7 @@ const clippyPhrases = [
     'Quer uma dica? Abre o LimeWire. Confia.',
     'Se quiser contratar ele, manda um e-mail. Eu sou só um clipe de papel.',
 ];
+let _trayBalloonTimer = null;
 let _clippyTimer = null;
 function showClippy() {
     const el = document.getElementById('clippy');
@@ -4305,28 +4351,54 @@ function runInstProgress() {
 ══════════════════════════════════════ */
 let _pbRAF = null, _pbRunning = false;
 let _pbBall = null, _pbScore = 0, _pbBalls = 3, _pbHigh = 0;
-let _pbFlipL = 0, _pbFlipR = 0; /* 0=down, 1=up */
+let _pbFlipL = 0, _pbFlipR = 0;
+let _pbFlipLAnim = 0.35, _pbFlipRAnim = Math.PI - 0.35;
 let _pbLaunching = false, _pbLaunchPower = 0;
+let _pbMultiplier = 1, _pbParticles = [];
 const PB_W = 400, PB_H = 520;
-const PB_GRAVITY = 0.15;
+const PB_GRAVITY = 0.18;
+const PB_FLIP_SPEED = 0.25;
+/* Flipper pivots closer together */
+const PB_FL_X = 130, PB_FR_X = 270, PB_FLIP_Y = 465, PB_FLIP_LEN = 55;
+/* Walls: left outer wall, right outer wall, and angled gutters leading to flippers */
+const PB_WALLS = [
+    /* Left wall */         { x1: 25, y1: 10, x2: 25, y2: 410 },
+    /* Left gutter angle */ { x1: 25, y1: 410, x2: 85, y2: 480 },
+    /* Left guide */        { x1: 85, y1: 480, x2: PB_FL_X - 5, y2: PB_FLIP_Y + 2 },
+    /* Right wall */        { x1: 355, y1: 10, x2: 355, y2: 370 },
+    /* Right gutter angle */{ x1: 355, y1: 370, x2: 315, y2: 480 },
+    /* Right guide */       { x1: 315, y1: 480, x2: PB_FR_X + 5, y2: PB_FLIP_Y + 2 },
+    /* Top wall */          { x1: 25, y1: 10, x2: 355, y2: 10 },
+    /* Launch lane left */  { x1: 362, y1: 400, x2: 362, y2: 10 },
+    /* Launch lane right */ { x1: 392, y1: PB_H, x2: 392, y2: 10 },
+    /* Launch lane top */   { x1: 362, y1: 10, x2: 392, y2: 10 },
+];
 const PB_BUMPERS = [
-    { x: 120, y: 140, r: 22 },
-    { x: 200, y: 100, r: 22 },
-    { x: 280, y: 140, r: 22 },
-    { x: 160, y: 220, r: 18 },
-    { x: 240, y: 220, r: 18 },
-    { x: 200, y: 300, r: 16 },
+    { x: 130, y: 140, r: 22, pts: 100 },
+    { x: 200, y: 95, r: 24, pts: 150 },
+    { x: 270, y: 140, r: 22, pts: 100 },
+    { x: 165, y: 230, r: 17, pts: 200 },
+    { x: 235, y: 230, r: 17, pts: 200 },
+    { x: 200, y: 310, r: 15, pts: 250 },
 ];
 const PB_TARGETS = [
-    { x: 60, y: 180, w: 6, h: 40, hit: false, pts: 500 },
-    { x: 334, y: 180, w: 6, h: 40, hit: false, pts: 500 },
-    { x: 100, y: 80, w: 6, h: 30, hit: false, pts: 750 },
-    { x: 300, y: 80, w: 6, h: 30, hit: false, pts: 750 },
+    { x: 55, y: 170, w: 6, h: 40, hit: false, pts: 500 },
+    { x: 340, y: 170, w: 6, h: 40, hit: false, pts: 500 },
+    { x: 100, y: 60, w: 6, h: 30, hit: false, pts: 750 },
+    { x: 295, y: 60, w: 6, h: 30, hit: false, pts: 750 },
+    { x: 160, y: 50, w: 30, h: 5, hit: false, pts: 1000 },
+    { x: 220, y: 50, w: 30, h: 5, hit: false, pts: 1000 },
+];
+/* Slingshots (triangular kickers near flippers) */
+const PB_SLINGS = [
+    { x1: 70, y1: 350, x2: 50, y2: 410, x3: 90, y3: 410 },
+    { x1: 330, y1: 350, x2: 310, y2: 410, x3: 350, y3: 410 },
 ];
 
 function pinballInit() {
-    _pbScore = 0; _pbBalls = 3;
+    _pbScore = 0; _pbBalls = 3; _pbMultiplier = 1; _pbParticles = [];
     PB_TARGETS.forEach(t => t.hit = false);
+    PB_BUMPERS.forEach(b => { b._flash = 0; });
     document.getElementById('pb-score').textContent = '0';
     document.getElementById('pb-ball').textContent = '3';
     document.getElementById('pb-high').textContent = _pbHigh;
@@ -4336,7 +4408,7 @@ function pinballInit() {
 }
 
 function pinballSpawnBall() {
-    _pbBall = { x: 375, y: 450, vx: 0, vy: 0, r: 7, active: false };
+    _pbBall = { x: 377, y: 460, vx: 0, vy: 0, r: 7, active: false };
     _pbLaunching = false; _pbLaunchPower = 0;
 }
 
@@ -4350,11 +4422,42 @@ function pinballLoop() {
     _pbRAF = requestAnimationFrame(pinballLoop);
 }
 
+function _pbTone(freq, dur) {
+    try {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ac.createOscillator(); const g = ac.createGain();
+        o.type = 'square'; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.06, ac.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+        o.connect(g); g.connect(ac.destination);
+        o.start(); o.stop(ac.currentTime + dur);
+    } catch (_) {}
+}
+
+function _pbSpawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 3;
+        _pbParticles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 20 + Math.random() * 15, color });
+    }
+}
+
 function pinballUpdate() {
     if (!_pbBall) return;
+    /* Animate flippers smoothly */
+    const flLTarget = _pbFlipL ? -0.5 : 0.35;
+    const flRTarget = _pbFlipR ? Math.PI + 0.5 : Math.PI - 0.35;
+    _pbFlipLAnim += (flLTarget - _pbFlipLAnim) * PB_FLIP_SPEED;
+    _pbFlipRAnim += (flRTarget - _pbFlipRAnim) * PB_FLIP_SPEED;
+    /* Particles */
+    _pbParticles = _pbParticles.filter(p => {
+        p.x += p.vx; p.y += p.vy; p.life--;
+        p.vx *= 0.96; p.vy *= 0.96;
+        return p.life > 0;
+    });
     /* Launcher */
     if (_pbLaunching) {
-        _pbLaunchPower = Math.min(_pbLaunchPower + 0.4, 18);
+        _pbLaunchPower = Math.min(_pbLaunchPower + 0.5, 16);
         return;
     }
     if (!_pbBall.active) return;
@@ -4362,12 +4465,27 @@ function pinballUpdate() {
     _pbBall.vy += PB_GRAVITY;
     _pbBall.x += _pbBall.vx;
     _pbBall.y += _pbBall.vy;
-    /* Walls */
-    if (_pbBall.x - _pbBall.r < 20) { _pbBall.x = 20 + _pbBall.r; _pbBall.vx = Math.abs(_pbBall.vx) * 0.8; }
-    if (_pbBall.x + _pbBall.r > 360) { _pbBall.x = 360 - _pbBall.r; _pbBall.vx = -Math.abs(_pbBall.vx) * 0.8; }
-    /* Launch lane wall */
-    if (_pbBall.x + _pbBall.r > 365 && _pbBall.y < 420) { _pbBall.x = 365 - _pbBall.r; _pbBall.vx = -Math.abs(_pbBall.vx) * 0.8; }
-    if (_pbBall.y - _pbBall.r < 10) { _pbBall.y = 10 + _pbBall.r; _pbBall.vy = Math.abs(_pbBall.vy) * 0.6; }
+    /* Friction */
+    _pbBall.vx *= 0.999;
+    /* Wall collisions (line segments) */
+    for (const w of PB_WALLS) {
+        const d = pbPointLineDist(_pbBall.x, _pbBall.y, w.x1, w.y1, w.x2, w.y2);
+        if (d < _pbBall.r + 2) {
+            const nx = -(w.y2 - w.y1), ny = w.x2 - w.x1;
+            const len = Math.sqrt(nx * nx + ny * ny);
+            if (len === 0) continue;
+            const ux = nx / len, uy = ny / len;
+            const dot = _pbBall.vx * ux + _pbBall.vy * uy;
+            if (dot < 0) {
+                _pbBall.vx -= 1.6 * dot * ux;
+                _pbBall.vy -= 1.6 * dot * uy;
+            }
+            /* Push ball out of wall */
+            const pen = _pbBall.r + 2 - d;
+            _pbBall.x += ux * pen * 0.5;
+            _pbBall.y += uy * pen * 0.5;
+        }
+    }
     /* Bumpers */
     for (const b of PB_BUMPERS) {
         const dx = _pbBall.x - b.x, dy = _pbBall.y - b.y;
@@ -4375,51 +4493,92 @@ function pinballUpdate() {
         if (dist < _pbBall.r + b.r) {
             const angle = Math.atan2(dy, dx);
             const speed = Math.sqrt(_pbBall.vx * _pbBall.vx + _pbBall.vy * _pbBall.vy);
-            const bounce = Math.max(speed, 5);
+            const bounce = Math.max(speed * 1.1, 6);
             _pbBall.vx = Math.cos(angle) * bounce;
             _pbBall.vy = Math.sin(angle) * bounce;
             _pbBall.x = b.x + Math.cos(angle) * (b.r + _pbBall.r + 1);
             _pbBall.y = b.y + Math.sin(angle) * (b.r + _pbBall.r + 1);
-            b._flash = 8;
-            pbAddScore(100);
+            b._flash = 10;
+            pbAddScore(b.pts);
+            _pbTone(600 + b.pts * 2, 0.08);
+            _pbSpawnParticles(b.x, b.y, '#ff6644', 5);
         }
         if (b._flash > 0) b._flash--;
     }
+    /* Slingshots */
+    for (const s of PB_SLINGS) {
+        const cx = (s.x1 + s.x2 + s.x3) / 3, cy = (s.y1 + s.y2 + s.y3) / 3;
+        const d = Math.sqrt((_pbBall.x - cx) ** 2 + (_pbBall.y - cy) ** 2);
+        if (d < _pbBall.r + 25) {
+            const sides = [
+                { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2 },
+                { x1: s.x2, y1: s.y2, x2: s.x3, y2: s.y3 },
+                { x1: s.x3, y1: s.y3, x2: s.x1, y2: s.y1 },
+            ];
+            for (const seg of sides) {
+                const sd = pbPointLineDist(_pbBall.x, _pbBall.y, seg.x1, seg.y1, seg.x2, seg.y2);
+                if (sd < _pbBall.r + 3) {
+                    const nx = -(_pbBall.y - cy), ny = _pbBall.x - cx;
+                    const nl = Math.sqrt(nx * nx + ny * ny) || 1;
+                    _pbBall.vx += (nx / nl) * 5;
+                    _pbBall.vy += (ny / nl) * 5;
+                    s._flash = 8;
+                    pbAddScore(50);
+                    _pbTone(400, 0.05);
+                    break;
+                }
+            }
+        }
+        if (s._flash > 0) s._flash--;
+    }
     /* Targets */
     for (const t of PB_TARGETS) {
-        if (t.hit) continue;
+        if (t.hit) { if (t._flash > 0) t._flash--; continue; }
         if (_pbBall.x + _pbBall.r > t.x && _pbBall.x - _pbBall.r < t.x + t.w &&
             _pbBall.y + _pbBall.r > t.y && _pbBall.y - _pbBall.r < t.y + t.h) {
             t.hit = true;
-            t._flash = 15;
-            _pbBall.vx = -_pbBall.vx;
+            t._flash = 20;
+            if (t.w > t.h) _pbBall.vy = -Math.abs(_pbBall.vy) - 2;
+            else _pbBall.vx = -_pbBall.vx;
             pbAddScore(t.pts);
+            _pbTone(900, 0.1);
+            _pbSpawnParticles(t.x + t.w / 2, t.y + t.h / 2, '#ffcc00', 4);
         }
         if (t._flash > 0) t._flash--;
     }
-    /* Flippers */
-    const flipY = 470;
-    /* Left flipper: pivot at (100, flipY), length 60 */
-    const flLA = _pbFlipL ? -0.45 : 0.35;
-    const flLEx = 100 + Math.cos(flLA) * 60, flLEy = flipY + Math.sin(flLA) * 60;
-    if (pbPointLineDist(_pbBall.x, _pbBall.y, 100, flipY, flLEx, flLEy) < _pbBall.r + 5) {
-        _pbBall.vy = -Math.abs(_pbBall.vy) - (_pbFlipL ? 6 : 1);
-        _pbBall.vx += (_pbFlipL ? 3 : 0.5) * (_pbBall.x > 200 ? 1 : -0.5);
-        _pbBall.y = Math.min(_pbBall.y, flipY - _pbBall.r - 6);
-        pbAddScore(10);
+    /* All targets hit = multiplier + reset */
+    if (PB_TARGETS.every(t => t.hit)) {
+        _pbMultiplier++;
+        PB_TARGETS.forEach(t => t.hit = false);
+        pbAddScore(5000);
+        _pbTone(1200, 0.2);
+        showNotif('🏓 Pinball', `Combo x${_pbMultiplier}! +5000`);
     }
-    /* Right flipper: pivot at (300, flipY), length 60 */
-    const flRA = _pbFlipR ? Math.PI + 0.45 : Math.PI - 0.35;
-    const flREx = 300 + Math.cos(flRA) * 60, flREy = flipY + Math.sin(flRA) * 60;
-    if (pbPointLineDist(_pbBall.x, _pbBall.y, 300, flipY, flREx, flREy) < _pbBall.r + 5) {
-        _pbBall.vy = -Math.abs(_pbBall.vy) - (_pbFlipR ? 6 : 1);
-        _pbBall.vx -= (_pbFlipR ? 3 : 0.5) * (_pbBall.x < 200 ? 1 : -0.5);
-        _pbBall.y = Math.min(_pbBall.y, flipY - _pbBall.r - 6);
-        pbAddScore(10);
+    /* Flippers collision */
+    const flLEx = PB_FL_X + Math.cos(_pbFlipLAnim) * PB_FLIP_LEN;
+    const flLEy = PB_FLIP_Y + Math.sin(_pbFlipLAnim) * PB_FLIP_LEN;
+    if (pbPointLineDist(_pbBall.x, _pbBall.y, PB_FL_X, PB_FLIP_Y, flLEx, flLEy) < _pbBall.r + 6) {
+        const power = _pbFlipL ? 8 : 1.5;
+        const hitPos = (_pbBall.x - PB_FL_X) / PB_FLIP_LEN;
+        _pbBall.vy = -Math.abs(_pbBall.vy) * 0.3 - power;
+        _pbBall.vx += (_pbFlipL ? 2.5 : 0.3) * (0.5 + hitPos);
+        _pbBall.y = Math.min(_pbBall.y, PB_FLIP_Y - _pbBall.r - 7);
+        if (_pbFlipL) _pbTone(300, 0.04);
+    }
+    const flREx = PB_FR_X + Math.cos(_pbFlipRAnim) * PB_FLIP_LEN;
+    const flREy = PB_FLIP_Y + Math.sin(_pbFlipRAnim) * PB_FLIP_LEN;
+    if (pbPointLineDist(_pbBall.x, _pbBall.y, PB_FR_X, PB_FLIP_Y, flREx, flREy) < _pbBall.r + 6) {
+        const power = _pbFlipR ? 8 : 1.5;
+        const hitPos = (PB_FR_X - _pbBall.x) / PB_FLIP_LEN;
+        _pbBall.vy = -Math.abs(_pbBall.vy) * 0.3 - power;
+        _pbBall.vx -= (_pbFlipR ? 2.5 : 0.3) * (0.5 + hitPos);
+        _pbBall.y = Math.min(_pbBall.y, PB_FLIP_Y - _pbBall.r - 7);
+        if (_pbFlipR) _pbTone(300, 0.04);
     }
     /* Drain */
     if (_pbBall.y > PB_H + 10) {
         _pbBalls--;
+        _pbMultiplier = 1;
         document.getElementById('pb-ball').textContent = _pbBalls;
         if (_pbBalls <= 0) {
             if (_pbScore > _pbHigh) { _pbHigh = _pbScore; document.getElementById('pb-high').textContent = _pbHigh; }
@@ -4429,6 +4588,7 @@ function pinballUpdate() {
             document.getElementById('pb-score').textContent = '0';
             PB_TARGETS.forEach(t => t.hit = false);
         }
+        _pbTone(150, 0.3);
         pinballSpawnBall();
     }
     /* Speed cap */
@@ -4446,44 +4606,78 @@ function pbPointLineDist(px, py, x1, y1, x2, y2) {
 }
 
 function pbAddScore(pts) {
-    _pbScore += pts;
+    _pbScore += pts * _pbMultiplier;
     document.getElementById('pb-score').textContent = _pbScore;
 }
 
 function pinballDraw(ctx) {
-    /* Background — space theme */
-    ctx.fillStyle = '#0a0a2e';
+    /* Background */
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, PB_H);
+    bgGrad.addColorStop(0, '#080828');
+    bgGrad.addColorStop(0.5, '#0a0a30');
+    bgGrad.addColorStop(1, '#060618');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, PB_W, PB_H);
-    /* Stars bg */
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    for (let i = 0; i < 40; i++) {
+    /* Stars */
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    for (let i = 0; i < 60; i++) {
         const sx = (i * 97 + 13) % PB_W, sy = (i * 73 + 29) % PB_H;
-        ctx.fillRect(sx, sy, 1, 1);
+        const sz = (i % 3 === 0) ? 2 : 1;
+        ctx.fillRect(sx, sy, sz, sz);
     }
-    /* Walls */
+    /* Wall segments */
     ctx.strokeStyle = '#3366cc';
     ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    for (const w of PB_WALLS) {
+        ctx.beginPath();
+        ctx.moveTo(w.x1, w.y1);
+        ctx.lineTo(w.x2, w.y2);
+        ctx.stroke();
+    }
+    /* Wall glow */
+    ctx.strokeStyle = 'rgba(50,100,200,0.15)';
+    ctx.lineWidth = 8;
+    for (const w of PB_WALLS) {
+        ctx.beginPath();
+        ctx.moveTo(w.x1, w.y1);
+        ctx.lineTo(w.x2, w.y2);
+        ctx.stroke();
+    }
+    /* Slingshots */
+    for (const s of PB_SLINGS) {
+        const flash = s._flash > 0;
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); ctx.lineTo(s.x3, s.y3); ctx.closePath();
+        ctx.fillStyle = flash ? 'rgba(255,100,50,0.5)' : 'rgba(60,80,140,0.4)';
+        ctx.fill();
+        ctx.strokeStyle = flash ? '#ff6644' : '#4466aa';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+    /* Lane guides (decorative) */
+    ctx.strokeStyle = 'rgba(80,120,200,0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    ctx.moveTo(20, 10); ctx.lineTo(20, 490);
-    ctx.moveTo(360, 10); ctx.lineTo(360, 420);
-    ctx.moveTo(20, 10); ctx.lineTo(360, 10);
-    /* Launch lane */
-    ctx.moveTo(365, 420); ctx.lineTo(365, 10);
-    ctx.moveTo(395, 520); ctx.lineTo(395, 10);
+    ctx.moveTo(110, 80); ctx.lineTo(110, 340);
+    ctx.moveTo(290, 80); ctx.lineTo(290, 340);
     ctx.stroke();
-    /* Gutters */
-    ctx.strokeStyle = '#224488';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(20, 490); ctx.lineTo(90, 490);
-    ctx.moveTo(310, 490); ctx.lineTo(360, 420);
-    ctx.stroke();
+    ctx.setLineDash([]);
     /* Bumpers */
     for (const b of PB_BUMPERS) {
         const flash = b._flash > 0;
-        const grad = ctx.createRadialGradient(b.x - 3, b.y - 3, 2, b.x, b.y, b.r);
-        grad.addColorStop(0, flash ? '#fff' : '#ff6644');
-        grad.addColorStop(1, flash ? '#ff4422' : '#882211');
+        /* Glow */
+        if (flash) {
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r + 6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,100,50,0.3)';
+            ctx.fill();
+        }
+        const grad = ctx.createRadialGradient(b.x - 4, b.y - 4, 2, b.x, b.y, b.r);
+        grad.addColorStop(0, flash ? '#fff' : '#ff7755');
+        grad.addColorStop(0.7, flash ? '#ff6633' : '#cc3311');
+        grad.addColorStop(1, flash ? '#ff4422' : '#661100');
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fillStyle = grad;
@@ -4491,67 +4685,98 @@ function pinballDraw(ctx) {
         ctx.strokeStyle = flash ? '#fff' : '#ff8866';
         ctx.lineWidth = 2;
         ctx.stroke();
-        /* pts text */
+        /* Ring */
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r - 4, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 9px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('100', b.x, b.y + 3);
+        ctx.fillText(b.pts, b.x, b.y + 3);
     }
     /* Targets */
     for (const t of PB_TARGETS) {
-        ctx.fillStyle = t.hit ? '#333' : (t._flash > 0 ? '#fff' : '#ffcc00');
-        ctx.fillRect(t.x, t.y, t.w, t.h);
-        if (!t.hit) {
-            ctx.fillStyle = '#ff0';
-            ctx.shadowColor = '#ff0';
-            ctx.shadowBlur = 6;
+        if (t.hit) {
+            ctx.fillStyle = t._flash > 0 ? `rgba(255,200,0,${t._flash / 20})` : '#222';
+            ctx.fillRect(t.x, t.y, t.w, t.h);
+        } else {
+            ctx.shadowColor = '#ffcc00';
+            ctx.shadowBlur = 8;
+            ctx.fillStyle = '#ffcc00';
             ctx.fillRect(t.x, t.y, t.w, t.h);
             ctx.shadowBlur = 0;
+            /* Inner glow */
+            ctx.fillStyle = '#ffe866';
+            ctx.fillRect(t.x + 1, t.y + 1, Math.max(t.w - 2, 1), Math.max(t.h - 2, 1));
         }
     }
+    /* Particles */
+    for (const p of _pbParticles) {
+        ctx.globalAlpha = p.life / 35;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - 1, p.y - 1, 3, 3);
+    }
+    ctx.globalAlpha = 1;
     /* Flippers */
-    const flipY = 470;
     ctx.lineCap = 'round';
     /* Left */
-    const flLA = _pbFlipL ? -0.45 : 0.35;
-    ctx.beginPath();
-    ctx.moveTo(100, flipY);
-    ctx.lineTo(100 + Math.cos(flLA) * 60, flipY + Math.sin(flLA) * 60);
-    ctx.strokeStyle = '#44aaff';
-    ctx.lineWidth = 10;
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 4;
-    ctx.stroke();
+    const flLEx = PB_FL_X + Math.cos(_pbFlipLAnim) * PB_FLIP_LEN;
+    const flLEy = PB_FLIP_Y + Math.sin(_pbFlipLAnim) * PB_FLIP_LEN;
+    ctx.beginPath(); ctx.moveTo(PB_FL_X, PB_FLIP_Y); ctx.lineTo(flLEx, flLEy);
+    ctx.strokeStyle = '#44aaff'; ctx.lineWidth = 12; ctx.stroke();
+    ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 5; ctx.stroke();
+    /* Left pivot dot */
+    ctx.beginPath(); ctx.arc(PB_FL_X, PB_FLIP_Y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#2288ee'; ctx.fill();
     /* Right */
-    const flRA = _pbFlipR ? Math.PI + 0.45 : Math.PI - 0.35;
-    ctx.beginPath();
-    ctx.moveTo(300, flipY);
-    ctx.lineTo(300 + Math.cos(flRA) * 60, flipY + Math.sin(flRA) * 60);
-    ctx.strokeStyle = '#44aaff';
-    ctx.lineWidth = 10;
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 4;
-    ctx.stroke();
+    const flREx = PB_FR_X + Math.cos(_pbFlipRAnim) * PB_FLIP_LEN;
+    const flREy = PB_FLIP_Y + Math.sin(_pbFlipRAnim) * PB_FLIP_LEN;
+    ctx.beginPath(); ctx.moveTo(PB_FR_X, PB_FLIP_Y); ctx.lineTo(flREx, flREy);
+    ctx.strokeStyle = '#44aaff'; ctx.lineWidth = 12; ctx.stroke();
+    ctx.strokeStyle = 'rgba(100,180,255,0.5)'; ctx.lineWidth = 5; ctx.stroke();
+    /* Right pivot dot */
+    ctx.beginPath(); ctx.arc(PB_FR_X, PB_FLIP_Y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#2288ee'; ctx.fill();
     /* Ball */
     if (_pbBall) {
+        /* Ball shadow */
+        ctx.beginPath();
+        ctx.arc(_pbBall.x + 2, _pbBall.y + 2, _pbBall.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fill();
+        /* Ball */
         const bGrad = ctx.createRadialGradient(_pbBall.x - 2, _pbBall.y - 2, 1, _pbBall.x, _pbBall.y, _pbBall.r);
         bGrad.addColorStop(0, '#fff');
-        bGrad.addColorStop(0.5, '#ddd');
-        bGrad.addColorStop(1, '#888');
+        bGrad.addColorStop(0.4, '#e8e8f0');
+        bGrad.addColorStop(1, '#8888aa');
         ctx.beginPath();
         ctx.arc(_pbBall.x, _pbBall.y, _pbBall.r, 0, Math.PI * 2);
         ctx.fillStyle = bGrad;
         ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
     }
     /* Launch power bar */
     if (_pbLaunching && _pbBall && !_pbBall.active) {
-        ctx.fillStyle = '#333';
-        ctx.fillRect(378, 460, 12, -60);
-        const h = (_pbLaunchPower / 18) * 58;
-        ctx.fillStyle = `hsl(${120 - (_pbLaunchPower / 18) * 120}, 100%, 50%)`;
-        ctx.fillRect(379, 459, 10, -h);
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(374, 465, 14, -65);
+        ctx.strokeStyle = '#3366cc';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(374, 465, 14, -65);
+        const h = (_pbLaunchPower / 16) * 62;
+        const hue = 120 - (_pbLaunchPower / 16) * 120;
+        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.fillRect(375, 464, 12, -h);
+    }
+    /* Multiplier indicator */
+    if (_pbMultiplier > 1) {
+        ctx.fillStyle = '#0f0';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`x${_pbMultiplier}`, 30, PB_H - 5);
     }
     ctx.lineCap = 'butt';
 }
@@ -4565,20 +4790,21 @@ function pinballStop() {
 document.addEventListener('keydown', e => {
     const pbWin = document.getElementById('win-pinball');
     if (!pbWin || pbWin.style.display === 'none') return;
-    if (e.key === 'z' || e.key === 'Z') { _pbFlipL = 1; e.preventDefault(); }
-    if (e.key === 'm' || e.key === 'M') { _pbFlipR = 1; e.preventDefault(); }
-    if (e.key === ' ' && _pbBall && !_pbBall.active) { _pbLaunching = true; e.preventDefault(); }
+    if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft') { _pbFlipL = 1; e.preventDefault(); }
+    if (e.key === 'm' || e.key === 'M' || e.key === 'ArrowRight') { _pbFlipR = 1; e.preventDefault(); }
+    if ((e.key === ' ' || e.key === 'ArrowDown') && _pbBall && !_pbBall.active) { _pbLaunching = true; e.preventDefault(); }
 });
 document.addEventListener('keyup', e => {
-    if (e.key === 'z' || e.key === 'Z') _pbFlipL = 0;
-    if (e.key === 'm' || e.key === 'M') _pbFlipR = 0;
-    if (e.key === ' ' && _pbLaunching) {
+    if (e.key === 'z' || e.key === 'Z' || e.key === 'ArrowLeft') _pbFlipL = 0;
+    if (e.key === 'm' || e.key === 'M' || e.key === 'ArrowRight') _pbFlipR = 0;
+    if ((e.key === ' ' || e.key === 'ArrowDown') && _pbLaunching) {
         _pbLaunching = false;
         if (_pbBall && !_pbBall.active) {
             _pbBall.active = true;
             _pbBall.vy = -_pbLaunchPower;
-            _pbBall.vx = -1 + Math.random() * 2;
+            _pbBall.vx = -0.5 + Math.random();
             _pbLaunchPower = 0;
+            _pbTone(200, 0.1);
         }
     }
 });
