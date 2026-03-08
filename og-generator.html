@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>OG Image Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      gap: 24px;
+    }
+    .og {
+      width: 1200px;
+      height: 630px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      background: #3a6ea5;
+    }
+    /* Bliss wallpaper recreation */
+    .og-sky {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, #4a90d9 0%, #87ceeb 35%, #b8e6b8 55%, #7ec47e 65%, #5ba85b 75%, #4a9a3a 100%);
+    }
+    .og-cloud1, .og-cloud2, .og-cloud3 {
+      position: absolute;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50%;
+      filter: blur(20px);
+    }
+    .og-cloud1 { width: 300px; height: 80px; top: 40px; left: 100px; }
+    .og-cloud2 { width: 200px; height: 60px; top: 80px; right: 200px; }
+    .og-cloud3 { width: 250px; height: 70px; top: 20px; right: 50px; opacity: 0.5; }
+    /* Hills */
+    .og-hill1, .og-hill2 {
+      position: absolute;
+      border-radius: 50%;
+    }
+    .og-hill1 {
+      width: 1800px; height: 600px;
+      background: linear-gradient(180deg, #6ab04c 0%, #4a8a2c 100%);
+      bottom: -320px; left: -200px;
+    }
+    .og-hill2 {
+      width: 1400px; height: 500px;
+      background: linear-gradient(180deg, #78c850 0%, #5aa030 100%);
+      bottom: -340px; right: -300px;
+    }
+    /* Dark overlay for readability */
+    .og-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,30,80,0.75) 0%, rgba(0,40,100,0.55) 50%, rgba(0,20,60,0.65) 100%);
+      z-index: 1;
+    }
+    /* XP window frame */
+    .og-window {
+      position: absolute;
+      z-index: 2;
+      top: 40px; left: 40px; right: 40px; bottom: 40px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+    }
+    .og-titlebar {
+      height: 32px;
+      background: linear-gradient(180deg, #0a246a 0%, #3a6ea5 30%, #0a246a 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 6px;
+    }
+    .og-tb-ico { width: 16px; height: 16px; border-radius: 2px; }
+    .og-tb-title {
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      flex: 1;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .og-tb-btn {
+      width: 21px; height: 21px;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: bold; color: #fff;
+    }
+    .og-tb-min { background: linear-gradient(180deg, #3a7bd5, #2a5ba5); }
+    .og-tb-max { background: linear-gradient(180deg, #3a7bd5, #2a5ba5); }
+    .og-tb-close { background: linear-gradient(180deg, #c75050, #a03030); }
+    .og-wbody {
+      background: rgba(10, 20, 50, 0.85);
+      height: calc(100% - 32px);
+      display: flex;
+      padding: 40px 50px;
+      gap: 50px;
+    }
+    /* Content */
+    .og-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 3;
+    }
+    .og-greeting {
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+      font-family: 'Courier New', monospace;
+    }
+    .og-greeting span { color: #4fc3f7; }
+    .og-name {
+      font-size: 54px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.1;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    .og-title {
+      font-size: 22px;
+      color: #90caf9;
+      margin-bottom: 28px;
+      font-weight: 400;
+    }
+    .og-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .og-tag {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.85);
+      padding: 6px 16px;
+      border-radius: 3px;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+    }
+    .og-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      gap: 16px;
+    }
+    .og-photo-wrap {
+      width: 200px; height: 200px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.25);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .og-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .og-url {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+    }
+    .og-xp-flag {
+      position: absolute;
+      bottom: 55px; right: 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      z-index: 3;
+      opacity: 0.5;
+      transform: rotate(-5deg);
+    }
+    .og-xp-flag div {
+      width: 14px; height: 14px;
+      border-radius: 2px;
+    }
+    .bf-r { background: #e74c3c; border-radius: 4px 2px 2px 2px; }
+    .bf-g { background: #27ae60; border-radius: 2px 4px 2px 2px; }
+    .bf-b { background: #2980b9; border-radius: 2px 2px 2px 4px; }
+    .bf-y { background: #f1c40f; border-radius: 2px 2px 4px 2px; }
+    /* Taskbar */
+    .og-taskbar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 36px;
+      background: linear-gradient(180deg, #245edb, #1a4aad, #245edb);
+      border-top: 2px solid #5b8fea;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+    .og-start {
+      background: linear-gradient(180deg, #3a9a3a, #2a7a2a);
+      border-radius: 0 8px 8px 0;
+      padding: 3px 14px 3px 10px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .og-start-flag {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+    }
+    .og-start-flag div { width: 8px; height: 8px; border-radius: 1px; }
+
+    /* Download button */
+    .dl-btn {
+      background: linear-gradient(180deg, #3a9a3a, #2a7a2a);
+      color: #fff;
+      border: 2px solid #5bc45b;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      transition: all 0.15s;
+    }
+    .dl-btn:hover { background: linear-gradient(180deg, #4ab04a, #3a8a3a); transform: scale(1.02); }
+    .dl-btn:active { transform: scale(0.98); }
+    .dl-hint {
+      color: #666;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="og" id="og-canvas">
+    <!-- Bliss-like background -->
+    <div class="og-sky"></div>
+    <div class="og-cloud1"></div>
+    <div class="og-cloud2"></div>
+    <div class="og-cloud3"></div>
+    <div class="og-hill1"></div>
+    <div class="og-hill2"></div>
+    <div class="og-overlay"></div>
+
+    <!-- XP Window -->
+    <div class="og-window">
+      <div class="og-titlebar">
+        <img src="src/img/system/chrome-icon.png" class="og-tb-ico" alt="">
+        <span class="og-tb-title">matheusteixeira.com.br - Google Chrome</span>
+        <div class="og-tb-btn og-tb-min">_</div>
+        <div class="og-tb-btn og-tb-max">&square;</div>
+        <div class="og-tb-btn og-tb-close">X</div>
+      </div>
+      <div class="og-wbody">
+        <div class="og-left">
+          <div class="og-greeting">C:\Users\Matheus&gt; <span>whoami</span></div>
+          <div class="og-name">Matheus<br>Teixeira</div>
+          <div class="og-title">Back-End Developer &bull; Especialista Laravel</div>
+          <div class="og-tags">
+            <span class="og-tag">PHP</span>
+            <span class="og-tag">Laravel</span>
+            <span class="og-tag">MySQL</span>
+            <span class="og-tag">Docker</span>
+            <span class="og-tag">Node.js</span>
+            <span class="og-tag">REST APIs</span>
+          </div>
+        </div>
+        <div class="og-right">
+          <div class="og-photo-wrap">
+            <img src="src/img/matheus.jpg" alt="Matheus" class="og-photo">
+          </div>
+          <div class="og-url">matheusteixeira.com.br</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="og-taskbar">
+      <div class="og-start">
+        <div class="og-start-flag">
+          <div class="bf-r"></div><div class="bf-g"></div>
+          <div class="bf-b"></div><div class="bf-y"></div>
+        </div>
+        Iniciar
+      </div>
+    </div>
+
+    <div class="og-xp-flag">
+      <div class="bf-r"></div><div class="bf-g"></div>
+      <div class="bf-b"></div><div class="bf-y"></div>
+    </div>
+  </div>
+
+  <button class="dl-btn" onclick="downloadOG()">Baixar como PNG (1200x630)</button>
+  <span class="dl-hint">A imagem sera salva automaticamente</span>
+
+  <script>
+    function downloadOG() {
+      const el = document.getElementById('og-canvas');
+      const w = 1200, h = 630;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      // Use html2canvas-like approach via foreignObject in SVG
+      const data = new XMLSerializer().serializeToString(el);
+      const styles = document.querySelectorAll('style');
+      let cssText = '';
+      styles.forEach(s => cssText += s.textContent);
+
+      // Get all images and convert to base64 first
+      const images = el.querySelectorAll('img');
+      const imgPromises = Array.from(images).map(img => {
+        return new Promise((resolve) => {
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth || img.width;
+          c.height = img.naturalHeight || img.height;
+          const cx = c.getContext('2d');
+          cx.drawImage(img, 0, 0);
+          try {
+            const dataUrl = c.toDataURL('image/png');
+            resolve({ src: img.getAttribute('src'), dataUrl });
+          } catch(e) {
+            resolve(null);
+          }
+        });
+      });
+
+      Promise.all(imgPromises).then(results => {
+        let htmlStr = el.outerHTML;
+        results.forEach(r => {
+          if (r) htmlStr = htmlStr.split(r.src).join(r.dataUrl);
+        });
+
+        const svgStr = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+            <style>${cssText}</style>
+            <foreignObject width="100%" height="100%">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                ${htmlStr}
+              </div>
+            </foreignObject>
+          </svg>`;
+
+        const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url);
+          canvas.toBlob(pngBlob => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(pngBlob);
+            a.download = 'og-image.png';
+            a.click();
+            URL.revokeObjectURL(a.href);
+          }, 'image/png');
+        };
+        img.onerror = () => {
+          alert('Erro ao gerar PNG. Use o metodo alternativo:\nF12 > Ctrl+Shift+P > "Capture node screenshot"\nClique no elemento .og');
+        };
+        img.src = url;
+      });
+    }
+  </script>
+</body>
+</html>
