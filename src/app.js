@@ -4949,44 +4949,156 @@ setInterval(checkGhostMode, 3000);
 const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
 /* ============================================================
    MINECRAFT 3D — Windows XP Edition
-   Raycaster voxel 3D em primeira pessoa (canvas 220x140 → CSS 660x420)
+   Raycaster voxel 3D com texturas procedurais 16×16 por face
    ============================================================ */
 (function () {
-    /* --- Resolução interna do canvas (3x menor que o display via CSS) --- */
     const RW = 220, RH = 140;
-    const FOV    = Math.PI / 2.5;           // ~72° horizontal
+    const FOV    = Math.PI / 2.5;
     const HTAN   = Math.tan(FOV / 2);
     const ASPECT = RW / RH;
-    const MAX_D  = 14;                      // distância máxima de raycast
+    const MAX_D  = 14;
 
-    /* --- Mundo 3D --- */
     const WX = 32, WY = 10, WZ = 32;
     const B = {AIR:0,GRASS:1,DIRT:2,STONE:3,WOOD:4,LEAVES:5,SAND:6,WATER:7,BEDROCK:8,PLANK:9,GLASS:10,GOLD:11};
     const HOTBAR  = [B.GRASS,B.DIRT,B.STONE,B.WOOD,B.LEAVES,B.SAND,B.PLANK,B.GLASS,B.GOLD];
     const HNAMES  = ['Grama','Terra','Pedra','Madeira','Folhas','Areia','Tábua','Vidro','Ouro'];
     const HCOLORS = ['#5D9E3A','#8B6340','#888','#7C5C2A','#2D7A2D','#D4C46A','#B08040','#A8D8F0','#FFD700'];
 
-    /*
-     * Cores por bloco: [top RGB, side RGB]
-     * Brilho por face: 0=topo 1=baixo 2=Z- 3=Z+ 4=X+ 5=X-
-     */
-    const COL = {
-        1: [[106,174,59],[60,100,38]],  // Grama
-        2: [[134,96,67], [110,75,48]],  // Terra
-        3: [[130,130,130],[110,110,110]],// Pedra
-        4: [[115,78,38], [90,60,28]],   // Madeira
-        5: [[58,112,34], [46,98,22]],   // Folhas
-        6: [[200,186,100],[188,174,88]],// Areia
-        7: [[32,96,200], [24,80,180]],  // Água
-        8: [[40,40,40],  [28,28,28]],   // Bedrock
-        9: [[176,128,64],[160,112,48]], // Tábua
-       10: [[168,216,240],[155,205,230]],// Vidro
-       11: [[255,215,0], [230,190,0]],  // Ouro
-    };
-    /* brilho: topo=1.0, baixo=0.35, Z-=0.70, Z+=0.80, X+=0.60, X-=0.90 */
+    /* brilho por face: 0=topo 1=baixo 2=Z 3=Z' 4=X 5=X' */
     const BRIGHT = [1.0, 0.35, 0.70, 0.80, 0.60, 0.90];
-    /* índice da cor: topo=0, todo lado=1 */
-    const FACE_CI = [0, 1, 1, 1, 1, 1];
+
+    /* ---- Texturas procedurais 16×16 (pixel art estilo Minecraft) ---- */
+    const TS = 16;
+
+    /* hash determinístico → [0,1) */
+    function ph(x, y, s) {
+        const n = Math.sin(x * 127.1 + y * 311.7 + s * 74.3) * 43758.5453;
+        return n - Math.floor(n);
+    }
+
+    /* constrói Uint8Array(TS*TS*3) com função fn(u,v) → [r,g,b] */
+    function mkTex(fn) {
+        const d = new Uint8Array(TS * TS * 3);
+        for (let v = 0; v < TS; v++)
+            for (let u = 0; u < TS; u++) {
+                const [r, g, b] = fn(u, v);
+                const i = (v * TS + u) * 3;
+                d[i] = r; d[i+1] = g; d[i+2] = b;
+            }
+        return d;
+    }
+
+    /* amostra textura em UV ∈ [0,1] */
+    function smpTex(tex, u, v) {
+        const ui = Math.min(TS-1, Math.max(0, (u * TS) | 0));
+        const vi = Math.min(TS-1, Math.max(0, (v * TS) | 0));
+        const i  = (vi * TS + ui) * 3;
+        return [tex[i], tex[i+1], tex[i+2]];
+    }
+
+    /* TX[bloco] = [texTopo, texLado] */
+    const TX = {
+        [B.GRASS]: [
+            /* topo – verde com variação */
+            mkTex((u, v) => {
+                const n = ph(u, v, 1), m = ph(u*2, v*2, 2) > 0.85 ? 0.82 : 1;
+                return [(78+n*18)*m|0, (148+n*30)*m|0, (52+n*14)*m|0];
+            }),
+            /* lado – faixa verde no topo, terra embaixo */
+            mkTex((u, v) => {
+                if (v < 3) { const n=ph(u,v,3); return [78+n*18|0, 148+n*25|0, 52+n*12|0]; }
+                const n = ph(u, v, 4);
+                return [118+n*28|0, 82+n*20|0, 52+n*14|0];
+            }),
+        ],
+        [B.DIRT]: (() => {
+            const t = mkTex((u,v)=>{ const n=ph(u,v,5); return [118+n*28|0, 82+n*20|0, 52+n*14|0]; });
+            return [t, t];
+        })(),
+        [B.STONE]: (() => {
+            const t = mkTex((u,v)=>{
+                const n = ph(u,v,6);
+                const ck = (ph(u*2,v,7)<0.09 || ph(u,v*2,8)<0.09) ? 0.68 : 1;
+                const c = (105+n*32)*ck|0;
+                return [c, c, c];
+            });
+            return [t, t];
+        })(),
+        [B.WOOD]: [
+            /* topo – anéis concêntricos (corte de madeira) */
+            mkTex((u,v)=>{
+                const cx=u-7.5, cy=v-7.5, d=Math.sqrt(cx*cx+cy*cy);
+                const ring = Math.sin(d*1.5)*0.4+0.5, n=ph(u,v,9)*0.12;
+                return [108+ring*42+n*18|0, 72+ring*26+n*12|0, 35+ring*14|0];
+            }),
+            /* lado – grão vertical */
+            mkTex((u,v)=>{
+                const n=ph(u,v,10), g=ph(u*4,v*0.2,11)*18;
+                return [118+n*18-g|0, 82+n*12-g*0.7|0, 42+n*10|0];
+            }),
+        ],
+        [B.LEAVES]: (() => {
+            const t = mkTex((u,v)=>{
+                const n=ph(u,v,12), sp=ph(u*1.8,v*1.8,13);
+                if (sp<0.13) return [24+n*12|0, 88+n*18|0, 16+n*8|0];
+                return [47+n*20|0, 128+n*22|0, 29+n*12|0];
+            });
+            return [t, t];
+        })(),
+        [B.SAND]: (() => {
+            const t = mkTex((u,v)=>{ const n=ph(u,v,14); return [208+n*18|0, 192+n*16|0, 118+n*18|0]; });
+            return [t, t];
+        })(),
+        [B.WATER]: (() => {
+            const t = mkTex((u,v)=>{
+                const w=ph(u*0.7,v*0.7,15), w2=ph(u*1.4,v*0.5,16);
+                return [22+w*12|0, 82+w2*22|0, 182+w*28|0];
+            });
+            return [t, t];
+        })(),
+        [B.BEDROCK]: (() => {
+            const t = mkTex((u,v)=>{
+                const n=ph(u,v,17), p=ph((u/4)|0,(v/4)|0,18);
+                const base = p<0.38 ? 22 : 52;
+                return [base+n*14|0, base+n*14|0, base+n*14|0];
+            });
+            return [t, t];
+        })(),
+        [B.PLANK]: (() => {
+            const t = mkTex((u,v)=>{
+                const n=ph(u,v,19);
+                const lh = (v%8===0) ? 0.62 : 1.0;
+                const lv = (u===8&&v<8)||(u===0) ? 0.7 : lh;
+                return [(152+n*22)*lv|0, (102+n*16)*lv|0, (52+n*10)*lv|0];
+            });
+            return [t, t];
+        })(),
+        [B.GLASS]: (() => {
+            const t = mkTex((u,v)=>{
+                if (u===0||u===15||v===0||v===15) return [152, 192, 228];
+                if (u===1||u===14||v===1||v===14) return [175, 210, 238];
+                const n=ph(u,v,20);
+                if (n<0.04) return [185, 218, 245];
+                return [210, 232, 252];
+            });
+            return [t, t];
+        })(),
+        [B.GOLD]: [
+            mkTex((u,v)=>{
+                const n=ph(u,v,21);
+                const cross=(u>=5&&u<=10&&(v===5||v===10))||(v>=5&&v<=10&&(u===5||u===10));
+                if (cross) return [198, 155, 2];
+                return [252, 208+n*18|0, 12+n*14|0];
+            }),
+            mkTex((u,v)=>{ const n=ph(u,v,21); return [252, 208+n*18|0, 12+n*14|0]; }),
+        ],
+    };
+
+    function getTexCol(block, face, u, v) {
+        const t = TX[block];
+        if (!t) return [128, 128, 128];
+        return smpTex(face === 0 ? t[0] : t[1], u, v);
+    }
 
     let world3d = null, mc3dReady = false, mc3dRunning = false, mc3dRaf = null;
     let cam = {x:16, y:6.5, z:16, yaw:0.4, pitch:-0.05};
@@ -5001,15 +5113,14 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
             Array.from({length:WY}, (_, y) =>
                 Array.from({length:WZ}, (_, z) => {
                     if (y === 0) return B.BEDROCK;
-                    const h = 4 + Math.round(Math.sin(x*0.5)*1.5 + Math.cos(z*0.45)*1.5);
-                    if (y < h - 2) return B.STONE;
-                    if (y < h)     return B.DIRT;
-                    if (y === h)   return B.GRASS;
+                    const hh = 4 + Math.round(Math.sin(x*0.5)*1.5 + Math.cos(z*0.45)*1.5);
+                    if (y < hh - 2) return B.STONE;
+                    if (y < hh)     return B.DIRT;
+                    if (y === hh)   return B.GRASS;
                     return B.AIR;
                 })
             )
         );
-        // Árvores
         [[6,6],[14,22],[22,10],[26,26],[10,18]].forEach(([tx,tz]) => {
             if (tx >= WX || tz >= WZ) return;
             let sy = 1;
@@ -5055,12 +5166,11 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         return null;
     }
 
-    /* ---------- Renderização ---------- */
+    /* ---------- Renderização com Texturas ---------- */
     function render3d() {
         if (!pdata || !world3d) return;
         const cosY = Math.cos(cam.yaw),  sinY = Math.sin(cam.yaw);
         const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
-        // Vetores da câmera
         const fwX = sinY*cosP, fwY = sinP,  fwZ = cosY*cosP;
         const rtX = cosY,      rtY = 0,      rtZ = -sinY;
         const upX = -sinY*sinP, upY = cosP,  upZ = cosY*sinP;
@@ -5073,29 +5183,45 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                 const rdy = fwY +           vf*upY;
                 const rdz = fwZ + hf*rtZ + vf*upZ;
                 const rl  = Math.sqrt(rdx*rdx + rdy*rdy + rdz*rdz);
-                const hit = castRay(cam.x, cam.y, cam.z, rdx/rl, rdy/rl, rdz/rl);
+                const ndx = rdx/rl, ndy = rdy/rl, ndz = rdz/rl;
+                const hit = castRay(cam.x, cam.y, cam.z, ndx, ndy, ndz);
                 let r, g, b;
                 if (!hit) {
-                    // Céu degradê
-                    const t = Math.min(1, Math.max(0, py/RH));
-                    r = (96  + (140-96)*t)  | 0;
-                    g = (160 + (190-160)*t) | 0;
-                    b = 235;
+                    /* céu degradê azul */
+                    const st = py / RH;
+                    r = (100 + st*55) | 0;
+                    g = (155 + st*40) | 0;
+                    b = (240 - st*10) | 0;
                 } else {
-                    const col = COL[hit.b] || COL[3];
-                    const c   = col[FACE_CI[hit.face]];
+                    /* ponto exato de colisão → UVs de textura */
+                    const hx = cam.x + ndx * hit.t;
+                    const hy = cam.y + ndy * hit.t;
+                    const hz = cam.z + ndz * hit.t;
+                    const fx = hx - Math.floor(hx);
+                    const fy = hy - Math.floor(hy);
+                    const fz = hz - Math.floor(hz);
+                    let u = 0, v = 0;
+                    switch (hit.face) {
+                        case 0: u=fx;   v=fz;   break; // topo
+                        case 1: u=fx;   v=fz;   break; // fundo
+                        case 2: u=fx;   v=1-fy; break; // Z
+                        case 3: u=1-fx; v=1-fy; break; // Z'
+                        case 4: u=fz;   v=1-fy; break; // X
+                        case 5: u=1-fz; v=1-fy; break; // X'
+                    }
+                    const [tc0, tc1, tc2] = getTexCol(hit.b, hit.face, u, v);
                     const br  = BRIGHT[hit.face];
                     const fog = Math.max(0, 1 - hit.t / MAX_D);
                     const f   = br * fog;
-                    r = (c[0]*f + 140*(1-fog)) | 0;
-                    g = (c[1]*f + 190*(1-fog)) | 0;
-                    b = (c[2]*f + 235*(1-fog)) | 0;
+                    r = (tc0*f + 100*(1-fog)) | 0;
+                    g = (tc1*f + 155*(1-fog)) | 0;
+                    b = (tc2*f + 235*(1-fog)) | 0;
                 }
                 const i = (py*RW + px) * 4;
-                pdata[i] = r; pdata[i+1] = g; pdata[i+2] = b; pdata[i+3] = 255;
+                pdata[i]=r; pdata[i+1]=g; pdata[i+2]=b; pdata[i+3]=255;
             }
         }
-        // Mira central
+        /* mira central */
         const cx = RW>>1, cy = RH>>1;
         for (let d = -4; d <= 4; d++) {
             if (!d) continue;
@@ -5190,7 +5316,6 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         lastT = performance.now();
         mc3dRaf = requestAnimationFrame(gameLoop);
 
-        /* Teclado — registrar uma vez */
         if (!c3d._kd) {
             c3d._kd = e => {
                 keys[e.code] = true;
@@ -5201,7 +5326,6 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         document.addEventListener('keydown', c3d._kd);
         document.addEventListener('keyup',   c3d._ku);
 
-        /* Mouse */
         c3d.oncontextmenu = e => e.preventDefault();
         c3d.onmousedown = e => {
             if (document.pointerLockElement !== c3d) { c3d.requestPointerLock(); return; }
