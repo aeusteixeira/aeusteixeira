@@ -5058,29 +5058,32 @@ pause</pre>
 
 
     <!-- MINECRAFT WINDOW -->
-    <div class="xp-win" id="win-minecraft" style="width:660px;height:520px;top:40px;left:120px;display:none">
+    <!-- MINECRAFT 3D WINDOW -->
+    <div class="xp-win" id="win-minecraft" style="width:680px;height:540px;top:40px;left:120px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-minecraft')">
         <span class="xp-titlebar-ico">⛏️</span>
-        <span class="xp-titlebar-txt">Minecraft — Windows Edition Beta 1.7.3</span>
+        <span class="xp-titlebar-txt">Minecraft 3D — Windows XP Edition Beta 1.7.3</span>
         <div class="xp-wbtns">
           <div class="xp-wbtn wmin" onclick="minimizeWin('win-minecraft')">_</div>
           <div class="xp-wbtn wmax" onclick="maximizeWin('win-minecraft')">□</div>
-          <div class="xp-wbtn wcls" onclick="closeWin('win-minecraft')">✕</div>
+          <div class="xp-wbtn wcls" onclick="closeWin('win-minecraft');mc3dStop()">✕</div>
         </div>
       </div>
-      <div class="xp-body" style="padding:0;background:#87CEEB;display:flex;flex-direction:column;height:100%;overflow:hidden;user-select:none;">
+      <div class="xp-body" style="padding:0;background:#000;overflow:hidden;user-select:none;">
         <!-- Info bar -->
-        <div id="mc-info" style="background:rgba(0,0,0,0.5);color:#fff;font-family:'Courier New',monospace;font-size:11px;padding:2px 8px;display:flex;gap:16px;">
-          <span>⛏️ Minecraft XP Edition</span>
-          <span id="mc-coords">X:0 Y:0</span>
-          <span id="mc-block-name">Bloco: Grama</span>
-          <span style="margin-left:auto;">🖱️ Esq=colocar · Dir=remover · Scroll=mudar bloco</span>
+        <div style="background:rgba(0,0,0,0.85);color:#fff;font-family:'Courier New',monospace;font-size:11px;padding:3px 8px;display:flex;gap:12px;align-items:center;">
+          <span>⛏️ Minecraft 3D</span>
+          <span id="mc3d-block">Bloco: Grama</span>
+          <span style="margin-left:auto;font-size:10px;opacity:0.7;">WASD=andar · ↑↓←→=olhar · Espaço=subir · C=descer · 🖱️clique=capturar mouse · Esq=quebrar · Dir=colocar</span>
         </div>
-        <!-- Canvas -->
-        <canvas id="mc-canvas" style="display:block;flex:1;cursor:crosshair;image-rendering:pixelated;width:100%;"></canvas>
+        <!--
+          Canvas interno: 220×140 px
+          Exibido via CSS em: 660×420 px  (escala 3x, pixelado)
+        -->
+        <canvas id="mc3d-canvas" width="220" height="140"
+          style="display:block;width:660px;height:420px;cursor:crosshair;image-rendering:pixelated;image-rendering:crisp-edges;"></canvas>
         <!-- Hotbar -->
-        <div id="mc-hotbar" style="background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;gap:4px;padding:6px;border-top:2px solid #555;">
-        </div>
+        <div id="mc3d-hotbar" style="background:#1a1a1a;display:flex;justify-content:center;align-items:center;gap:4px;padding:6px;border-top:2px solid #444;"></div>
       </div>
     </div>
 

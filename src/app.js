@@ -343,7 +343,7 @@ function openWindow(id) {
     if (id === 'win-taskmgr') taskmgrInit();
     if (id === 'win-cmd') cmdInit();
     if (id === 'win-pinball') pinballInit();
-    if (id === 'win-minecraft') mcInit();
+    if (id === 'win-minecraft') mc3dInit();
 }
 function printCV() {
     const page = document.getElementById('cv-page');
@@ -4948,225 +4948,287 @@ setInterval(checkGhostMode, 3000);
 /* Hook no processador de comandos do CMD */
 const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
 /* ============================================================
-   MINECRAFT — Windows XP Edition
-   Mini-jogo 2D de construção com blocos
+   MINECRAFT 3D — Windows XP Edition
+   Raycaster voxel 3D em primeira pessoa (canvas 220x140 → CSS 660x420)
    ============================================================ */
 (function () {
-    const TILE = 28; // tamanho de cada bloco em px
-    const COLS  = 24;
-    const ROWS  = 18;
+    /* --- Resolução interna do canvas (3x menor que o display via CSS) --- */
+    const RW = 220, RH = 140;
+    const FOV    = Math.PI / 2.5;           // ~72° horizontal
+    const HTAN   = Math.tan(FOV / 2);
+    const ASPECT = RW / RH;
+    const MAX_D  = 14;                      // distância máxima de raycast
 
-    // Tipos de bloco
-    const B = {
-        AIR:     0,
-        GRASS:   1,
-        DIRT:    2,
-        STONE:   3,
-        WOOD:    4,
-        LEAVES:  5,
-        SAND:    6,
-        WATER:   7,
-        BEDROCK: 8,
-        PLANK:   9,
-        GLASS:   10,
-        GOLD:    11,
+    /* --- Mundo 3D --- */
+    const WX = 32, WY = 10, WZ = 32;
+    const B = {AIR:0,GRASS:1,DIRT:2,STONE:3,WOOD:4,LEAVES:5,SAND:6,WATER:7,BEDROCK:8,PLANK:9,GLASS:10,GOLD:11};
+    const HOTBAR  = [B.GRASS,B.DIRT,B.STONE,B.WOOD,B.LEAVES,B.SAND,B.PLANK,B.GLASS,B.GOLD];
+    const HNAMES  = ['Grama','Terra','Pedra','Madeira','Folhas','Areia','Tábua','Vidro','Ouro'];
+    const HCOLORS = ['#5D9E3A','#8B6340','#888','#7C5C2A','#2D7A2D','#D4C46A','#B08040','#A8D8F0','#FFD700'];
+
+    /*
+     * Cores por bloco: [top RGB, side RGB]
+     * Brilho por face: 0=topo 1=baixo 2=Z- 3=Z+ 4=X+ 5=X-
+     */
+    const COL = {
+        1: [[106,174,59],[60,100,38]],  // Grama
+        2: [[134,96,67], [110,75,48]],  // Terra
+        3: [[130,130,130],[110,110,110]],// Pedra
+        4: [[115,78,38], [90,60,28]],   // Madeira
+        5: [[58,112,34], [46,98,22]],   // Folhas
+        6: [[200,186,100],[188,174,88]],// Areia
+        7: [[32,96,200], [24,80,180]],  // Água
+        8: [[40,40,40],  [28,28,28]],   // Bedrock
+        9: [[176,128,64],[160,112,48]], // Tábua
+       10: [[168,216,240],[155,205,230]],// Vidro
+       11: [[255,215,0], [230,190,0]],  // Ouro
     };
+    /* brilho: topo=1.0, baixo=0.35, Z-=0.70, Z+=0.80, X+=0.60, X-=0.90 */
+    const BRIGHT = [1.0, 0.35, 0.70, 0.80, 0.60, 0.90];
+    /* índice da cor: topo=0, todo lado=1 */
+    const FACE_CI = [0, 1, 1, 1, 1, 1];
 
-    // Paleta de cores [top, side, bottom] ou cor única
-    const BLOCK_DEF = {
-        [B.AIR]:     { label: 'Ar',       color: null },
-        [B.GRASS]:   { label: 'Grama',    color: '#5D9E3A', side: '#8B6340', top: '#5D9E3A' },
-        [B.DIRT]:    { label: 'Terra',    color: '#8B6340' },
-        [B.STONE]:   { label: 'Pedra',    color: '#8A8A8A' },
-        [B.WOOD]:    { label: 'Madeira',  color: '#7C5C2A', dark: '#5C3C0A' },
-        [B.LEAVES]:  { label: 'Folhas',   color: '#2D7A2D', dark: '#1A5C1A' },
-        [B.SAND]:    { label: 'Areia',    color: '#D4C46A' },
-        [B.WATER]:   { label: 'Água',     color: '#2060C8', alpha: 0.7 },
-        [B.BEDROCK]: { label: 'Bedrock',  color: '#333333', dark: '#111111' },
-        [B.PLANK]:   { label: 'Tábua',    color: '#B08040', dark: '#806020' },
-        [B.GLASS]:   { label: 'Vidro',    color: '#A8D8E8', alpha: 0.5 },
-        [B.GOLD]:    { label: 'Ouro',     color: '#FFD700', dark: '#C8A800' },
-    };
+    let world3d = null, mc3dReady = false, mc3dRunning = false, mc3dRaf = null;
+    let cam = {x:16, y:6.5, z:16, yaw:0.4, pitch:-0.05};
+    let keys = {}, selSlot = 0;
+    let c3d, ctx3d, imgData, pdata;
+    let hotbar3d, blockLbl3d;
+    let lastT = 0;
 
-    const HOTBAR_BLOCKS = [B.GRASS, B.DIRT, B.STONE, B.WOOD, B.LEAVES, B.SAND, B.PLANK, B.GLASS, B.GOLD];
-
-    let world = [];
-    let selectedSlot = 0;
-    let canvas, ctx, hotbarEl, coordsEl, blockNameEl;
-    let mcRaf = null;
-    let mcInitialized = false;
-
-    function genWorld() {
-        world = Array.from({ length: ROWS }, (_, r) =>
-            Array.from({ length: COLS }, (_, c) => {
-                if (r === ROWS - 1) return B.BEDROCK;
-                if (r >= ROWS - 4) return B.DIRT;
-                if (r === ROWS - 5) return B.GRASS;
-                return B.AIR;
-            })
+    /* ---------- Geração do mundo ---------- */
+    function genWorld3d() {
+        world3d = Array.from({length:WX}, (_, x) =>
+            Array.from({length:WY}, (_, y) =>
+                Array.from({length:WZ}, (_, z) => {
+                    if (y === 0) return B.BEDROCK;
+                    const h = 4 + Math.round(Math.sin(x*0.5)*1.5 + Math.cos(z*0.45)*1.5);
+                    if (y < h - 2) return B.STONE;
+                    if (y < h)     return B.DIRT;
+                    if (y === h)   return B.GRASS;
+                    return B.AIR;
+                })
+            )
         );
-        // Adicionar algumas árvores
-        [4, 12, 18].forEach(tx => {
-            const base = ROWS - 5;
-            // Tronco
-            for (let i = 0; i < 4; i++) world[base - i][tx] = B.WOOD;
-            // Folhas
-            for (let dr = -2; dr <= 0; dr++) {
-                for (let dc = -2; dc <= 2; dc++) {
-                    const rr = base - 4 + dr, cc = tx + dc;
-                    if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS && world[rr][cc] === B.AIR)
-                        world[rr][cc] = B.LEAVES;
-                }
+        // Árvores
+        [[6,6],[14,22],[22,10],[26,26],[10,18]].forEach(([tx,tz]) => {
+            if (tx >= WX || tz >= WZ) return;
+            let sy = 1;
+            for (let y = WY-1; y >= 0; y--) if (world3d[tx][y][tz] !== B.AIR) { sy = y; break; }
+            const top = sy + 1;
+            for (let i = 0; i < 4 && top+i < WY; i++) world3d[tx][top+i][tz] = B.WOOD;
+            for (let dy = -1; dy <= 2; dy++)
+                for (let dx = -2; dx <= 2; dx++)
+                    for (let dz = -2; dz <= 2; dz++) {
+                        if (dx===0 && dz===0 && dy < 2) continue;
+                        if (Math.abs(dx)===2 && Math.abs(dz)===2) continue;
+                        const lx=tx+dx, ly=top+3+dy, lz=tz+dz;
+                        if (lx>=0&&lx<WX&&ly>=0&&ly<WY&&lz>=0&&lz<WZ&&world3d[lx][ly][lz]===B.AIR)
+                            world3d[lx][ly][lz] = B.LEAVES;
+                    }
+        });
+    }
+
+    /* ---------- DDA 3D ---------- */
+    function castRay(ox, oy, oz, dx, dy, dz) {
+        let x = ox|0, y = oy|0, z = oz|0;
+        const stepX = dx>=0?1:-1, stepY = dy>=0?1:-1, stepZ = dz>=0?1:-1;
+        const tDX = Math.abs(dx)<1e-9 ? 1e18 : 1/Math.abs(dx);
+        const tDY = Math.abs(dy)<1e-9 ? 1e18 : 1/Math.abs(dy);
+        const tDZ = Math.abs(dz)<1e-9 ? 1e18 : 1/Math.abs(dz);
+        let tmX = dx>=0 ? (x+1-ox)*tDX : (ox-x)*tDX;
+        let tmY = dy>=0 ? (y+1-oy)*tDY : (oy-y)*tDY;
+        let tmZ = dz>=0 ? (z+1-oz)*tDZ : (oz-z)*tDZ;
+        let t = 0, face = 0, px = x, py2 = y, pz = z;
+        for (let s = 0; s < 60; s++) {
+            if (t > MAX_D) return null;
+            if (x>=0&&x<WX&&y>=0&&y<WY&&z>=0&&z<WZ&&world3d[x][y][z]!==B.AIR)
+                return {b:world3d[x][y][z], x, y, z, face, t, px, py:py2, pz};
+            px = x; py2 = y; pz = z;
+            if (tmX < tmY && tmX < tmZ) {
+                t = tmX; tmX += tDX; x += stepX; face = stepX>0?5:4;
+            } else if (tmY < tmZ) {
+                t = tmY; tmY += tDY; y += stepY; face = stepY>0?1:0;
+            } else {
+                t = tmZ; tmZ += tDZ; z += stepZ; face = stepZ>0?3:2;
             }
-        });
-        // Um lago de água
-        for (let c = 8; c <= 11; c++) world[ROWS - 5][c] = B.WATER;
-        // Areia ao redor da água
-        [7, 12].forEach(c => { world[ROWS - 5][c] = B.SAND; });
-    }
-
-    function drawBlock(r, c) {
-        const type = world[r][c];
-        if (type === B.AIR) return;
-        const def = BLOCK_DEF[type];
-        if (!def || !def.color) return;
-
-        const x = c * TILE, y = r * TILE;
-
-        ctx.globalAlpha = def.alpha !== undefined ? def.alpha : 1;
-        ctx.fillStyle = def.color;
-        ctx.fillRect(x, y, TILE, TILE);
-
-        // Topo mais claro (iluminação)
-        if (type === B.GRASS) {
-            ctx.fillStyle = def.top || def.color;
-            ctx.fillRect(x, y, TILE, 4);
         }
+        return null;
+    }
 
-        // Padrão de veio (para pedra, bedrock, madeira, etc.)
-        if (def.dark) {
-            ctx.fillStyle = def.dark;
-            ctx.fillRect(x + TILE * 0.15, y + TILE * 0.15, TILE * 0.2, TILE * 0.2);
-            ctx.fillRect(x + TILE * 0.6,  y + TILE * 0.6,  TILE * 0.2, TILE * 0.2);
-            ctx.fillRect(x + TILE * 0.55, y + TILE * 0.1,  TILE * 0.15, TILE * 0.15);
+    /* ---------- Renderização ---------- */
+    function render3d() {
+        if (!pdata || !world3d) return;
+        const cosY = Math.cos(cam.yaw),  sinY = Math.sin(cam.yaw);
+        const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
+        // Vetores da câmera
+        const fwX = sinY*cosP, fwY = sinP,  fwZ = cosY*cosP;
+        const rtX = cosY,      rtY = 0,      rtZ = -sinY;
+        const upX = -sinY*sinP, upY = cosP,  upZ = cosY*sinP;
+
+        for (let py = 0; py < RH; py++) {
+            const vf = ((py/RH) - 0.5) * 2 * (HTAN/ASPECT);
+            for (let px = 0; px < RW; px++) {
+                const hf = ((px/RW) - 0.5) * 2 * HTAN;
+                const rdx = fwX + hf*rtX + vf*upX;
+                const rdy = fwY +           vf*upY;
+                const rdz = fwZ + hf*rtZ + vf*upZ;
+                const rl  = Math.sqrt(rdx*rdx + rdy*rdy + rdz*rdz);
+                const hit = castRay(cam.x, cam.y, cam.z, rdx/rl, rdy/rl, rdz/rl);
+                let r, g, b;
+                if (!hit) {
+                    // Céu degradê
+                    const t = Math.min(1, Math.max(0, py/RH));
+                    r = (96  + (140-96)*t)  | 0;
+                    g = (160 + (190-160)*t) | 0;
+                    b = 235;
+                } else {
+                    const col = COL[hit.b] || COL[3];
+                    const c   = col[FACE_CI[hit.face]];
+                    const br  = BRIGHT[hit.face];
+                    const fog = Math.max(0, 1 - hit.t / MAX_D);
+                    const f   = br * fog;
+                    r = (c[0]*f + 140*(1-fog)) | 0;
+                    g = (c[1]*f + 190*(1-fog)) | 0;
+                    b = (c[2]*f + 235*(1-fog)) | 0;
+                }
+                const i = (py*RW + px) * 4;
+                pdata[i] = r; pdata[i+1] = g; pdata[i+2] = b; pdata[i+3] = 255;
+            }
         }
-
-        // Borda do bloco
-        ctx.globalAlpha = 0.3;
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 0.5;
-        ctx.strokeRect(x + 0.25, y + 0.25, TILE - 0.5, TILE - 0.5);
-
-        // Destacar bloco (cantos brancos)
-        ctx.globalAlpha = 0.15;
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(x, y, TILE, 2);
-        ctx.fillRect(x, y, 2, TILE);
-
-        ctx.globalAlpha = 1;
+        // Mira central
+        const cx = RW>>1, cy = RH>>1;
+        for (let d = -4; d <= 4; d++) {
+            if (!d) continue;
+            let i = (cy*RW + cx+d)*4; pdata[i]=pdata[i+1]=pdata[i+2]=220; pdata[i+3]=255;
+            i = ((cy+d)*RW + cx)*4;   pdata[i]=pdata[i+1]=pdata[i+2]=220; pdata[i+3]=255;
+        }
+        ctx3d.putImageData(imgData, 0, 0);
     }
 
-    function drawSky() {
-        const grad = ctx.createLinearGradient(0, 0, 0, (ROWS - 5) * TILE);
-        grad.addColorStop(0, '#5BA8E5');
-        grad.addColorStop(1, '#87CEEB');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    /* ---------- Update / movimento ---------- */
+    function update(dt) {
+        const sp = 4*dt, lk = 1.8*dt;
+        if (keys['ArrowLeft'])  cam.yaw -= lk;
+        if (keys['ArrowRight']) cam.yaw += lk;
+        if (keys['ArrowUp'])    cam.pitch = Math.max(-1.4, cam.pitch - lk);
+        if (keys['ArrowDown'])  cam.pitch = Math.min(1.4,  cam.pitch + lk);
+        const cY = Math.cos(cam.yaw), sY = Math.sin(cam.yaw);
+        if (keys['KeyW']) { cam.x += sY*sp; cam.z += cY*sp; }
+        if (keys['KeyS']) { cam.x -= sY*sp; cam.z -= cY*sp; }
+        if (keys['KeyA']) { cam.x -= cY*sp; cam.z += sY*sp; }
+        if (keys['KeyD']) { cam.x += cY*sp; cam.z -= sY*sp; }
+        if (keys['Space'])     cam.y += sp;
+        if (keys['KeyC'] || keys['ShiftLeft'] || keys['ShiftRight']) cam.y -= sp;
+        cam.x = Math.max(0.5, Math.min(WX-0.5, cam.x));
+        cam.y = Math.max(0.5, Math.min(WY-0.5, cam.y));
+        cam.z = Math.max(0.5, Math.min(WZ-0.5, cam.z));
     }
 
-    function render() {
-        if (!canvas || !ctx) return;
-        canvas.width  = COLS * TILE;
-        canvas.height = ROWS * TILE;
-        drawSky();
-        for (let r = 0; r < ROWS; r++)
-            for (let c = 0; c < COLS; c++)
-                drawBlock(r, c);
+    function gameLoop(ts) {
+        if (!mc3dRunning) return;
+        const dt = Math.min(0.05, (ts - lastT) / 1000);
+        lastT = ts;
+        update(dt);
+        render3d();
+        mc3dRaf = requestAnimationFrame(gameLoop);
     }
 
-    function buildHotbar() {
-        hotbarEl.innerHTML = '';
-        HOTBAR_BLOCKS.forEach((btype, i) => {
-            const def = BLOCK_DEF[btype];
-            const slot = document.createElement('div');
-            slot.style.cssText = `
-                width:36px;height:36px;border:2px solid ${i === selectedSlot ? '#fff' : '#666'};
-                background:${def.color || '#333'};border-radius:3px;cursor:pointer;
-                display:flex;align-items:center;justify-content:center;
-                font-size:9px;color:#fff;text-shadow:1px 1px 0 #000;
-                box-shadow:${i === selectedSlot ? '0 0 6px #fff' : 'none'};
-                position:relative;flex-shrink:0;
-            `;
-            slot.title = def.label;
-            // Número do slot
-            const num = document.createElement('span');
-            num.textContent = i + 1;
-            num.style.cssText = 'position:absolute;top:1px;left:2px;font-size:8px;color:#ddd;line-height:1;';
-            slot.appendChild(num);
-            slot.addEventListener('click', () => { selectedSlot = i; buildHotbar(); updateBlockName(); });
-            hotbarEl.appendChild(slot);
-        });
-    }
-
-    function updateBlockName() {
-        if (!blockNameEl) return;
-        blockNameEl.textContent = 'Bloco: ' + BLOCK_DEF[HOTBAR_BLOCKS[selectedSlot]].label;
-    }
-
-    function getCellFromEvent(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = (COLS * TILE) / rect.width;
-        const scaleY = (ROWS * TILE) / rect.height;
-        const px = (e.clientX - rect.left) * scaleX;
-        const py = (e.clientY - rect.top)  * scaleY;
-        return { c: Math.floor(px / TILE), r: Math.floor(py / TILE) };
-    }
-
-    function mcPlace(e) {
+    /* ---------- Interação com blocos ---------- */
+    function interact(e) {
         e.preventDefault();
-        const { r, c } = getCellFromEvent(e);
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
-        if (e.button === 2) {
-            // Botão direito: remover (exceto bedrock)
-            if (world[r][c] !== B.BEDROCK) { world[r][c] = B.AIR; render(); }
-        } else {
-            // Botão esquerdo: colocar
-            if (world[r][c] === B.AIR) { world[r][c] = HOTBAR_BLOCKS[selectedSlot]; render(); }
+        const cosY = Math.cos(cam.yaw), sinY = Math.sin(cam.yaw);
+        const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
+        const hit = castRay(cam.x, cam.y, cam.z, sinY*cosP, sinP, cosY*cosP);
+        if (!hit) return;
+        if (e.button === 0) {
+            if (world3d[hit.x][hit.y][hit.z] !== B.BEDROCK) world3d[hit.x][hit.y][hit.z] = B.AIR;
+        } else if (e.button === 2) {
+            if (hit.px>=0&&hit.px<WX&&hit.py>=0&&hit.py<WY&&hit.pz>=0&&hit.pz<WZ)
+                world3d[hit.px][hit.py][hit.pz] = HOTBAR[selSlot];
         }
     }
 
-    function mcMove(e) {
-        if (!coordsEl) return;
-        const { r, c } = getCellFromEvent(e);
-        coordsEl.textContent = `X:${c} Y:${ROWS - 1 - r}`;
+    /* ---------- Hotbar ---------- */
+    function buildHotbar3d() {
+        if (!hotbar3d) return;
+        hotbar3d.innerHTML = '';
+        HOTBAR.forEach((_, i) => {
+            const sel = i === selSlot;
+            const s = document.createElement('div');
+            s.style.cssText = `width:36px;height:36px;background:${HCOLORS[i]};border:3px solid ${sel?'#fff':'#555'};border-radius:3px;cursor:pointer;position:relative;flex-shrink:0;box-shadow:${sel?'0 0 7px #fff':'none'}`;
+            s.title = HNAMES[i];
+            const n = document.createElement('span');
+            n.textContent = i+1;
+            n.style.cssText = 'position:absolute;top:1px;left:2px;font-size:9px;color:#fff;text-shadow:1px 1px 0 #000;font-family:monospace';
+            s.appendChild(n);
+            s.addEventListener('mousedown', ev => {
+                ev.stopPropagation(); selSlot = i; buildHotbar3d();
+                if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[i];
+            });
+            hotbar3d.appendChild(s);
+        });
     }
 
-    window.mcInit = function () {
-        canvas     = document.getElementById('mc-canvas');
-        hotbarEl   = document.getElementById('mc-hotbar');
-        coordsEl   = document.getElementById('mc-coords');
-        blockNameEl = document.getElementById('mc-block-name');
-        if (!canvas) return;
-        ctx = canvas.getContext('2d');
+    /* ---------- Init / Stop ---------- */
+    window.mc3dInit = function () {
+        c3d       = document.getElementById('mc3d-canvas');
+        hotbar3d  = document.getElementById('mc3d-hotbar');
+        blockLbl3d= document.getElementById('mc3d-block');
+        if (!c3d) return;
+        ctx3d   = c3d.getContext('2d');
+        imgData = ctx3d.createImageData(RW, RH);
+        pdata   = imgData.data;
+        if (!mc3dReady) { genWorld3d(); mc3dReady = true; }
 
-        if (!mcInitialized) {
-            genWorld();
-            mcInitialized = true;
+        mc3dRunning = false;
+        if (mc3dRaf) cancelAnimationFrame(mc3dRaf);
+        keys = {};
+        buildHotbar3d();
+        if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[selSlot];
+
+        mc3dRunning = true;
+        lastT = performance.now();
+        mc3dRaf = requestAnimationFrame(gameLoop);
+
+        /* Teclado — registrar uma vez */
+        if (!c3d._kd) {
+            c3d._kd = e => {
+                keys[e.code] = true;
+                if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
+            };
+            c3d._ku = e => { keys[e.code] = false; };
         }
+        document.addEventListener('keydown', c3d._kd);
+        document.addEventListener('keyup',   c3d._ku);
 
-        render();
-        buildHotbar();
-        updateBlockName();
-
-        // Eventos
-        canvas.onmousedown = mcPlace;
-        canvas.oncontextmenu = e => e.preventDefault();
-        canvas.onmousemove = e => { if (e.buttons) mcPlace(e); mcMove(e); };
-        canvas.onwheel = e => {
-            e.preventDefault();
-            selectedSlot = (selectedSlot + (e.deltaY > 0 ? 1 : -1) + HOTBAR_BLOCKS.length) % HOTBAR_BLOCKS.length;
-            buildHotbar();
-            updateBlockName();
+        /* Mouse */
+        c3d.oncontextmenu = e => e.preventDefault();
+        c3d.onmousedown = e => {
+            if (document.pointerLockElement !== c3d) { c3d.requestPointerLock(); return; }
+            interact(e);
         };
+        c3d.onmousemove = e => {
+            if (document.pointerLockElement === c3d) {
+                cam.yaw  += e.movementX * 0.003;
+                cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch + e.movementY * 0.003));
+            }
+        };
+        c3d.onwheel = e => {
+            e.preventDefault();
+            selSlot = (selSlot + (e.deltaY>0?1:-1) + HOTBAR.length) % HOTBAR.length;
+            buildHotbar3d();
+            if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[selSlot];
+        };
+    };
+
+    window.mc3dStop = function () {
+        mc3dRunning = false;
+        if (mc3dRaf) cancelAnimationFrame(mc3dRaf);
+        if (c3d) {
+            document.removeEventListener('keydown', c3d._kd);
+            document.removeEventListener('keyup',   c3d._ku);
+        }
+        keys = {};
+        if (document.pointerLockElement === c3d) document.exitPointerLock();
     };
 })();
