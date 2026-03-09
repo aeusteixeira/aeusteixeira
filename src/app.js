@@ -201,6 +201,7 @@ const winMeta = {
     'win-defrag': { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' },
     'win-pendrive': { ico: _ico('pasta-vazia.ico'), lbl: 'Disco removível (E:)' },
     'win-pinball': { ico: '🏓', lbl: '3D Pinball — Space Cadet' },
+    'win-minecraft': { ico: '⛏️', lbl: 'Minecraft — Windows Edition' },
 };
 
 const gtaPageUrls = {
@@ -342,6 +343,7 @@ function openWindow(id) {
     if (id === 'win-taskmgr') taskmgrInit();
     if (id === 'win-cmd') cmdInit();
     if (id === 'win-pinball') pinballInit();
+    if (id === 'win-minecraft') mcInit();
 }
 function printCV() {
     const page = document.getElementById('cv-page');
@@ -4945,3 +4947,226 @@ setInterval(checkGhostMode, 3000);
 
 /* Hook no processador de comandos do CMD */
 const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
+/* ============================================================
+   MINECRAFT — Windows XP Edition
+   Mini-jogo 2D de construção com blocos
+   ============================================================ */
+(function () {
+    const TILE = 28; // tamanho de cada bloco em px
+    const COLS  = 24;
+    const ROWS  = 18;
+
+    // Tipos de bloco
+    const B = {
+        AIR:     0,
+        GRASS:   1,
+        DIRT:    2,
+        STONE:   3,
+        WOOD:    4,
+        LEAVES:  5,
+        SAND:    6,
+        WATER:   7,
+        BEDROCK: 8,
+        PLANK:   9,
+        GLASS:   10,
+        GOLD:    11,
+    };
+
+    // Paleta de cores [top, side, bottom] ou cor única
+    const BLOCK_DEF = {
+        [B.AIR]:     { label: 'Ar',       color: null },
+        [B.GRASS]:   { label: 'Grama',    color: '#5D9E3A', side: '#8B6340', top: '#5D9E3A' },
+        [B.DIRT]:    { label: 'Terra',    color: '#8B6340' },
+        [B.STONE]:   { label: 'Pedra',    color: '#8A8A8A' },
+        [B.WOOD]:    { label: 'Madeira',  color: '#7C5C2A', dark: '#5C3C0A' },
+        [B.LEAVES]:  { label: 'Folhas',   color: '#2D7A2D', dark: '#1A5C1A' },
+        [B.SAND]:    { label: 'Areia',    color: '#D4C46A' },
+        [B.WATER]:   { label: 'Água',     color: '#2060C8', alpha: 0.7 },
+        [B.BEDROCK]: { label: 'Bedrock',  color: '#333333', dark: '#111111' },
+        [B.PLANK]:   { label: 'Tábua',    color: '#B08040', dark: '#806020' },
+        [B.GLASS]:   { label: 'Vidro',    color: '#A8D8E8', alpha: 0.5 },
+        [B.GOLD]:    { label: 'Ouro',     color: '#FFD700', dark: '#C8A800' },
+    };
+
+    const HOTBAR_BLOCKS = [B.GRASS, B.DIRT, B.STONE, B.WOOD, B.LEAVES, B.SAND, B.PLANK, B.GLASS, B.GOLD];
+
+    let world = [];
+    let selectedSlot = 0;
+    let canvas, ctx, hotbarEl, coordsEl, blockNameEl;
+    let mcRaf = null;
+    let mcInitialized = false;
+
+    function genWorld() {
+        world = Array.from({ length: ROWS }, (_, r) =>
+            Array.from({ length: COLS }, (_, c) => {
+                if (r === ROWS - 1) return B.BEDROCK;
+                if (r >= ROWS - 4) return B.DIRT;
+                if (r === ROWS - 5) return B.GRASS;
+                return B.AIR;
+            })
+        );
+        // Adicionar algumas árvores
+        [4, 12, 18].forEach(tx => {
+            const base = ROWS - 5;
+            // Tronco
+            for (let i = 0; i < 4; i++) world[base - i][tx] = B.WOOD;
+            // Folhas
+            for (let dr = -2; dr <= 0; dr++) {
+                for (let dc = -2; dc <= 2; dc++) {
+                    const rr = base - 4 + dr, cc = tx + dc;
+                    if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS && world[rr][cc] === B.AIR)
+                        world[rr][cc] = B.LEAVES;
+                }
+            }
+        });
+        // Um lago de água
+        for (let c = 8; c <= 11; c++) world[ROWS - 5][c] = B.WATER;
+        // Areia ao redor da água
+        [7, 12].forEach(c => { world[ROWS - 5][c] = B.SAND; });
+    }
+
+    function drawBlock(r, c) {
+        const type = world[r][c];
+        if (type === B.AIR) return;
+        const def = BLOCK_DEF[type];
+        if (!def || !def.color) return;
+
+        const x = c * TILE, y = r * TILE;
+
+        ctx.globalAlpha = def.alpha !== undefined ? def.alpha : 1;
+        ctx.fillStyle = def.color;
+        ctx.fillRect(x, y, TILE, TILE);
+
+        // Topo mais claro (iluminação)
+        if (type === B.GRASS) {
+            ctx.fillStyle = def.top || def.color;
+            ctx.fillRect(x, y, TILE, 4);
+        }
+
+        // Padrão de veio (para pedra, bedrock, madeira, etc.)
+        if (def.dark) {
+            ctx.fillStyle = def.dark;
+            ctx.fillRect(x + TILE * 0.15, y + TILE * 0.15, TILE * 0.2, TILE * 0.2);
+            ctx.fillRect(x + TILE * 0.6,  y + TILE * 0.6,  TILE * 0.2, TILE * 0.2);
+            ctx.fillRect(x + TILE * 0.55, y + TILE * 0.1,  TILE * 0.15, TILE * 0.15);
+        }
+
+        // Borda do bloco
+        ctx.globalAlpha = 0.3;
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x + 0.25, y + 0.25, TILE - 0.5, TILE - 0.5);
+
+        // Destacar bloco (cantos brancos)
+        ctx.globalAlpha = 0.15;
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x, y, TILE, 2);
+        ctx.fillRect(x, y, 2, TILE);
+
+        ctx.globalAlpha = 1;
+    }
+
+    function drawSky() {
+        const grad = ctx.createLinearGradient(0, 0, 0, (ROWS - 5) * TILE);
+        grad.addColorStop(0, '#5BA8E5');
+        grad.addColorStop(1, '#87CEEB');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function render() {
+        if (!canvas || !ctx) return;
+        canvas.width  = COLS * TILE;
+        canvas.height = ROWS * TILE;
+        drawSky();
+        for (let r = 0; r < ROWS; r++)
+            for (let c = 0; c < COLS; c++)
+                drawBlock(r, c);
+    }
+
+    function buildHotbar() {
+        hotbarEl.innerHTML = '';
+        HOTBAR_BLOCKS.forEach((btype, i) => {
+            const def = BLOCK_DEF[btype];
+            const slot = document.createElement('div');
+            slot.style.cssText = `
+                width:36px;height:36px;border:2px solid ${i === selectedSlot ? '#fff' : '#666'};
+                background:${def.color || '#333'};border-radius:3px;cursor:pointer;
+                display:flex;align-items:center;justify-content:center;
+                font-size:9px;color:#fff;text-shadow:1px 1px 0 #000;
+                box-shadow:${i === selectedSlot ? '0 0 6px #fff' : 'none'};
+                position:relative;flex-shrink:0;
+            `;
+            slot.title = def.label;
+            // Número do slot
+            const num = document.createElement('span');
+            num.textContent = i + 1;
+            num.style.cssText = 'position:absolute;top:1px;left:2px;font-size:8px;color:#ddd;line-height:1;';
+            slot.appendChild(num);
+            slot.addEventListener('click', () => { selectedSlot = i; buildHotbar(); updateBlockName(); });
+            hotbarEl.appendChild(slot);
+        });
+    }
+
+    function updateBlockName() {
+        if (!blockNameEl) return;
+        blockNameEl.textContent = 'Bloco: ' + BLOCK_DEF[HOTBAR_BLOCKS[selectedSlot]].label;
+    }
+
+    function getCellFromEvent(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = (COLS * TILE) / rect.width;
+        const scaleY = (ROWS * TILE) / rect.height;
+        const px = (e.clientX - rect.left) * scaleX;
+        const py = (e.clientY - rect.top)  * scaleY;
+        return { c: Math.floor(px / TILE), r: Math.floor(py / TILE) };
+    }
+
+    function mcPlace(e) {
+        e.preventDefault();
+        const { r, c } = getCellFromEvent(e);
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+        if (e.button === 2) {
+            // Botão direito: remover (exceto bedrock)
+            if (world[r][c] !== B.BEDROCK) { world[r][c] = B.AIR; render(); }
+        } else {
+            // Botão esquerdo: colocar
+            if (world[r][c] === B.AIR) { world[r][c] = HOTBAR_BLOCKS[selectedSlot]; render(); }
+        }
+    }
+
+    function mcMove(e) {
+        if (!coordsEl) return;
+        const { r, c } = getCellFromEvent(e);
+        coordsEl.textContent = `X:${c} Y:${ROWS - 1 - r}`;
+    }
+
+    window.mcInit = function () {
+        canvas     = document.getElementById('mc-canvas');
+        hotbarEl   = document.getElementById('mc-hotbar');
+        coordsEl   = document.getElementById('mc-coords');
+        blockNameEl = document.getElementById('mc-block-name');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+
+        if (!mcInitialized) {
+            genWorld();
+            mcInitialized = true;
+        }
+
+        render();
+        buildHotbar();
+        updateBlockName();
+
+        // Eventos
+        canvas.onmousedown = mcPlace;
+        canvas.oncontextmenu = e => e.preventDefault();
+        canvas.onmousemove = e => { if (e.buttons) mcPlace(e); mcMove(e); };
+        canvas.onwheel = e => {
+            e.preventDefault();
+            selectedSlot = (selectedSlot + (e.deltaY > 0 ? 1 : -1) + HOTBAR_BLOCKS.length) % HOTBAR_BLOCKS.length;
+            buildHotbar();
+            updateBlockName();
+        };
+    };
+})();
