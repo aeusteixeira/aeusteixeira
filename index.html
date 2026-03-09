@@ -5058,7 +5058,7 @@ pause</pre>
 
 
     <!-- MINECRAFT WINDOW -->
-    <div class="xp-win" id="win-minecraft" style="width:660px;height:520px;top:40px;left:120px;display:none">
+    <div class="xp-win" id="win-minecraft" style="width:680px;height:530px;top:40px;left:120px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-minecraft')">
         <span class="xp-titlebar-ico">⛏️</span>
         <span class="xp-titlebar-txt">Minecraft — Windows Edition Beta 1.7.3</span>
@@ -5068,19 +5068,18 @@ pause</pre>
           <div class="xp-wbtn wcls" onclick="closeWin('win-minecraft')">✕</div>
         </div>
       </div>
-      <div class="xp-body" style="padding:0;background:#87CEEB;display:flex;flex-direction:column;height:100%;overflow:hidden;user-select:none;">
+      <div class="xp-body" style="padding:0;background:#000;overflow:hidden;user-select:none;">
         <!-- Info bar -->
-        <div id="mc-info" style="background:rgba(0,0,0,0.5);color:#fff;font-family:'Courier New',monospace;font-size:11px;padding:2px 8px;display:flex;gap:16px;">
-          <span>⛏️ Minecraft XP Edition</span>
+        <div style="background:rgba(0,0,0,0.8);color:#fff;font-family:'Courier New',monospace;font-size:11px;padding:3px 8px;display:flex;gap:16px;flex-wrap:wrap;">
+          <span>⛏️ Minecraft XP</span>
           <span id="mc-coords">X:0 Y:0</span>
           <span id="mc-block-name">Bloco: Grama</span>
-          <span style="margin-left:auto;">🖱️ Esq=colocar · Dir=remover · Scroll=mudar bloco</span>
+          <span style="margin-left:auto;font-size:10px;opacity:0.8;">Esq=colocar · Dir=remover · Scroll=bloco</span>
         </div>
-        <!-- Canvas -->
-        <canvas id="mc-canvas" style="display:block;flex:1;cursor:crosshair;image-rendering:pixelated;width:100%;"></canvas>
+        <!-- Canvas with fixed pixel dimensions -->
+        <canvas id="mc-canvas" width="660" height="420" style="display:block;cursor:crosshair;image-rendering:pixelated;image-rendering:crisp-edges;"></canvas>
         <!-- Hotbar -->
-        <div id="mc-hotbar" style="background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;gap:4px;padding:6px;border-top:2px solid #555;">
-        </div>
+        <div id="mc-hotbar" style="background:#222;display:flex;justify-content:center;align-items:center;gap:4px;padding:5px;border-top:2px solid #555;"></div>
       </div>
     </div>
 
