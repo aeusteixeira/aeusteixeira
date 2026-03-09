@@ -261,6 +261,7 @@ const chromeTabUrls = [
     'pudim.com.br',
     'www.clubedohardware.com.br/forums/topic/1098432-como-desinstalar-o-baidu-pc-faster-completamente',
     'www.orkut.com.br/Main#Profile?uid=5841029374',
+    'www.youtube.com/watch?v=aWzKb071D9o',
     'chrome://history',
 ];
 const chromeTitles = [
@@ -270,6 +271,7 @@ const chromeTitles = [
     'Pudim — Google Chrome',
     'Como desinstalar o Baidu PC Faster completamente - Clube do Hardware',
     'Orkut - Matheus Teixeira — Google Chrome',
+    'Em busca da casa automática #1? - Minecraft Aventura — YouTube',
     'Histórico — Google Chrome',
 ];
 /* ══════════════════════════════════════
@@ -291,8 +293,8 @@ function chromeMenuAction(action) {
     sndClick();
     switch (action) {
         case 'history':
-            document.getElementById('ctab-6').style.display = '';
-            chromeTab(6);
+            document.getElementById('ctab-7').style.display = '';
+            chromeTab(7);
             break;
         case 'downloads':
             openWindow('win-downloads');
@@ -3460,7 +3462,7 @@ function closeTab(n) {
 
 function reopenAllTabs() {
     document.querySelectorAll('.chrome-tab').forEach((t, i) => {
-        t.style.display = i <= 5 ? '' : 'none'; /* abas 0-5 sempre, 6+ só pelo menu */
+        t.style.display = i <= 6 ? '' : 'none'; /* abas 0-6 sempre, 7+ só pelo menu */
     });
     chromeTab(0);
 }
