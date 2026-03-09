@@ -4956,9 +4956,9 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
     const FOV    = Math.PI / 2.5;
     const HTAN   = Math.tan(FOV / 2);
     const ASPECT = RW / RH;
-    const MAX_D  = 14;
+    const MAX_D  = 32;
 
-    const WX = 32, WY = 10, WZ = 32;
+    const WX = 32, WY = 20, WZ = 32;
     const B = {AIR:0,GRASS:1,DIRT:2,STONE:3,WOOD:4,LEAVES:5,SAND:6,WATER:7,BEDROCK:8,PLANK:9,GLASS:10,GOLD:11};
     const HOTBAR  = [B.GRASS,B.DIRT,B.STONE,B.WOOD,B.LEAVES,B.SAND,B.PLANK,B.GLASS,B.GOLD];
     const HNAMES  = ['Grama','Terra','Pedra','Madeira','Folhas','Areia','Tábua','Vidro','Ouro'];
@@ -5101,7 +5101,7 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
     }
 
     let world3d = null, mc3dReady = false, mc3dRunning = false, mc3dRaf = null;
-    let cam = {x:16, y:6.5, z:16, yaw:0.4, pitch:-0.05};
+    let cam = {x:16, y:12, z:16, yaw:0.4, pitch:0.0};
     let keys = {}, selSlot = 0;
     let c3d, ctx3d, imgData, pdata;
     let hotbar3d, blockLbl3d;
@@ -5150,7 +5150,7 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         let tmY = dy>=0 ? (y+1-oy)*tDY : (oy-y)*tDY;
         let tmZ = dz>=0 ? (z+1-oz)*tDZ : (oz-z)*tDZ;
         let t = 0, face = 0, px = x, py2 = y, pz = z;
-        for (let s = 0; s < 60; s++) {
+        for (let s = 0; s < 128; s++) {
             if (t > MAX_D) return null;
             if (x>=0&&x<WX&&y>=0&&y<WY&&z>=0&&z<WZ&&world3d[x][y][z]!==B.AIR)
                 return {b:world3d[x][y][z], x, y, z, face, t, px, py:py2, pz};
@@ -5187,11 +5187,11 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                 const hit = castRay(cam.x, cam.y, cam.z, ndx, ndy, ndz);
                 let r, g, b;
                 if (!hit) {
-                    /* céu degradê azul */
+                    /* céu degradê azul (topo=azul profundo, horizonte=claro) */
                     const st = py / RH;
-                    r = (100 + st*55) | 0;
-                    g = (155 + st*40) | 0;
-                    b = (240 - st*10) | 0;
+                    r = (80 + st*75) | 0;
+                    g = (130 + st*65) | 0;
+                    b = (240 - st*5) | 0;
                 } else {
                     /* ponto exato de colisão → UVs de textura */
                     const hx = cam.x + ndx * hit.t;
@@ -5211,11 +5211,12 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                     }
                     const [tc0, tc1, tc2] = getTexCol(hit.b, hit.face, u, v);
                     const br  = BRIGHT[hit.face];
-                    const fog = Math.max(0, 1 - hit.t / MAX_D);
+                    const fogL = Math.max(0, 1 - hit.t / MAX_D);
+                    const fog = fogL * fogL;
                     const f   = br * fog;
-                    r = (tc0*f + 100*(1-fog)) | 0;
-                    g = (tc1*f + 155*(1-fog)) | 0;
-                    b = (tc2*f + 235*(1-fog)) | 0;
+                    r = (tc0*f + 135*(1-fog)) | 0;
+                    g = (tc1*f + 185*(1-fog)) | 0;
+                    b = (tc2*f + 245*(1-fog)) | 0;
                 }
                 const i = (py*RW + px) * 4;
                 pdata[i]=r; pdata[i+1]=g; pdata[i+2]=b; pdata[i+3]=255;
@@ -5236,8 +5237,8 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         const sp = 4*dt, lk = 1.8*dt;
         if (keys['ArrowLeft'])  cam.yaw -= lk;
         if (keys['ArrowRight']) cam.yaw += lk;
-        if (keys['ArrowUp'])    cam.pitch = Math.max(-1.4, cam.pitch - lk);
-        if (keys['ArrowDown'])  cam.pitch = Math.min(1.4,  cam.pitch + lk);
+        if (keys['ArrowUp'])    cam.pitch = Math.min(1.4,  cam.pitch + lk);
+        if (keys['ArrowDown'])  cam.pitch = Math.max(-1.4, cam.pitch - lk);
         const cY = Math.cos(cam.yaw), sY = Math.sin(cam.yaw);
         if (keys['KeyW']) { cam.x += sY*sp; cam.z += cY*sp; }
         if (keys['KeyS']) { cam.x -= sY*sp; cam.z -= cY*sp; }
@@ -5304,7 +5305,17 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         ctx3d   = c3d.getContext('2d');
         imgData = ctx3d.createImageData(RW, RH);
         pdata   = imgData.data;
-        if (!mc3dReady) { genWorld3d(); mc3dReady = true; }
+        if (!mc3dReady) {
+            genWorld3d();
+            /* spawn acima do terreno */
+            const sx = cam.x|0, sz = cam.z|0;
+            let spawnY = 1;
+            for (let y = WY-1; y >= 0; y--) {
+                if (sx>=0&&sx<WX&&sz>=0&&sz<WZ&&world3d[sx][y][sz] !== B.AIR) { spawnY = y+2; break; }
+            }
+            cam.y = spawnY;
+            mc3dReady = true;
+        }
 
         mc3dRunning = false;
         if (mc3dRaf) cancelAnimationFrame(mc3dRaf);
@@ -5334,7 +5345,7 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         c3d.onmousemove = e => {
             if (document.pointerLockElement === c3d) {
                 cam.yaw  += e.movementX * 0.003;
-                cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch + e.movementY * 0.003));
+                cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch - e.movementY * 0.003));
             }
         };
         c3d.onwheel = e => {
