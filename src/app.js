@@ -5261,8 +5261,8 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                     }
                     const [tc0, tc1, tc2] = getTexCol(hit.b, hit.face, u, v);
                     const br  = BRIGHT[hit.face];
-                    const fogL = Math.max(0, 1 - hit.t / MAX_D);
-                    const fog = fogL * fogL;
+                    const fogL = Math.max(0, 1 - Math.max(0, hit.t - MAX_D*0.35) / (MAX_D*0.65));
+                    const fog = fogL;
                     const f   = br * fog;
                     r = (tc0*f + 135*(1-fog)) | 0;
                     g = (tc1*f + 185*(1-fog)) | 0;
