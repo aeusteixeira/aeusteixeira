@@ -5261,12 +5261,9 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                     }
                     const [tc0, tc1, tc2] = getTexCol(hit.b, hit.face, u, v);
                     const br  = BRIGHT[hit.face];
-                    const fogL = Math.max(0, 1 - Math.max(0, hit.t - MAX_D*0.35) / (MAX_D*0.65));
-                    const fog = fogL;
-                    const f   = br * fog;
-                    r = (tc0*f + 135*(1-fog)) | 0;
-                    g = (tc1*f + 185*(1-fog)) | 0;
-                    b = (tc2*f + 245*(1-fog)) | 0;
+                    r = (tc0*br) | 0;
+                    g = (tc1*br) | 0;
+                    b = (tc2*br) | 0;
                 }
                 const i = (py*RW + px) * 4;
                 pdata[i]=r; pdata[i+1]=g; pdata[i+2]=b; pdata[i+3]=255;
