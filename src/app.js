@@ -5176,7 +5176,7 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         const upX = -sinY*sinP, upY = cosP,  upZ = cosY*sinP;
 
         for (let py = 0; py < RH; py++) {
-            const vf = ((py/RH) - 0.5) * 2 * (HTAN/ASPECT);
+            const vf = (0.5 - py/RH) * 2 * (HTAN/ASPECT);
             for (let px = 0; px < RW; px++) {
                 const hf = ((px/RW) - 0.5) * 2 * HTAN;
                 const rdx = fwX + hf*rtX + vf*upX;
