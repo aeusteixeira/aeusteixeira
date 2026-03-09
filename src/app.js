@@ -5137,6 +5137,56 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
                             world3d[lx][ly][lz] = B.LEAVES;
                     }
         });
+        genHouse3d();
+    }
+
+    function genHouse3d() {
+        const cx = 20, cz = 20;
+        const sb = (x,y,z,b) => { if(x>=0&&x<WX&&y>=0&&y<WY&&z>=0&&z<WZ) world3d[x][y][z]=b; };
+        let gy = 1;
+        for (let y = WY-1; y >= 0; y--) if (world3d[cx][y][cz] !== B.AIR) { gy = y; break; }
+        const base = gy + 1;
+
+        /* limpa interior + acima */
+        for (let dx = -2; dx <= 2; dx++)
+            for (let dz = -2; dz <= 2; dz++)
+                for (let h = 0; h <= 4; h++) sb(cx+dx, base+h, cz+dz, B.AIR);
+
+        /* paredes – 3 fileiras */
+        for (let h = 0; h < 3; h++)
+            for (let i = -2; i <= 2; i++) {
+                sb(cx+i, base+h, cz-2, B.PLANK);
+                sb(cx+i, base+h, cz+2, B.PLANK);
+                sb(cx-2, base+h, cz+i, B.PLANK);
+                sb(cx+2, base+h, cz+i, B.PLANK);
+            }
+
+        /* teto plano */
+        for (let dx = -2; dx <= 2; dx++)
+            for (let dz = -2; dz <= 2; dz++)
+                sb(cx+dx, base+3, cz+dz, B.PLANK);
+
+        /* pilares de madeira nos cantos */
+        for (let h = 0; h < 4; h++) {
+            sb(cx-2, base+h, cz-2, B.WOOD);
+            sb(cx+2, base+h, cz-2, B.WOOD);
+            sb(cx-2, base+h, cz+2, B.WOOD);
+            sb(cx+2, base+h, cz+2, B.WOOD);
+        }
+
+        /* porta (frente: dz=-2, dx=0, h=0 e h=1) */
+        sb(cx, base,   cz-2, B.AIR);
+        sb(cx, base+1, cz-2, B.AIR);
+
+        /* janelas de vidro */
+        sb(cx-1, base+1, cz-2, B.GLASS);
+        sb(cx+1, base+1, cz-2, B.GLASS);
+        sb(cx-1, base+1, cz+2, B.GLASS);
+        sb(cx+1, base+1, cz+2, B.GLASS);
+        sb(cx-2, base+1, cz-1, B.GLASS);
+        sb(cx-2, base+1, cz+1, B.GLASS);
+        sb(cx+2, base+1, cz-1, B.GLASS);
+        sb(cx+2, base+1, cz+1, B.GLASS);
     }
 
     /* ---------- DDA 3D ---------- */
