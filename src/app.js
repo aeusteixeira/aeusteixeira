@@ -201,7 +201,7 @@ const winMeta = {
     'win-defrag': { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' },
     'win-pendrive': { ico: _ico('pasta-vazia.ico'), lbl: 'Disco removível (E:)' },
     'win-pinball': { ico: '🏓', lbl: '3D Pinball — Space Cadet' },
-    'win-minecraft': { ico: '⛏️', lbl: 'Minecraft — Windows Edition' },
+    'win-minecraft': { ico: '<img src="src/img/minecfrat.webp" alt="" style="width:16px;height:16px;vertical-align:middle;">', lbl: 'Minecraft — Windows Edition' },
 };
 
 const gtaPageUrls = {
