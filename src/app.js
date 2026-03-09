@@ -5237,8 +5237,8 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         const sp = 4*dt, lk = 1.8*dt;
         if (keys['ArrowLeft'])  cam.yaw -= lk;
         if (keys['ArrowRight']) cam.yaw += lk;
-        if (keys['ArrowUp'])    cam.pitch = Math.min(1.4,  cam.pitch + lk);
-        if (keys['ArrowDown'])  cam.pitch = Math.max(-1.4, cam.pitch - lk);
+        if (keys['ArrowUp'])    cam.pitch = Math.min(1.1,  cam.pitch + lk);
+        if (keys['ArrowDown'])  cam.pitch = Math.max(-1.1, cam.pitch - lk);
         const cY = Math.cos(cam.yaw), sY = Math.sin(cam.yaw);
         if (keys['KeyW']) { cam.x += sY*sp; cam.z += cY*sp; }
         if (keys['KeyS']) { cam.x -= sY*sp; cam.z -= cY*sp; }
@@ -5345,7 +5345,7 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         c3d.onmousemove = e => {
             if (document.pointerLockElement === c3d) {
                 cam.yaw  += e.movementX * 0.003;
-                cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch - e.movementY * 0.003));
+                cam.pitch = Math.max(-1.1, Math.min(1.1, cam.pitch - e.movementY * 0.003));
             }
         };
         c3d.onwheel = e => {
