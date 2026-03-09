@@ -343,7 +343,7 @@ function openWindow(id) {
     if (id === 'win-taskmgr') taskmgrInit();
     if (id === 'win-cmd') cmdInit();
     if (id === 'win-pinball') pinballInit();
-    if (id === 'win-minecraft') mcInit();
+    if (id === 'win-minecraft') mc3dInit();
 }
 function printCV() {
     const page = document.getElementById('cv-page');
@@ -4948,202 +4948,287 @@ setInterval(checkGhostMode, 3000);
 /* Hook no processador de comandos do CMD */
 const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
 /* ============================================================
-   MINECRAFT — Windows XP Edition
-   Mini-jogo 2D de construção com blocos
+   MINECRAFT 3D — Windows XP Edition
+   Raycaster voxel 3D em primeira pessoa (canvas 220x140 → CSS 660x420)
    ============================================================ */
 (function () {
-    // Canvas HTML tem width=660 height=420 fixos
-    const TILE = 28;
-    const COLS = 23;  // 23*28 = 644px (cabe em 660)
-    const ROWS = 15;  // 15*28 = 420px (exato)
+    /* --- Resolução interna do canvas (3x menor que o display via CSS) --- */
+    const RW = 220, RH = 140;
+    const FOV    = Math.PI / 2.5;           // ~72° horizontal
+    const HTAN   = Math.tan(FOV / 2);
+    const ASPECT = RW / RH;
+    const MAX_D  = 14;                      // distância máxima de raycast
 
-    const B = { AIR:0, GRASS:1, DIRT:2, STONE:3, WOOD:4, LEAVES:5, SAND:6, WATER:7, BEDROCK:8, PLANK:9, GLASS:10, GOLD:11 };
+    /* --- Mundo 3D --- */
+    const WX = 32, WY = 10, WZ = 32;
+    const B = {AIR:0,GRASS:1,DIRT:2,STONE:3,WOOD:4,LEAVES:5,SAND:6,WATER:7,BEDROCK:8,PLANK:9,GLASS:10,GOLD:11};
+    const HOTBAR  = [B.GRASS,B.DIRT,B.STONE,B.WOOD,B.LEAVES,B.SAND,B.PLANK,B.GLASS,B.GOLD];
+    const HNAMES  = ['Grama','Terra','Pedra','Madeira','Folhas','Areia','Tábua','Vidro','Ouro'];
+    const HCOLORS = ['#5D9E3A','#8B6340','#888','#7C5C2A','#2D7A2D','#D4C46A','#B08040','#A8D8F0','#FFD700'];
 
-    const BLOCK_DEF = {
-        0:  { label:'Ar',      color:null },
-        1:  { label:'Grama',   color:'#5D9E3A', dark:'#3A7A1A', grassTop:true },
-        2:  { label:'Terra',   color:'#8B6340', dark:'#6B4320' },
-        3:  { label:'Pedra',   color:'#8A8A8A', dark:'#606060' },
-        4:  { label:'Madeira', color:'#7C5C2A', dark:'#4C3C0A' },
-        5:  { label:'Folhas',  color:'#2D7A2D', dark:'#1A5A1A' },
-        6:  { label:'Areia',   color:'#D4C46A', dark:'#B4A44A' },
-        7:  { label:'Água',    color:'#2060C8', alpha:0.75 },
-        8:  { label:'Bedrock', color:'#2A2A2A', dark:'#111111' },
-        9:  { label:'Tábua',   color:'#B08040', dark:'#806020' },
-        10: { label:'Vidro',   color:'#A8D8F0', alpha:0.45 },
-        11: { label:'Ouro',    color:'#FFD700', dark:'#C8A000' },
+    /*
+     * Cores por bloco: [top RGB, side RGB]
+     * Brilho por face: 0=topo 1=baixo 2=Z- 3=Z+ 4=X+ 5=X-
+     */
+    const COL = {
+        1: [[106,174,59],[60,100,38]],  // Grama
+        2: [[134,96,67], [110,75,48]],  // Terra
+        3: [[130,130,130],[110,110,110]],// Pedra
+        4: [[115,78,38], [90,60,28]],   // Madeira
+        5: [[58,112,34], [46,98,22]],   // Folhas
+        6: [[200,186,100],[188,174,88]],// Areia
+        7: [[32,96,200], [24,80,180]],  // Água
+        8: [[40,40,40],  [28,28,28]],   // Bedrock
+        9: [[176,128,64],[160,112,48]], // Tábua
+       10: [[168,216,240],[155,205,230]],// Vidro
+       11: [[255,215,0], [230,190,0]],  // Ouro
     };
+    /* brilho: topo=1.0, baixo=0.35, Z-=0.70, Z+=0.80, X+=0.60, X-=0.90 */
+    const BRIGHT = [1.0, 0.35, 0.70, 0.80, 0.60, 0.90];
+    /* índice da cor: topo=0, todo lado=1 */
+    const FACE_CI = [0, 1, 1, 1, 1, 1];
 
-    const HOTBAR = [B.GRASS, B.DIRT, B.STONE, B.WOOD, B.LEAVES, B.SAND, B.PLANK, B.GLASS, B.GOLD];
+    let world3d = null, mc3dReady = false, mc3dRunning = false, mc3dRaf = null;
+    let cam = {x:16, y:6.5, z:16, yaw:0.4, pitch:-0.05};
+    let keys = {}, selSlot = 0;
+    let c3d, ctx3d, imgData, pdata;
+    let hotbar3d, blockLbl3d;
+    let lastT = 0;
 
-    let world = [], selectedSlot = 0;
-    let canvas, ctx, hotbarEl, coordsEl, blockNameEl;
-    let mcReady = false;
-
-    function genWorld() {
-        world = Array.from({length:ROWS}, (_, r) =>
-            Array.from({length:COLS}, () => {
-                if (r === ROWS - 1) return B.BEDROCK;
-                if (r >= ROWS - 4) return B.DIRT;
-                if (r === ROWS - 5) return B.GRASS;
-                return B.AIR;
-            })
+    /* ---------- Geração do mundo ---------- */
+    function genWorld3d() {
+        world3d = Array.from({length:WX}, (_, x) =>
+            Array.from({length:WY}, (_, y) =>
+                Array.from({length:WZ}, (_, z) => {
+                    if (y === 0) return B.BEDROCK;
+                    const h = 4 + Math.round(Math.sin(x*0.5)*1.5 + Math.cos(z*0.45)*1.5);
+                    if (y < h - 2) return B.STONE;
+                    if (y < h)     return B.DIRT;
+                    if (y === h)   return B.GRASS;
+                    return B.AIR;
+                })
+            )
         );
         // Árvores
-        [3, 11, 18].forEach(tx => {
-            const base = ROWS - 5;
-            for (let i = 0; i < 4; i++) {
-                if (base - i >= 0) world[base - i][tx] = B.WOOD;
-            }
-            for (let dr = -2; dr <= 0; dr++) {
-                for (let dc = -2; dc <= 2; dc++) {
-                    const rr = base - 4 + dr, cc = tx + dc;
-                    if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS && world[rr][cc] === B.AIR)
-                        world[rr][cc] = B.LEAVES;
-                }
-            }
+        [[6,6],[14,22],[22,10],[26,26],[10,18]].forEach(([tx,tz]) => {
+            if (tx >= WX || tz >= WZ) return;
+            let sy = 1;
+            for (let y = WY-1; y >= 0; y--) if (world3d[tx][y][tz] !== B.AIR) { sy = y; break; }
+            const top = sy + 1;
+            for (let i = 0; i < 4 && top+i < WY; i++) world3d[tx][top+i][tz] = B.WOOD;
+            for (let dy = -1; dy <= 2; dy++)
+                for (let dx = -2; dx <= 2; dx++)
+                    for (let dz = -2; dz <= 2; dz++) {
+                        if (dx===0 && dz===0 && dy < 2) continue;
+                        if (Math.abs(dx)===2 && Math.abs(dz)===2) continue;
+                        const lx=tx+dx, ly=top+3+dy, lz=tz+dz;
+                        if (lx>=0&&lx<WX&&ly>=0&&ly<WY&&lz>=0&&lz<WZ&&world3d[lx][ly][lz]===B.AIR)
+                            world3d[lx][ly][lz] = B.LEAVES;
+                    }
         });
-        // Lago
-        for (let c = 7; c <= 9; c++) world[ROWS-5][c] = B.WATER;
-        world[ROWS-5][6] = B.SAND;
-        world[ROWS-5][10] = B.SAND;
     }
 
-    function render() {
-        if (!ctx) return;
-        // Céu
-        const skyH = (ROWS - 5) * TILE;
-        const grad = ctx.createLinearGradient(0, 0, 0, skyH);
-        grad.addColorStop(0, '#3A7FC1');
-        grad.addColorStop(1, '#87CEEB');
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Blocos
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                const type = world[r][c];
-                if (type === B.AIR) continue;
-                const def = BLOCK_DEF[type];
-                if (!def || !def.color) continue;
-
-                const x = c * TILE, y = r * TILE;
-
-                ctx.globalAlpha = def.alpha !== undefined ? def.alpha : 1;
-
-                // Cor base
-                ctx.fillStyle = def.color;
-                ctx.fillRect(x, y, TILE, TILE);
-
-                // Topo da grama (verde mais vivo)
-                if (def.grassTop) {
-                    ctx.fillStyle = '#7EC850';
-                    ctx.fillRect(x, y, TILE, 5);
-                }
-
-                // Detalhes escuros (veios)
-                if (def.dark) {
-                    ctx.fillStyle = def.dark;
-                    ctx.fillRect(x + 4, y + 4, 5, 5);
-                    ctx.fillRect(x + TILE - 9, y + TILE - 9, 5, 5);
-                }
-
-                // Borda
-                ctx.globalAlpha = 0.35;
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(x + 0.5, y + 0.5, TILE - 1, TILE - 1);
-
-                // Brilho topo/esquerda
-                ctx.globalAlpha = 0.2;
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(x, y, TILE, 3);
-                ctx.fillRect(x, y, 3, TILE);
-
-                ctx.globalAlpha = 1;
+    /* ---------- DDA 3D ---------- */
+    function castRay(ox, oy, oz, dx, dy, dz) {
+        let x = ox|0, y = oy|0, z = oz|0;
+        const stepX = dx>=0?1:-1, stepY = dy>=0?1:-1, stepZ = dz>=0?1:-1;
+        const tDX = Math.abs(dx)<1e-9 ? 1e18 : 1/Math.abs(dx);
+        const tDY = Math.abs(dy)<1e-9 ? 1e18 : 1/Math.abs(dy);
+        const tDZ = Math.abs(dz)<1e-9 ? 1e18 : 1/Math.abs(dz);
+        let tmX = dx>=0 ? (x+1-ox)*tDX : (ox-x)*tDX;
+        let tmY = dy>=0 ? (y+1-oy)*tDY : (oy-y)*tDY;
+        let tmZ = dz>=0 ? (z+1-oz)*tDZ : (oz-z)*tDZ;
+        let t = 0, face = 0, px = x, py2 = y, pz = z;
+        for (let s = 0; s < 60; s++) {
+            if (t > MAX_D) return null;
+            if (x>=0&&x<WX&&y>=0&&y<WY&&z>=0&&z<WZ&&world3d[x][y][z]!==B.AIR)
+                return {b:world3d[x][y][z], x, y, z, face, t, px, py:py2, pz};
+            px = x; py2 = y; pz = z;
+            if (tmX < tmY && tmX < tmZ) {
+                t = tmX; tmX += tDX; x += stepX; face = stepX>0?5:4;
+            } else if (tmY < tmZ) {
+                t = tmY; tmY += tDY; y += stepY; face = stepY>0?1:0;
+            } else {
+                t = tmZ; tmZ += tDZ; z += stepZ; face = stepZ>0?3:2;
             }
         }
+        return null;
     }
 
-    function buildHotbar() {
-        if (!hotbarEl) return;
-        hotbarEl.innerHTML = '';
-        HOTBAR.forEach((btype, i) => {
-            const def = BLOCK_DEF[btype];
-            const slot = document.createElement('div');
-            const sel = i === selectedSlot;
-            slot.style.cssText = [
-                'width:38px', 'height:38px', 'border-radius:4px', 'cursor:pointer',
-                'position:relative', 'flex-shrink:0',
-                'background:' + (def.color || '#555'),
-                'border:3px solid ' + (sel ? '#fff' : '#555'),
-                'box-shadow:' + (sel ? '0 0 8px #fff,inset 0 0 4px rgba(255,255,255,0.3)' : 'none'),
-                'outline:' + (sel ? '1px solid #000' : 'none'),
-            ].join(';');
-            slot.title = def.label;
-            const num = document.createElement('span');
-            num.textContent = i + 1;
-            num.style.cssText = 'position:absolute;top:1px;left:3px;font-size:9px;color:#fff;text-shadow:1px 1px 0 #000;font-family:monospace;line-height:1';
-            slot.appendChild(num);
-            slot.addEventListener('mousedown', e => {
-                e.stopPropagation();
-                selectedSlot = i;
-                buildHotbar();
-                if (blockNameEl) blockNameEl.textContent = 'Bloco: ' + BLOCK_DEF[HOTBAR[selectedSlot]].label;
-            });
-            hotbarEl.appendChild(slot);
-        });
+    /* ---------- Renderização ---------- */
+    function render3d() {
+        if (!pdata || !world3d) return;
+        const cosY = Math.cos(cam.yaw),  sinY = Math.sin(cam.yaw);
+        const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
+        // Vetores da câmera
+        const fwX = sinY*cosP, fwY = sinP,  fwZ = cosY*cosP;
+        const rtX = cosY,      rtY = 0,      rtZ = -sinY;
+        const upX = -sinY*sinP, upY = cosP,  upZ = cosY*sinP;
+
+        for (let py = 0; py < RH; py++) {
+            const vf = ((py/RH) - 0.5) * 2 * (HTAN/ASPECT);
+            for (let px = 0; px < RW; px++) {
+                const hf = ((px/RW) - 0.5) * 2 * HTAN;
+                const rdx = fwX + hf*rtX + vf*upX;
+                const rdy = fwY +           vf*upY;
+                const rdz = fwZ + hf*rtZ + vf*upZ;
+                const rl  = Math.sqrt(rdx*rdx + rdy*rdy + rdz*rdz);
+                const hit = castRay(cam.x, cam.y, cam.z, rdx/rl, rdy/rl, rdz/rl);
+                let r, g, b;
+                if (!hit) {
+                    // Céu degradê
+                    const t = Math.min(1, Math.max(0, py/RH));
+                    r = (96  + (140-96)*t)  | 0;
+                    g = (160 + (190-160)*t) | 0;
+                    b = 235;
+                } else {
+                    const col = COL[hit.b] || COL[3];
+                    const c   = col[FACE_CI[hit.face]];
+                    const br  = BRIGHT[hit.face];
+                    const fog = Math.max(0, 1 - hit.t / MAX_D);
+                    const f   = br * fog;
+                    r = (c[0]*f + 140*(1-fog)) | 0;
+                    g = (c[1]*f + 190*(1-fog)) | 0;
+                    b = (c[2]*f + 235*(1-fog)) | 0;
+                }
+                const i = (py*RW + px) * 4;
+                pdata[i] = r; pdata[i+1] = g; pdata[i+2] = b; pdata[i+3] = 255;
+            }
+        }
+        // Mira central
+        const cx = RW>>1, cy = RH>>1;
+        for (let d = -4; d <= 4; d++) {
+            if (!d) continue;
+            let i = (cy*RW + cx+d)*4; pdata[i]=pdata[i+1]=pdata[i+2]=220; pdata[i+3]=255;
+            i = ((cy+d)*RW + cx)*4;   pdata[i]=pdata[i+1]=pdata[i+2]=220; pdata[i+3]=255;
+        }
+        ctx3d.putImageData(imgData, 0, 0);
     }
 
-    function cellAt(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width  / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const px = (e.clientX - rect.left)  * scaleX;
-        const py = (e.clientY - rect.top)   * scaleY;
-        return { r: Math.floor(py / TILE), c: Math.floor(px / TILE) };
+    /* ---------- Update / movimento ---------- */
+    function update(dt) {
+        const sp = 4*dt, lk = 1.8*dt;
+        if (keys['ArrowLeft'])  cam.yaw -= lk;
+        if (keys['ArrowRight']) cam.yaw += lk;
+        if (keys['ArrowUp'])    cam.pitch = Math.max(-1.4, cam.pitch - lk);
+        if (keys['ArrowDown'])  cam.pitch = Math.min(1.4,  cam.pitch + lk);
+        const cY = Math.cos(cam.yaw), sY = Math.sin(cam.yaw);
+        if (keys['KeyW']) { cam.x += sY*sp; cam.z += cY*sp; }
+        if (keys['KeyS']) { cam.x -= sY*sp; cam.z -= cY*sp; }
+        if (keys['KeyA']) { cam.x -= cY*sp; cam.z += sY*sp; }
+        if (keys['KeyD']) { cam.x += cY*sp; cam.z -= sY*sp; }
+        if (keys['Space'])     cam.y += sp;
+        if (keys['KeyC'] || keys['ShiftLeft'] || keys['ShiftRight']) cam.y -= sp;
+        cam.x = Math.max(0.5, Math.min(WX-0.5, cam.x));
+        cam.y = Math.max(0.5, Math.min(WY-0.5, cam.y));
+        cam.z = Math.max(0.5, Math.min(WZ-0.5, cam.z));
     }
 
-    function mcPlace(e) {
+    function gameLoop(ts) {
+        if (!mc3dRunning) return;
+        const dt = Math.min(0.05, (ts - lastT) / 1000);
+        lastT = ts;
+        update(dt);
+        render3d();
+        mc3dRaf = requestAnimationFrame(gameLoop);
+    }
+
+    /* ---------- Interação com blocos ---------- */
+    function interact(e) {
         e.preventDefault();
-        const {r, c} = cellAt(e);
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
-        if (e.button === 2) {
-            if (world[r][c] !== B.BEDROCK) { world[r][c] = B.AIR; render(); }
-        } else {
-            if (world[r][c] === B.AIR) { world[r][c] = HOTBAR[selectedSlot]; render(); }
+        const cosY = Math.cos(cam.yaw), sinY = Math.sin(cam.yaw);
+        const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
+        const hit = castRay(cam.x, cam.y, cam.z, sinY*cosP, sinP, cosY*cosP);
+        if (!hit) return;
+        if (e.button === 0) {
+            if (world3d[hit.x][hit.y][hit.z] !== B.BEDROCK) world3d[hit.x][hit.y][hit.z] = B.AIR;
+        } else if (e.button === 2) {
+            if (hit.px>=0&&hit.px<WX&&hit.py>=0&&hit.py<WY&&hit.pz>=0&&hit.pz<WZ)
+                world3d[hit.px][hit.py][hit.pz] = HOTBAR[selSlot];
         }
     }
 
-    window.mcInit = function () {
-        canvas      = document.getElementById('mc-canvas');
-        hotbarEl    = document.getElementById('mc-hotbar');
-        coordsEl    = document.getElementById('mc-coords');
-        blockNameEl = document.getElementById('mc-block-name');
-        if (!canvas) return;
-        ctx = canvas.getContext('2d');
+    /* ---------- Hotbar ---------- */
+    function buildHotbar3d() {
+        if (!hotbar3d) return;
+        hotbar3d.innerHTML = '';
+        HOTBAR.forEach((_, i) => {
+            const sel = i === selSlot;
+            const s = document.createElement('div');
+            s.style.cssText = `width:36px;height:36px;background:${HCOLORS[i]};border:3px solid ${sel?'#fff':'#555'};border-radius:3px;cursor:pointer;position:relative;flex-shrink:0;box-shadow:${sel?'0 0 7px #fff':'none'}`;
+            s.title = HNAMES[i];
+            const n = document.createElement('span');
+            n.textContent = i+1;
+            n.style.cssText = 'position:absolute;top:1px;left:2px;font-size:9px;color:#fff;text-shadow:1px 1px 0 #000;font-family:monospace';
+            s.appendChild(n);
+            s.addEventListener('mousedown', ev => {
+                ev.stopPropagation(); selSlot = i; buildHotbar3d();
+                if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[i];
+            });
+            hotbar3d.appendChild(s);
+        });
+    }
 
-        if (!mcReady) { genWorld(); mcReady = true; }
+    /* ---------- Init / Stop ---------- */
+    window.mc3dInit = function () {
+        c3d       = document.getElementById('mc3d-canvas');
+        hotbar3d  = document.getElementById('mc3d-hotbar');
+        blockLbl3d= document.getElementById('mc3d-block');
+        if (!c3d) return;
+        ctx3d   = c3d.getContext('2d');
+        imgData = ctx3d.createImageData(RW, RH);
+        pdata   = imgData.data;
+        if (!mc3dReady) { genWorld3d(); mc3dReady = true; }
 
-        render();
-        buildHotbar();
-        if (blockNameEl) blockNameEl.textContent = 'Bloco: ' + BLOCK_DEF[HOTBAR[selectedSlot]].label;
+        mc3dRunning = false;
+        if (mc3dRaf) cancelAnimationFrame(mc3dRaf);
+        keys = {};
+        buildHotbar3d();
+        if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[selSlot];
 
-        canvas.onmousedown    = mcPlace;
-        canvas.oncontextmenu  = e => e.preventDefault();
-        canvas.onmousemove    = e => {
-            if (e.buttons) mcPlace(e);
-            if (coordsEl) {
-                const {r, c} = cellAt(e);
-                coordsEl.textContent = 'X:' + c + ' Y:' + (ROWS - 1 - r);
+        mc3dRunning = true;
+        lastT = performance.now();
+        mc3dRaf = requestAnimationFrame(gameLoop);
+
+        /* Teclado — registrar uma vez */
+        if (!c3d._kd) {
+            c3d._kd = e => {
+                keys[e.code] = true;
+                if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
+            };
+            c3d._ku = e => { keys[e.code] = false; };
+        }
+        document.addEventListener('keydown', c3d._kd);
+        document.addEventListener('keyup',   c3d._ku);
+
+        /* Mouse */
+        c3d.oncontextmenu = e => e.preventDefault();
+        c3d.onmousedown = e => {
+            if (document.pointerLockElement !== c3d) { c3d.requestPointerLock(); return; }
+            interact(e);
+        };
+        c3d.onmousemove = e => {
+            if (document.pointerLockElement === c3d) {
+                cam.yaw  += e.movementX * 0.003;
+                cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch + e.movementY * 0.003));
             }
         };
-        canvas.onwheel = e => {
+        c3d.onwheel = e => {
             e.preventDefault();
-            selectedSlot = (selectedSlot + (e.deltaY > 0 ? 1 : -1) + HOTBAR.length) % HOTBAR.length;
-            buildHotbar();
-            if (blockNameEl) blockNameEl.textContent = 'Bloco: ' + BLOCK_DEF[HOTBAR[selectedSlot]].label;
+            selSlot = (selSlot + (e.deltaY>0?1:-1) + HOTBAR.length) % HOTBAR.length;
+            buildHotbar3d();
+            if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[selSlot];
         };
+    };
+
+    window.mc3dStop = function () {
+        mc3dRunning = false;
+        if (mc3dRaf) cancelAnimationFrame(mc3dRaf);
+        if (c3d) {
+            document.removeEventListener('keydown', c3d._kd);
+            document.removeEventListener('keyup',   c3d._ku);
+        }
+        keys = {};
+        if (document.pointerLockElement === c3d) document.exitPointerLock();
     };
 })();
