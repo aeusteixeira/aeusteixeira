@@ -44,9 +44,9 @@ function sndBoot() {
     else { playTone('sine', 523, 1.0, 0.12); playTone('sine', 659, 1.0, 0.12); playTone('sine', 784, 1.0, 0.12); playTone('sine', 1047, 1.0, 0.18, 0.05, 0.5); }
     }, d));
 }
-function sndClick() { playTone('square', 800, 0.06, 0.06, 0.001, 0.02); }
-function sndOpen() { playTone('sine', 440, 0.12, 0.08, 0.005, 0.05); setTimeout(() => playTone('sine', 550, 0.1, 0.08), 60); setTimeout(() => playTone('sine', 660, 0.1, 0.1), 120); }
-function sndClose() { playTone('sine', 660, 0.1, 0.08, 0.005, 0.05); setTimeout(() => playTone('sine', 550, 0.1, 0.08), 60); setTimeout(() => playTone('sine', 440, 0.08, 0.1), 120); }
+function sndClick() { /* som de clique removido a pedido do usuário */ }
+function sndOpen() { /* som de abrir janela removido a pedido do usuário */ }
+function sndClose() { /* som de fechar removido a pedido do usuário */ }
 function sndMinimize() { playTone('sine', 660, 0.15, 0.08, 0.005, 0.06); setTimeout(() => playTone('sine', 440, 0.1, 0.12), 80); }
 function sndNotif() { playTone('sine', 880, 0.2, 0.09, 0.005, 0.06); setTimeout(() => playTone('sine', 1100, 0.15, 0.15, 0.005, 0.08), 100); }
 function sndShutdown() { playTone('sine', 523, 0.5, 0.12); setTimeout(() => playTone('sine', 440, 0.6, 0.12), 200); setTimeout(() => playTone('sine', 349, 0.8, 0.18), 450); setTimeout(() => playTone('sine', 294, 1.0, 0.2), 750); }
@@ -4614,13 +4614,13 @@ const PB_WALLS = [
     /* Left wall */         { x1: 25, y1: 10, x2: 25, y2: 410 },
     /* Left gutter angle */ { x1: 25, y1: 410, x2: 85, y2: 480 },
     /* Left guide */        { x1: 85, y1: 480, x2: PB_FL_X - 5, y2: PB_FLIP_Y + 2 },
-    /* Right wall */        { x1: 355, y1: 10, x2: 355, y2: 370 },
+    /* Right wall */        { x1: 355, y1: 95, x2: 355, y2: 370 },
     /* Right gutter angle */{ x1: 355, y1: 370, x2: 315, y2: 480 },
     /* Right guide */       { x1: 315, y1: 480, x2: PB_FR_X + 5, y2: PB_FLIP_Y + 2 },
-    /* Top wall */          { x1: 25, y1: 10, x2: 355, y2: 10 },
-    /* Launch lane left */  { x1: 362, y1: 400, x2: 362, y2: 10 },
+    /* Top wall */          { x1: 25, y1: 10, x2: 300, y2: 10 },
+    /* Launch deflector */  { x1: 300, y1: 10, x2: 392, y2: 48 },
+    /* Launch lane left */  { x1: 362, y1: 400, x2: 362, y2: 95 },
     /* Launch lane right */ { x1: 392, y1: PB_H, x2: 392, y2: 10 },
-    /* Launch lane top */   { x1: 362, y1: 10, x2: 392, y2: 10 },
 ];
 const PB_BUMPERS = [
     { x: 130, y: 140, r: 22, pts: 100 },
@@ -4713,27 +4713,39 @@ function pinballUpdate() {
     if (!_pbBall.active) return;
     /* Physics */
     _pbBall.vy += PB_GRAVITY;
-    _pbBall.x += _pbBall.vx;
-    _pbBall.y += _pbBall.vy;
     /* Friction */
     _pbBall.vx *= 0.999;
-    /* Wall collisions (line segments) */
-    for (const w of PB_WALLS) {
-        const d = pbPointLineDist(_pbBall.x, _pbBall.y, w.x1, w.y1, w.x2, w.y2);
-        if (d < _pbBall.r + 2) {
-            const nx = -(w.y2 - w.y1), ny = w.x2 - w.x1;
-            const len = Math.sqrt(nx * nx + ny * ny);
-            if (len === 0) continue;
-            const ux = nx / len, uy = ny / len;
-            const dot = _pbBall.vx * ux + _pbBall.vy * uy;
-            if (dot < 0) {
-                _pbBall.vx -= 1.6 * dot * ux;
-                _pbBall.vy -= 1.6 * dot * uy;
+    /* Integração em sub-passos: a bola nunca anda mais que ~5px por passo, então
+       não atravessa as paredes finas mesmo em alta velocidade (anti-tunneling) */
+    const _pbSpeed = Math.sqrt(_pbBall.vx * _pbBall.vx + _pbBall.vy * _pbBall.vy);
+    const _pbSteps = Math.max(1, Math.ceil(_pbSpeed / 5));
+    for (let _s = 0; _s < _pbSteps; _s++) {
+        _pbBall.x += _pbBall.vx / _pbSteps;
+        _pbBall.y += _pbBall.vy / _pbSteps;
+        /* Wall collisions (line segments) — normal calculada do ponto mais próximo da
+           parede em direção à bola, então funciona com qualquer ordem dos pontos */
+        for (const w of PB_WALLS) {
+            const cx0 = w.x2 - w.x1, cy0 = w.y2 - w.y1;
+            const lenSq = cx0 * cx0 + cy0 * cy0;
+            const t = lenSq ? Math.max(0, Math.min(1, ((_pbBall.x - w.x1) * cx0 + (_pbBall.y - w.y1) * cy0) / lenSq)) : 0;
+            const px = w.x1 + t * cx0, py = w.y1 + t * cy0;
+            let nx = _pbBall.x - px, ny = _pbBall.y - py;
+            let d = Math.sqrt(nx * nx + ny * ny);
+            if (d < _pbBall.r + 2) {
+                if (d < 0.0001) { /* bola exatamente sobre a parede: usa a perpendicular */
+                    nx = -cy0; ny = cx0; d = Math.sqrt(nx * nx + ny * ny) || 1;
+                }
+                const ux = nx / d, uy = ny / d; /* aponta da parede para a bola */
+                const dot = _pbBall.vx * ux + _pbBall.vy * uy;
+                if (dot < 0) {
+                    _pbBall.vx -= 1.6 * dot * ux;
+                    _pbBall.vy -= 1.6 * dot * uy;
+                }
+                /* empurra a bola totalmente para fora da parede */
+                const pen = _pbBall.r + 2 - d;
+                _pbBall.x += ux * pen;
+                _pbBall.y += uy * pen;
             }
-            /* Push ball out of wall */
-            const pen = _pbBall.r + 2 - d;
-            _pbBall.x += ux * pen * 0.5;
-            _pbBall.y += uy * pen * 0.5;
         }
     }
     /* Bumpers */
@@ -4845,6 +4857,9 @@ function pinballUpdate() {
     const maxV = 14;
     if (Math.abs(_pbBall.vx) > maxV) _pbBall.vx = Math.sign(_pbBall.vx) * maxV;
     if (Math.abs(_pbBall.vy) > maxV) _pbBall.vy = Math.sign(_pbBall.vy) * maxV;
+    /* Rede de segurança: impede a bola de atravessar as paredes laterais em alta velocidade */
+    if (_pbBall.x < 18) { _pbBall.x = 18; _pbBall.vx = Math.abs(_pbBall.vx); }
+    if (_pbBall.x > 399) { _pbBall.x = 399; _pbBall.vx = -Math.abs(_pbBall.vx); }
 }
 
 function pbPointLineDist(px, py, x1, y1, x2, y2) {
@@ -5051,7 +5066,8 @@ document.addEventListener('keyup', e => {
         _pbLaunching = false;
         if (_pbBall && !_pbBall.active) {
             _pbBall.active = true;
-            _pbBall.vy = -_pbLaunchPower;
+            /* piso de força: garante que a bola sempre alcance o defletor e entre em jogo */
+            _pbBall.vy = -Math.max(_pbLaunchPower, 13.5);
             _pbBall.vx = -0.5 + Math.random();
             _pbLaunchPower = 0;
             _pbTone(200, 0.1);
