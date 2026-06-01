@@ -1,0 +1,89 @@
+/* ══════════════════════════════════════════════════════════════
+   LUNA POLISH — afinação visual fiel ao Windows XP (tema Azul).
+   Carregado DEPOIS de app.css, sobrescreve por ordem de cascata.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Barra de título: brilho glossy fino no topo, gradiente XP autêntico */
+.xp-titlebar {
+  background: linear-gradient(180deg,
+      #2f8cf0 0%,
+      #1f6fde 8%,
+      #1f6fde 40%,
+      #1a5fd0 50%,
+      #1453c4 92%,
+      #2f7be6 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+/* Janela inativa: barra mais acinzentada e dessaturada */
+.xp-win.inactive .xp-titlebar {
+  background: linear-gradient(180deg,
+      #d4dded 0%,
+      #c2cee0 40%,
+      #b2bed2 50%,
+      #aab6cc 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #eef2f8 !important;
+}
+
+/* Botões de legenda (min/max/close) mais redondos e vívidos */
+.xp-wbtn { box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 1px rgba(0,0,0,.25) !important; }
+.xp-wbtn.wmin { background: linear-gradient(180deg,#f3e36a,#dcb733 55%,#c19420) !important; }
+.xp-wbtn.wmax { background: linear-gradient(180deg,#86e886,#4fc24f 55%,#2a922a) !important; }
+.xp-wbtn.wcls { background: linear-gradient(180deg,#f59191,#e25151 45%,#c22a2a 75%,#a01818) !important; }
+
+/* Barra de tarefas: gradiente azul com topo iluminado (efeito 3D) */
+#taskbar {
+  background: linear-gradient(180deg,
+      #3f8aee 0%,
+      #2a72dc 8%,
+      #1e62cf 45%,
+      #1655c2 90%,
+      #114aa8 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.12),
+              inset 0 -2px 5px rgba(0, 0, 0, 0.35) !important;
+  border-top: 1px solid #3f7fe0 !important;
+}
+
+/* Botão Iniciar: orbe verde brilhante */
+#start-btn {
+  background: linear-gradient(180deg,
+      #7bdd2a 0%,
+      #5fc70d 10%,
+      #43a705 50%,
+      #2f8a03 78%,
+      #1f6f00 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset -2px 0 6px rgba(0, 0, 0, 0.25),
+              1px 1px 3px rgba(0, 0, 0, 0.35) !important;
+  border-radius: 0 14px 14px 0 !important;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45) !important;
+}
+#start-btn:hover { filter: brightness(1.08); }
+#start-btn:active { filter: brightness(0.94); }
+
+/* Bandeja do sistema: azul mais escuro e consistente */
+#tray {
+  background: linear-gradient(180deg, #1a64c8 0%, #1556bb 50%, #0e479e 100%) !important;
+  box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Cabeçalho do Menu Iniciar: azul Luna mais profundo */
+.sm-header {
+  background: linear-gradient(180deg, #1f63c4 0%, #164ba6 55%, #2a64c0 100%) !important;
+}
+
+/* Barras de rolagem azul-aço estilo Luna */
+.xp-body::-webkit-scrollbar, .ax-pane::-webkit-scrollbar, .exp-main::-webkit-scrollbar { width: 16px; height: 16px; }
+.xp-body::-webkit-scrollbar-thumb, .ax-pane::-webkit-scrollbar-thumb, .exp-main::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #cdd9ea 0%, #dde8f6 50%, #b9c8de 100%) !important;
+  border: 1px solid #6b87b3 !important;
+  border-radius: 2px;
+}
+.xp-body::-webkit-scrollbar-track, .ax-pane::-webkit-scrollbar-track {
+  background: #e8eef7 !important;
+}
+
+/* Tahoma como fonte base das janelas (autêntico XP) */
+.xp-win, .xp-titlebar, .xp-body { font-family: Tahoma, "Segoe UI", sans-serif; }

@@ -16,7 +16,7 @@ console.log('');
 console.log('%c  Se curtiu, me chama:', 'color:#f1c40f;font-size:12px;');
 console.log('%c  💼 linkedin.com/in/aeusteixeira', 'color:#ccc;font-size:12px;');
 console.log('%c  🐙 github.com/aeusteixeira', 'color:#ccc;font-size:12px;');
-console.log('%c  📧 contato@matheusteixeira.com.br', 'color:#ccc;font-size:12px;');
+console.log('%c  📧 contato.matheusteixeira@gmail.com', 'color:#ccc;font-size:12px;');
 console.log('');
 console.log('%c  PS: tenta digitar "about" no CMD ali do desktop. ;)', 'color:#e74c3c;font-size:12px;font-style:italic;');
 
@@ -303,7 +303,7 @@ function chromeMenuAction(action) {
             showNotif('⭐ Favoritos', 'Barra de favoritos já está visível!');
             break;
         case 'newtab':
-            showNotif('🌐 Nova aba', 'Calma, já tem aba demais aberta.');
+            chromeNewTab();
             break;
         case 'newwin':
             showNotif('🌐 Nova janela', 'Uma janela já é suficiente pra esse PC.');
@@ -332,8 +332,9 @@ function gm_toggleSpam() {
 }
 
 function openWindow(id) {
-    sndOpen();
     const w = document.getElementById(id);
+    if (!w) { showNotif('⚠️ Erro', 'Não foi possível abrir esta janela.'); return; }
+    sndOpen();
     w.style.display = 'flex';
     w.classList.remove('minimized', 'inactive', 'win-minimizing');
     w.classList.add('win-opening');
@@ -357,8 +358,9 @@ function printCV() {
 }
 
 function closeWin(id) {
-    sndClose();
     const w = document.getElementById(id);
+    if (!w) return;
+    sndClose();
     const meta = winMeta[id] || { ico: '🪟', lbl: id };
     // add to recycle bin
     recyclebin.push({ id, ico: meta.ico, lbl: meta.lbl, time: new Date().toLocaleTimeString() });
@@ -470,7 +472,10 @@ document.addEventListener('mousemove', e => {
     if (drag) {
     const el = document.getElementById(drag.id);
     const tbH = 34;
-    el.style.left = Math.max(0, e.clientX - drag.ox) + 'px';
+    const ww = el.offsetWidth || 200;
+    let nl = e.clientX - drag.ox;
+    nl = Math.min(Math.max(nl, -(ww - 90)), window.innerWidth - 90);
+    el.style.left = nl + 'px';
     el.style.top = Math.max(0, Math.min(e.clientY - drag.oy, window.innerHeight - tbH - 28)) + 'px';
     }
     if (resize) {
@@ -883,8 +888,8 @@ const autoScripts = {
     ]
     },
 };
-// delays iniciais após entrar no desktop (ms)
-const autoStartAt = { 'Pablo': 12000, 'Carla': 24000, 'Edmundo': 38000, 'Kris': 50000 };
+// delays iniciais após entrar no desktop (ms) — bem espaçados para não chegarem várias conversas juntas
+const autoStartAt = { 'Pablo': 12000, 'Carla': 45000, 'Edmundo': 80000, 'Kris': 115000 };
 const scriptIdx = {};
 function startAutoConversations() {
     Object.keys(autoScripts).forEach(name => {
@@ -923,8 +928,9 @@ function runNextMsg(name) {
     // agenda próxima mensagem
     const next = scriptIdx[name];
     if (next < sc.msgs.length) {
-        const delay = sc.msgs[next].d || 2000;
-        setTimeout(() => runNextMsg(name), Math.max(delay, 800));
+        // mensagens mais ágeis dentro da conversa (~55% do tempo original)
+        const delay = (sc.msgs[next].d || 2000) * 0.55;
+        setTimeout(() => runNextMsg(name), Math.max(delay, 600));
     }
     }, typingDelay);
 }
@@ -1261,7 +1267,7 @@ function toggleWMP() {
     else minimizeWin('wmp');
 }
 function wmpRender() {
-    const pl = document.getElementById('wmp-playlist'); pl.innerHTML = '';
+    const pl = document.getElementById('wmp-playlist'); if (!pl) return; pl.innerHTML = '';
     if (!wmpTracks.length) {
     pl.innerHTML = '<div class="wmp-empty-msg">Nenhuma faixa encontrada.<br>Adicione arquivos MP3 em <strong>src/music/</strong><br>e registre-os no array <strong>wmpTracks</strong><br>no topo do bloco JavaScript.</div>';
     return;
@@ -1361,15 +1367,23 @@ wmpAudio.addEventListener('ended', () => {
 /* ══════════════════════════════════════
     CAMPO MINADO
 ══════════════════════════════════════ */
-const MINE_ROWS = 9, MINE_COLS = 9, MINE_COUNT = 10;
+const MINE_DIFF = {
+    beginner:     { rows: 9,  cols: 9,  mines: 10, lbl: 'Iniciante' },
+    intermediate: { rows: 16, cols: 16, mines: 40, lbl: 'Intermediário' },
+    expert:       { rows: 16, cols: 30, mines: 99, lbl: 'Especialista' }
+};
+let mineLevel = localStorage.getItem('mt_mine_level') || 'beginner';
+if (!MINE_DIFF[mineLevel]) mineLevel = 'beginner';
+let MINE_ROWS = MINE_DIFF[mineLevel].rows, MINE_COLS = MINE_DIFF[mineLevel].cols, MINE_COUNT = MINE_DIFF[mineLevel].mines;
 let mineBoard = [], mineRevealed = [], mineFlagged = [], mineGameOver = false, mineFirstClick = true;
 let mineTimerVal = 0, mineTimerInt = null, mineFlagsUsed = 0;
+let mineQuestionsOn = true;
 function mineNewGame() {
     clearInterval(mineTimerInt); mineTimerVal = 0; mineFirstClick = true; mineGameOver = false; mineFlagsUsed = 0;
     mineBoard = Array.from({ length: MINE_ROWS }, () => Array(MINE_COLS).fill(0));
     mineRevealed = Array.from({ length: MINE_ROWS }, () => Array(MINE_COLS).fill(false));
-    mineFlagged = Array.from({ length: MINE_ROWS }, () => Array(MINE_COLS).fill(false));
-    document.getElementById('mine-smiley').textContent = '🙂';
+    mineFlagged = Array.from({ length: MINE_ROWS }, () => Array(MINE_COLS).fill(0));
+    const sm = document.getElementById('mine-smiley'); if (sm) sm.textContent = '🙂';
     mineUpdateSeg('mine-count', MINE_COUNT);
     mineUpdateSeg('mine-timer', 0);
     mineRender();
@@ -1393,7 +1407,8 @@ function minePlaceMines(sr, sc) {
     }
 }
 function mineReveal(r, c) {
-    if (mineGameOver || mineRevealed[r][c] || mineFlagged[r][c]) return;
+    if (mineGameOver || mineRevealed[r][c] || mineFlagged[r][c] === 1) return;
+    sndClick();
     if (mineFirstClick) {
     mineFirstClick = false;
     minePlaceMines(r, c);
@@ -1406,7 +1421,8 @@ function mineReveal(r, c) {
     if (mineBoard[r][c] === -1) {
     mineGameOver = true;
     clearInterval(mineTimerInt);
-    document.getElementById('mine-smiley').textContent = '😵';
+    playTone('sawtooth', 160, 0.5, 0.12); setTimeout(() => playTone('sawtooth', 110, 0.6, 0.12), 120);
+    const sm = document.getElementById('mine-smiley'); if (sm) sm.textContent = '😵';
     // reveal all mines
     for (let i = 0; i < MINE_ROWS; i++) for (let j = 0; j < MINE_COLS; j++) {
         if (mineBoard[i][j] === -1) mineRevealed[i][j] = true;
@@ -1419,7 +1435,7 @@ function mineReveal(r, c) {
     if (mineBoard[r][c] === 0) {
     for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
         const nr = r + dr, nc = c + dc;
-        if (nr >= 0 && nr < MINE_ROWS && nc >= 0 && nc < MINE_COLS && !mineRevealed[nr][nc] && !mineFlagged[nr][nc])
+        if (nr >= 0 && nr < MINE_ROWS && nc >= 0 && nc < MINE_COLS && !mineRevealed[nr][nc] && mineFlagged[nr][nc] !== 1)
         mineReveal(nr, nc);
     }
     }
@@ -1428,20 +1444,30 @@ function mineReveal(r, c) {
     for (let i = 0; i < MINE_ROWS; i++) for (let j = 0; j < MINE_COLS; j++) if (!mineRevealed[i][j]) hidden++;
     if (hidden === MINE_COUNT) {
     mineGameOver = true; clearInterval(mineTimerInt);
-    document.getElementById('mine-smiley').textContent = '😎';
+    const sm = document.getElementById('mine-smiley'); if (sm) sm.textContent = '😎';
     mineUpdateSeg('mine-count', 0);
+    mineWin();
     }
     mineRender();
 }
 function mineFlag(r, c) {
     if (mineGameOver || mineRevealed[r][c]) return;
-    mineFlagged[r][c] = !mineFlagged[r][c];
-    mineFlagsUsed += mineFlagged[r][c] ? 1 : -1;
-    mineUpdateSeg('mine-count', Math.max(0, MINE_COUNT - mineFlagsUsed));
+    const prev = mineFlagged[r][c] || 0;
+    let next;
+    if (prev === 0) next = 1;
+    else if (prev === 1) next = mineQuestionsOn ? 2 : 0;
+    else next = 0;
+    mineFlagged[r][c] = next;
+    if (prev === 1) mineFlagsUsed--;
+    if (next === 1) mineFlagsUsed++;
+    mineUpdateSeg('mine-count', MINE_COUNT - mineFlagsUsed);
+    sndClick();
     mineRender();
 }
 function mineRender() {
     const grid = document.getElementById('mine-grid'); if (!grid) return;
+    grid.style.gridTemplateColumns = 'repeat(' + MINE_COLS + ', 24px)';
+    grid.style.gridAutoRows = '24px';
     grid.innerHTML = '';
     for (let r = 0; r < MINE_ROWS; r++) for (let c = 0; c < MINE_COLS; c++) {
     const cell = document.createElement('div');
@@ -1451,13 +1477,15 @@ function mineRender() {
         cell.classList.add('revealed');
         if (mineBoard[r][c] === -1) { cell.textContent = '💣'; }
         else if (mineBoard[r][c] > 0) { cell.textContent = mineBoard[r][c]; cell.classList.add('mine-c' + mineBoard[r][c]); }
-    } else if (mineFlagged[r][c]) {
+    } else if (mineFlagged[r][c] === 1) {
         cell.classList.add('flagged'); cell.textContent = '🚩';
+    } else if (mineFlagged[r][c] === 2) {
+        cell.textContent = '❓';
     }
     cell.addEventListener('click', () => mineReveal(r, c));
     cell.addEventListener('contextmenu', e => { e.preventDefault(); mineFlag(r, c); });
-    cell.addEventListener('mousedown', e => { if (!mineGameOver) document.getElementById('mine-smiley').textContent = '😮'; });
-    cell.addEventListener('mouseup', e => { if (!mineGameOver) document.getElementById('mine-smiley').textContent = '🙂'; });
+    cell.addEventListener('mousedown', e => { if (!mineGameOver) { const s = document.getElementById('mine-smiley'); if (s) s.textContent = '😮'; } });
+    cell.addEventListener('mouseup', e => { if (!mineGameOver) { const s = document.getElementById('mine-smiley'); if (s) s.textContent = '🙂'; } });
     grid.appendChild(cell);
     }
 }
@@ -1465,6 +1493,88 @@ function mineUpdateSeg(id, n) {
     const el = document.getElementById(id); if (!el) return;
     el.textContent = String(Math.max(0, Math.min(999, n))).padStart(3, '0');
 }
+function mineSetDiff(level) {
+    if (!MINE_DIFF[level]) return;
+    mineLevel = level;
+    localStorage.setItem('mt_mine_level', level);
+    MINE_ROWS = MINE_DIFF[level].rows; MINE_COLS = MINE_DIFF[level].cols; MINE_COUNT = MINE_DIFF[level].mines;
+    mineNewGame();
+}
+function mineToggleQuestion() {
+    mineQuestionsOn = !mineQuestionsOn;
+    const el = document.getElementById('mine-dd-q');
+    if (el) el.innerHTML = (mineQuestionsOn ? '<span class="mine-dd-check">✔</span>' : '') + 'Marcas (?)';
+    mineCloseMenus();
+}
+function mineToggleMenu(e, id) {
+    e.stopPropagation();
+    const want = document.getElementById(id);
+    const wasOpen = want && want.style.display === 'block';
+    mineCloseMenus();
+    if (want && !wasOpen) {
+        want.style.display = 'block';
+        ['beginner', 'intermediate', 'expert'].forEach(l => {
+            const d = document.getElementById('mine-dd-' + l);
+            if (d) d.innerHTML = (l === mineLevel ? '<span class="mine-dd-check">●</span>' : '') + MINE_DIFF[l].lbl;
+        });
+        const q = document.getElementById('mine-dd-q');
+        if (q) q.innerHTML = (mineQuestionsOn ? '<span class="mine-dd-check">✔</span>' : '') + 'Marcas (?)';
+    }
+}
+function mineCloseMenus() {
+    document.querySelectorAll('#win-mine .mine-dropdown').forEach(d => d.style.display = 'none');
+}
+document.addEventListener('click', e => { if (!e.target.closest('.mine-menubar')) mineCloseMenus(); });
+function mineLoadBest() {
+    try { return JSON.parse(localStorage.getItem('mt_mine_best')) || {}; } catch (e) { return {}; }
+}
+function mineWin() {
+    playTone('sine', 660, 0.15, 0.1); setTimeout(() => playTone('sine', 880, 0.15, 0.1), 120); setTimeout(() => playTone('sine', 1320, 0.3, 0.12), 240);
+    const best = mineLoadBest();
+    const prev = best[mineLevel];
+    if (prev === undefined || mineTimerVal < prev) {
+        best[mineLevel] = mineTimerVal;
+        localStorage.setItem('mt_mine_best', JSON.stringify(best));
+        showNotif('🏆 Novo recorde!', MINE_DIFF[mineLevel].lbl + ': ' + mineTimerVal + ' segundos. Mandou bem!');
+    } else {
+        showNotif('😎 Você venceu!', 'Tempo: ' + mineTimerVal + 's. Recorde ' + MINE_DIFF[mineLevel].lbl + ': ' + prev + 's.');
+    }
+}
+function mineShowBest() {
+    const best = mineLoadBest();
+    const fmt = l => best[l] !== undefined ? best[l] + ' seg' : '999 seg (sem recorde)';
+    mineModal('Melhores tempos — Campo Minado',
+        '<div style="font-size:11px;line-height:2">'
+        + '<b>Iniciante:</b> ' + fmt('beginner') + '<br>'
+        + '<b>Intermediário:</b> ' + fmt('intermediate') + '<br>'
+        + '<b>Especialista:</b> ' + fmt('expert') + '</div>',
+        [{ txt: 'Zerar recordes', fn: () => { localStorage.removeItem('mt_mine_best'); mineCloseModal(); showNotif('🗑️ Recordes', 'Melhores tempos apagados.'); } },
+         { txt: 'OK', fn: mineCloseModal, primary: true }]);
+}
+function mineShowAbout() {
+    mineModal('Campo Minado',
+        '<div style="font-size:11px;line-height:1.6">Campo Minado clássico do Windows XP.<br><br>'
+        + 'Clique para revelar uma casa. Botão direito alterna 🚩 e ❓.<br>'
+        + 'Revele todas as casas sem minas para vencer.<br><br>'
+        + '<i>Recriado por Matheus Teixeira.</i></div>',
+        [{ txt: 'OK', fn: mineCloseModal, primary: true }]);
+}
+function mineModal(title, body, buttons) {
+    mineCloseModal();
+    const ov = document.createElement('div');
+    ov.id = 'mine-modal-ov';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:99998;display:flex;align-items:center;justify-content:center';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#ece9d8;border:1px solid #0a246a;border-radius:6px 6px 3px 3px;box-shadow:3px 5px 18px rgba(0,0,0,.5);width:300px;font-family:Tahoma,sans-serif;overflow:hidden';
+    const btns = buttons.map((b, i) => '<button data-i="' + i + '" class="mine-modal-btn" style="font-family:Tahoma;font-size:11px;padding:3px 14px;cursor:pointer;border:1px solid #707070;border-radius:3px;background:' + (b.primary ? '#cfe3ff' : '#f5f4ea') + '">' + b.txt + '</button>').join('');
+    box.innerHTML = '<div style="background:linear-gradient(180deg,#0058e6,#3f8cf3);color:#fff;font-weight:bold;font-size:11px;padding:4px 8px">' + title + '</div>'
+        + '<div style="padding:14px 16px">' + body + '</div>'
+        + '<div style="display:flex;gap:8px;justify-content:flex-end;padding:0 16px 14px">' + btns + '</div>';
+    ov.appendChild(box); document.body.appendChild(ov);
+    box.querySelectorAll('.mine-modal-btn').forEach(bt => bt.addEventListener('click', () => { sndClick(); buttons[+bt.dataset.i].fn(); }));
+    ov.addEventListener('click', e => { if (e.target === ov) mineCloseModal(); });
+}
+function mineCloseModal() { const ov = document.getElementById('mine-modal-ov'); if (ov) ov.remove(); }
 
 /* ══════════════════════════════════════
     NOTEPAD++
@@ -1729,8 +1839,8 @@ body {
 <!-- TICKER -->
 <div class="ticker">
 <span class="ticker-inner">
-    ★ DISPONÍVEL PARA NOVOS PROJETOS ★ PHP · Laravel · Go · Python · Docker · PostgreSQL
-    ★ CONTATO: matheus@matheusteixeira.com.br ★ SÃO PAULO, SP ★ 5+ ANOS DE EXPERIÊNCIA ★
+    ★ DISPONÍVEL PARA NOVOS PROJETOS ★ PHP · Laravel · MySQL · n8n · Docker · Python
+    ★ CONTATO: contato.matheusteixeira@gmail.com ★ SÃO PAULO, SP ★ 8+ ANOS DE EXPERIÊNCIA ★
 </span>
 </div>
 
@@ -1739,8 +1849,8 @@ body {
 <div class="hero-content">
     <h1 class="hero-title">Back-End<br>Developer</h1>
     <p class="hero-sub">
-    Especialista em PHP, Laravel e Go. Construindo APIs robustas,<br>
-    microsserviços escaláveis e sistemas de alta disponibilidade.
+    Especialista em PHP e Laravel. Construindo APIs robustas,<br>
+    automações inteligentes e sistemas que duram.
     </p>
     <div class="hero-btns">
     <a class="btn btn-primary" href="#projetos">Ver Projetos</a>
@@ -1756,29 +1866,28 @@ body {
     <img class="sobre-photo" src="src/img/matheus.jpg" alt="Matheus Teixeira">
     <div class="sobre-text">
     <p>
-        Desenvolvedor back-end com mais de 5 anos de experiência construindo
-        aplicações web de alta performance. Apaixonado por arquitetura limpa,
-        código bem testado e soluções que escalam.
+        Desenvolvedor e consultor PHP/Laravel com mais de 8 anos de
+        experiência construindo sistemas web, APIs e automações.
+        Apaixonado por arquitetura limpa e código que dura.
     </p>
     <p>
-        Trabalho principalmente com PHP/Laravel no dia a dia, mas também uso
-        Go para serviços que exigem alto throughput. Experiência sólida com
-        bancos de dados relacionais (PostgreSQL, MySQL) e mensageria
-        (RabbitMQ, Redis).
+        Trabalho com PHP, Laravel, MySQL e n8n no dia a dia. Experiência
+        sólida com automações, integrações com IA, filas assíncronas,
+        Docker e CI/CD. Fundador do Mestre Oficina (SaaS).
     </p>
     <p>
-        Quando não estou codando, estou contribuindo para open source,
-        escrevendo no blog ou explorando novas tecnologias de backend.
+        Quando não estou codando, estou mergulhando, andando de moto
+        ou contribuindo para a comunidade PHP (PHPSP, PHP Rio).
     </p>
     <div class="sobre-tags">
         <span class="tag">PHP 8.3</span>
-        <span class="tag">Laravel 11</span>
-        <span class="tag">Go 1.22</span>
+        <span class="tag">Laravel</span>
+        <span class="tag">MySQL</span>
+        <span class="tag">n8n</span>
         <span class="tag">Docker</span>
-        <span class="tag">PostgreSQL</span>
         <span class="tag">Redis</span>
-        <span class="tag">RabbitMQ</span>
-        <span class="tag">TDD</span>
+        <span class="tag">Python</span>
+        <span class="tag">CI/CD</span>
     </div>
     </div>
 </div>
@@ -1790,41 +1899,41 @@ body {
 <div class="projects-grid">
 
     <div class="project-card">
-    <div class="project-title">📦 PaymentGateway API</div>
+    <div class="project-title">🔧 Mestre Oficina</div>
     <p class="project-desc">
-        Gateway de pagamentos multi-provider com suporte a Pix, cartão e boleto.
-        Processa +50k transações/dia com 99.97% de uptime.
+        SaaS para gestão de oficinas mecânicas. NF-e em 945+ municípios,
+        API WhatsApp, automações n8n e CI/CD com testes a cada push.
     </p>
     <div class="project-tech">
         <span class="tech-badge">Laravel</span>
-        <span class="tech-badge">PostgreSQL</span>
-        <span class="tech-badge">Redis</span>
+        <span class="tech-badge">MySQL</span>
+        <span class="tech-badge">n8n</span>
     </div>
     </div>
 
     <div class="project-card">
-    <div class="project-title">🚀 MicroAuth Service</div>
+    <div class="project-title">🤖 Orquestrador</div>
     <p class="project-desc">
-        Microsserviço de autenticação com JWT, OAuth2 e suporte a 2FA.
-        Arquitetura hexagonal, 100% de cobertura de testes.
+        Plataforma que centralizou e automatizou processos fiscais e
+        contábeis. Economizou milhares de horas de trabalho manual.
     </p>
     <div class="project-tech">
-        <span class="tech-badge">Go</span>
-        <span class="tech-badge">gRPC</span>
+        <span class="tech-badge">Laravel</span>
+        <span class="tech-badge">PHP</span>
         <span class="tech-badge">Docker</span>
     </div>
     </div>
 
     <div class="project-card">
-    <div class="project-title">📊 DataPipeline Worker</div>
+    <div class="project-title">🖥️ Portfolio Windows XP</div>
     <p class="project-desc">
-        Worker assíncrono para processamento de eventos em tempo real.
-        Consome +1M mensagens/hora via RabbitMQ.
+        Simulação completa do Windows XP em HTML, CSS e JS puro.
+        Um único arquivo. Sem framework. Nostalgia pura.
     </p>
     <div class="project-tech">
-        <span class="tech-badge">PHP</span>
-        <span class="tech-badge">RabbitMQ</span>
-        <span class="tech-badge">MySQL</span>
+        <span class="tech-badge">HTML</span>
+        <span class="tech-badge">CSS</span>
+        <span class="tech-badge">JavaScript</span>
     </div>
     </div>
 
@@ -1846,33 +1955,33 @@ body {
     <div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div>
     </div>
     <div class="skill-item">
-    <span class="skill-ico">🐹</span>
-    <div class="skill-name">Go</div>
-    <div class="skill-bar-wrap"><div class="skill-bar" style="width:78%"></div></div>
+    <span class="skill-ico">🗄️</span>
+    <div class="skill-name">MySQL</div>
+    <div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div>
     </div>
     <div class="skill-item">
     <span class="skill-ico">🐍</span>
     <div class="skill-name">Python</div>
-    <div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div>
+    <div class="skill-bar-wrap"><div class="skill-bar" style="width:65%"></div></div>
     </div>
     <div class="skill-item">
-    <span class="skill-ico">🐘</span>
-    <div class="skill-name">PostgreSQL</div>
+    <span class="skill-ico">🔄</span>
+    <div class="skill-name">n8n</div>
     <div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div>
     </div>
     <div class="skill-item">
     <span class="skill-ico">🐳</span>
     <div class="skill-name">Docker</div>
-    <div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div>
+    <div class="skill-bar-wrap"><div class="skill-bar" style="width:82%"></div></div>
     </div>
     <div class="skill-item">
-    <span class="skill-ico">☁️</span>
-    <div class="skill-name">AWS</div>
-    <div class="skill-bar-wrap"><div class="skill-bar" style="width:72%"></div></div>
+    <span class="skill-ico">🔴</span>
+    <div class="skill-name">Redis</div>
+    <div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div>
     </div>
     <div class="skill-item">
-    <span class="skill-ico">🔄</span>
-    <div class="skill-name">RabbitMQ</div>
+    <span class="skill-ico">⚙️</span>
+    <div class="skill-name">GitHub Actions</div>
     <div class="skill-bar-wrap"><div class="skill-bar" style="width:80%"></div></div>
     </div>
 </div>
@@ -1880,11 +1989,11 @@ body {
 
 <!-- FOOTER -->
 <footer class="site-footer">
-<p>© 2025 Matheus Teixeira — Back-End Developer</p>
+<p>© 2026 Matheus Teixeira — Desenvolvedor &amp; Consultor PHP · Laravel</p>
 <p style="margin-top:6px">
-    matheus@matheusteixeira.com.br
-    · github.com/matheusteixeira
-    · linkedin.com/in/matheusteixeira
+    contato.matheusteixeira@gmail.com
+    · github.com/aeusteixeira
+    · linkedin.com/in/aeusteixeira
 </p>
 </footer>
 
@@ -2118,6 +2227,7 @@ function showDesktop() {
     sndMinimize();
     document.querySelectorAll('.xp-win').forEach(w => {
     if (w.style.display !== 'none' && !w.classList.contains('minimized')) {
+        w.style.display = 'none';
         w.classList.add('minimized');
         const id = w.id; const tbi = document.getElementById('tbi-' + id);
         if (tbi) tbi.classList.remove('tb-active');
@@ -2415,25 +2525,8 @@ function dlVirusAlert() {
 }
 
 /* ══════════════════════════════════════
-    BSOD
+    BSOD (triggerBSOD real está mais abaixo, usando #bsod-overlay)
 ══════════════════════════════════════ */
-function triggerBsod() {
-    const el = document.getElementById('bsod');
-    if (!el) return;
-    el.style.display = 'flex';
-    let pct = 0;
-    const pctEl = document.getElementById('bsod-pct');
-    const iv = setInterval(() => {
-        pct += Math.floor(Math.random() * 4) + 1;
-        if (pct >= 100) { pct = 100; clearInterval(iv); }
-        if (pctEl) pctEl.textContent = pct;
-    }, 180);
-}
-function exitBsod() {
-    const el = document.getElementById('bsod');
-    if (el) el.style.display = 'none';
-    document.getElementById('bsod-pct').textContent = '0';
-}
 
 /* ══════════════════════════════════════
     RUN DIALOG (Win+R)
@@ -2921,7 +3014,7 @@ Object.assign(cmdHandlers, {
 <span class="cmd-cyan">Stack</span>: PHP · Laravel · MySQL · Docker · n8n · AWS · Redis
 <span class="cmd-cyan">Uptime</span>: 8 anos, 3 meses, 12 dias sem mudar de stack
 <span class="cmd-cyan">Packages</span>: 847 (composer) + 9,412 (node_modules, não pergunte)
-<span class="cmd-cyan">GitHub</span>: github.com/matheusteixeira
+<span class="cmd-cyan">GitHub</span>: github.com/aeusteixeira
 <span class="cmd-cyan">Coffee</span>: ████████████████████ 100%
 </div>`,
     'npm install': () => {
@@ -3008,21 +3101,7 @@ Object.assign(cmdHandlers, {
 /* ══════════════════════════════════════
     KONAMI CODE EASTER EGG
 ══════════════════════════════════════ */
-(function konamiInit() {
-    const seq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-    let idx = 0;
-    document.addEventListener('keydown', e => {
-        if (e.key === seq[idx]) {
-            idx++;
-            if (idx === seq.length) {
-                idx = 0;
-                showKonami();
-            }
-        } else {
-            idx = e.key === seq[0] ? 1 : 0;
-        }
-    });
-})();
+/* Konami detection moved to MATRIX RAIN section below */
 function showKonami() {
     sndNotif();
     document.getElementById('konami-overlay').classList.add('active');
@@ -3257,8 +3336,7 @@ function gmShowFolder(folder) {
     gmOpenId = null;
     document.querySelectorAll('.gm2-ni').forEach(n => n.classList.remove('gm2-ni-active'));
     const map = { inbox:'gm2-nav-inbox' };
-    if (map[folder]) document.getElementById(map[folder]).classList.add('gm2-ni-active');
-    const tabs = document.getElementById('gm2-tabs');
+    if (map[folder]) { const navEl = document.getElementById(map[folder]); if (navEl) navEl.classList.add('gm2-ni-active'); }
     const pager = document.getElementById('gm2-pager');
     const reader = document.getElementById('gm2-reader');
     const list = document.getElementById('gm2-list');
@@ -3442,6 +3520,7 @@ function chromeTab(n) {
     if (title) title.textContent = chromeTitles[n] || 'Google Chrome';
     if (n === 1) bkInit();
     if (n === 2) gmInit();
+    if (n === 7) renderHistory();
     sndClick();
 }
 
@@ -3474,75 +3553,211 @@ const SOL_SUITS = ['♠','♥','♦','♣'];
 const SOL_VALS  = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SOL_RED   = ['♥','♦'];
 let solStock=[], solWaste=[], solFound=[[],[],[],[]], solTab=[[],[],[],[],[],[],[]];
-let solSelected=null, solScore=0;
+let solScore=0, solDrawMode=1, solTimer=0, solTimerInt=null, solStarted=false;
+let solHistory=[], solDrag=null;
 
+function solSnapshot(){ return JSON.stringify({s:solStock,w:solWaste,f:solFound,t:solTab,sc:solScore}); }
+function solPushHistory(){ solHistory.push(solSnapshot()); if(solHistory.length>250) solHistory.shift(); }
+function solUndo(){
+    if(!solHistory.length){ sndClick(); return; }
+    const o=JSON.parse(solHistory.pop());
+    solStock=o.s; solWaste=o.w; solFound=o.f; solTab=o.t; solScore=o.sc;
+    sndClick(); solRender();
+}
 function solNewGame() {
+    solHistory=[]; solDrag=null; clearInterval(solTimerInt); solTimer=0; solStarted=false;
     let deck=[];
-    SOL_SUITS.forEach(s => SOL_VALS.forEach(v => deck.push({suit:s,val:v,idx:SOL_VALS.indexOf(v),faceUp:false})));
+    SOL_SUITS.forEach(s => SOL_VALS.forEach((v,i) => deck.push({suit:s,val:v,idx:i,faceUp:false})));
     for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
     solStock=[...deck]; solWaste=[]; solFound=[[],[],[],[]]; solTab=[[],[],[],[],[],[],[]];
     for(let c=0;c<7;c++) for(let r=0;r<=c;r++){const cd=solStock.pop();cd.faceUp=(r===c);solTab[c].push(cd);}
-    solSelected=null; solScore=0; solRender();
+    solScore=0; solUpdTimer(); solRender();
 }
+function solStartTimer(){ if(solStarted) return; solStarted=true; solTimerInt=setInterval(()=>{ solTimer++; solUpdTimer(); }, 1000); }
+function solUpdTimer(){ const el=document.getElementById('sol-timer'); if(el) el.textContent='Tempo: '+solTimer+'s'; }
 function solRender() {
     const st=document.getElementById('sol-stock');
-    if(st) st.innerHTML=solStock.length>0?'<div class="sol-card sol-back">🂠</div>':'<div class="sol-pile-empty" onclick="solStockClick()" style="cursor:pointer;color:#8fc;font-size:20px;display:flex;align-items:center;justify-content:center;">↺</div>';
+    if(st) st.innerHTML = solStock.length>0 ? '<div class="sol-card sol-back"></div>'
+        : '<div class="sol-recycle" title="Reembaralhar">↺</div>';
     const ws=document.getElementById('sol-waste');
-    if(ws){ws.innerHTML='';if(solWaste.length>0)ws.appendChild(solMakeCardEl(solWaste[solWaste.length-1],'waste',0,solWaste.length-1));}
-    for(let f=0;f<4;f++){const fd=document.getElementById('sol-f'+f);if(!fd)continue;fd.innerHTML=solFound[f].length===0?`<span class="sol-suit-hint">${SOL_SUITS[f]}</span>`:'';if(solFound[f].length>0)fd.appendChild(solMakeCardEl(solFound[f][solFound[f].length-1],'found',f,solFound[f].length-1));}
-    const tab=document.getElementById('sol-tableau');if(!tab)return;tab.innerHTML='';
-    for(let c=0;c<7;c++){
-        const col=document.createElement('div');col.className='sol-col';col.style.cssText='position:relative;min-height:110px;flex:1;';
-        if(solTab[c].length===0){const e=document.createElement('div');e.className='sol-pile-empty';e.onclick=()=>solColClick(c);col.appendChild(e);}
-        solTab[c].forEach((card,i)=>{const el=solMakeCardEl(card,'tab',c,i);el.style.position='absolute';el.style.top=(i*22)+'px';col.appendChild(el);});
-        col.style.minHeight=(Math.max(1,solTab[c].length)*22+88)+'px';tab.appendChild(col);
+    if(ws){
+        ws.innerHTML='';
+        const show = solDrawMode===3 ? solWaste.slice(-3) : solWaste.slice(-1);
+        const base = solWaste.length - show.length;
+        show.forEach((card,i)=>{
+            const el=solMakeCardEl(card,'waste',0,base+i);
+            el.style.position='absolute'; el.style.left=(i*16)+'px'; el.style.top='0';
+            if(i<show.length-1) el.style.pointerEvents='none';
+            ws.appendChild(el);
+        });
     }
-    const sc=document.getElementById('sol-score');if(sc)sc.textContent='Pontos: '+solScore;
-    if(solFound.every(f=>f.length===13))showNotif('🃏 Paciência','Você ganhou!! 🎉 Pontuação: '+solScore);
+    for(let f=0;f<4;f++){
+        const fd=document.getElementById('sol-f'+f); if(!fd) continue;
+        if(solFound[f].length===0){ fd.innerHTML=`<span class="sol-suit-hint">${SOL_SUITS[f]}</span>`; }
+        else { fd.innerHTML=''; fd.appendChild(solMakeCardEl(solFound[f][solFound[f].length-1],'found',f,solFound[f].length-1)); }
+    }
+    const tab=document.getElementById('sol-tableau'); if(!tab) return; tab.innerHTML='';
+    for(let c=0;c<7;c++){
+        const col=document.createElement('div'); col.className='sol-col'; col.dataset.col=c;
+        col.style.cssText='position:relative;flex:1;min-height:110px;';
+        if(solTab[c].length===0){ const e=document.createElement('div'); e.className='sol-pile-empty'; col.appendChild(e); }
+        solTab[c].forEach((card,i)=>{ const el=solMakeCardEl(card,'tab',c,i); el.style.position='absolute'; el.style.top=(i*22)+'px'; el.style.left='0'; el.style.right='0'; col.appendChild(el); });
+        col.style.minHeight=(Math.max(1,solTab[c].length)*22+90)+'px'; tab.appendChild(col);
+    }
+    const sc=document.getElementById('sol-score'); if(sc) sc.textContent='Pontos: '+solScore;
 }
 function solMakeCardEl(card,src,idx,pos){
     const el=document.createElement('div');
+    if(!card.faceUp){ el.className='sol-card sol-back'; return el; }
     const red=SOL_RED.includes(card.suit);
-    const sel=solSelected&&solSelected.src===src&&solSelected.idx===idx&&solSelected.pos===pos;
-    if(!card.faceUp){el.className='sol-card sol-back';el.innerHTML='🂠';return el;}
-    el.className='sol-card'+(red?' sol-red':'')+(sel?' sol-sel':'');
+    el.className='sol-card'+(red?' sol-red':'');
     el.innerHTML=`<div class="sol-card-tl">${card.val}<br>${card.suit}</div><div class="sol-card-ctr">${card.suit}</div><div class="sol-card-br">${card.val}<br>${card.suit}</div>`;
-    el.onclick=(e)=>{e.stopPropagation();solCardClick(card,src,idx,pos);};
-    if(src==='tab'&&pos<solTab[idx].length-1)el.style.pointerEvents='auto';
+    el.addEventListener('mousedown', e=>solDragStart(e,src,idx,pos));
+    el.addEventListener('dblclick', e=>{ e.preventDefault(); solAutoFound(src,idx,pos); });
     return el;
 }
-function solCardClick(card,src,idx,pos){
-    sndClick();
-    if(!solSelected){solSelected={card,src,idx,pos};solRender();return;}
-    if(solSelected.src===src&&solSelected.idx===idx&&solSelected.pos===pos){solSelected=null;solRender();return;}
-    // try move to foundation
-    for(let f=0;f<4;f++){
-        if(SOL_SUITS[f]===solSelected.card.suit&&solCanFound(solSelected.card,f)){
-            solDoMoveFound(solSelected.src,solSelected.idx,solSelected.pos,f);
-            solSelected=null;solScore+=10;solRender();return;
+function solGhostCard(card){
+    const el=document.createElement('div');
+    el.className='sol-card'+(SOL_RED.includes(card.suit)?' sol-red':'');
+    el.innerHTML=`<div class="sol-card-tl">${card.val}<br>${card.suit}</div><div class="sol-card-ctr">${card.suit}</div><div class="sol-card-br">${card.val}<br>${card.suit}</div>`;
+    return el;
+}
+function solGrab(src,idx,pos){
+    if(src==='waste'){ return (solWaste.length && pos===solWaste.length-1) ? [solWaste[solWaste.length-1]] : null; }
+    if(src==='found'){ return solFound[idx].length ? [solFound[idx][solFound[idx].length-1]] : null; }
+    const pile=solTab[idx]; const sub=pile.slice(pos);
+    for(let i=0;i<sub.length;i++){
+        if(!sub[i].faceUp) return null;
+        if(i>0){ const p=sub[i-1], c=sub[i]; if(!(p.idx===c.idx+1 && SOL_RED.includes(p.suit)!==SOL_RED.includes(c.suit))) return null; }
+    }
+    return sub.length?sub:null;
+}
+function solDragStart(e,src,idx,pos){
+    if(e.button!==0) return;
+    const cards=solGrab(src,idx,pos); if(!cards) return;
+    e.preventDefault();
+    solDrag={ src, idx, pos, cards, sx:e.clientX, sy:e.clientY, moved:false, ghost:null };
+    document.addEventListener('mousemove', solDragMove);
+    document.addEventListener('mouseup', solDragEnd);
+}
+function solDragMove(e){
+    if(!solDrag) return;
+    const dx=e.clientX-solDrag.sx, dy=e.clientY-solDrag.sy;
+    if(!solDrag.moved && Math.abs(dx)+Math.abs(dy)>4){
+        solDrag.moved=true;
+        const g=document.createElement('div'); g.className='sol-drag-ghost';
+        solDrag.cards.forEach((card,i)=>{ const c=solGhostCard(card); c.style.position='absolute'; c.style.top=(i*22)+'px'; c.style.left='0'; g.appendChild(c); });
+        document.body.appendChild(g); solDrag.ghost=g;
+    }
+    if(solDrag.ghost){ solDrag.ghost.style.left=(e.clientX-26)+'px'; solDrag.ghost.style.top=(e.clientY-18)+'px'; }
+}
+function solDragEnd(e){
+    document.removeEventListener('mousemove', solDragMove);
+    document.removeEventListener('mouseup', solDragEnd);
+    const d=solDrag; solDrag=null;
+    if(!d) return;
+    if(d.ghost) d.ghost.remove();
+    if(!d.moved){ solAutoFound(d.src,d.idx,d.pos); return; }
+    const tgt=solHitTest(e.clientX,e.clientY);
+    if(tgt){
+        if(tgt.type==='found' && d.cards.length===1 && solCanFound(d.cards[0],tgt.idx)){
+            solPushHistory(); solStartTimer(); solApplyMove(d,'found',tgt.idx); solScore+=10; solAfterMove(); return;
+        }
+        if(tgt.type==='tab' && tgt.idx!==(d.src==='tab'?d.idx:-1) && solCanTab(d.cards[0],tgt.idx)){
+            solPushHistory(); solStartTimer(); solApplyMove(d,'tab',tgt.idx); solScore+=5; solAfterMove(); return;
         }
     }
-    solSelected={card,src,idx,pos};solRender();
+    sndClick(); solRender();
 }
-function solColClick(c){
-    if(!solSelected)return;sndClick();
-    if(solCanTab(solSelected.card,c)){solDoMoveTab(solSelected.src,solSelected.idx,solSelected.pos,c);solSelected=null;solScore+=5;solRender();}
+function solHitTest(x,y){
+    for(let f=0;f<4;f++){ const el=document.getElementById('sol-f'+f); if(el){ const r=el.getBoundingClientRect(); if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return {type:'found',idx:f}; } }
+    const cols=document.querySelectorAll('#sol-tableau .sol-col');
+    for(let c=0;c<cols.length;c++){ const r=cols[c].getBoundingClientRect(); if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return {type:'tab',idx:c}; }
+    return null;
 }
-function solFoundClick(f){
-    sndClick();if(!solSelected)return;
-    if(solCanFound(solSelected.card,f)){solDoMoveFound(solSelected.src,solSelected.idx,solSelected.pos,f);solSelected=null;solScore+=10;solRender();}
+function solApplyMove(d,destType,destIdx){
+    if(d.src==='waste') solWaste.pop();
+    else if(d.src==='found') solFound[d.idx].pop();
+    else solTab[d.idx].splice(d.pos);
+    if(destType==='found') solFound[destIdx].push(d.cards[0]);
+    else d.cards.forEach(c=>solTab[destIdx].push(c));
+    if(d.src==='tab'){ const p=solTab[d.idx]; if(p.length){ const t=p[p.length-1]; if(!t.faceUp){ t.faceUp=true; solScore+=5; } } }
 }
+function solAfterMove(){ sndClick(); solRender(); solCheckWin(); }
+function solAutoFound(src,idx,pos){
+    let card;
+    if(src==='waste'){ if(pos!==solWaste.length-1) return; card=solWaste[solWaste.length-1]; }
+    else if(src==='tab'){ const p=solTab[idx]; if(pos!==p.length-1) return; card=p[p.length-1]; }
+    else if(src==='found'){ return; }
+    if(!card||!card.faceUp) return;
+    for(let f=0;f<4;f++){
+        if(solCanFound(card,f)){ solPushHistory(); solStartTimer(); solApplyMove({src,idx,pos,cards:[card]},'found',f); solScore+=10; solAfterMove(); return; }
+    }
+}
+function solColClick(c){}
+function solFoundClick(f){}
 function solCanTab(card,col){const pile=solTab[col];if(pile.length===0)return card.val==='K';const top=pile[pile.length-1];return top.faceUp&&top.idx===card.idx+1&&SOL_RED.includes(top.suit)!==SOL_RED.includes(card.suit);}
 function solCanFound(card,f){const pile=solFound[f];if(pile.length===0)return card.val==='A'&&SOL_SUITS[f]===card.suit;const top=pile[pile.length-1];return top.suit===card.suit&&top.idx===card.idx-1;}
-function solDoMoveTab(src,idx,pos,destCol){const cards=solExtract(src,idx,pos);cards.forEach(c=>solTab[destCol].push(c));solFlipTop(src,idx);}
-function solDoMoveFound(src,idx,pos,f){const cards=solExtract(src,idx,pos);solFound[f].push(cards[0]);solFlipTop(src,idx);}
-function solExtract(src,idx,pos){if(src==='waste')return[solWaste.pop()];if(src==='found')return[solFound[idx].pop()];return solTab[idx].splice(pos);}
-function solFlipTop(src,idx){if(src==='tab'&&solTab[idx]&&solTab[idx].length>0){const t=solTab[idx][solTab[idx].length-1];if(!t.faceUp){t.faceUp=true;solScore+=5;}}}
 function solStockClick(){
     sndClick();
-    if(solStock.length===0){solStock=[...solWaste].reverse();solWaste=[];solStock.forEach(c=>c.faceUp=false);solScore=Math.max(0,solScore-100);}
-    else{const c=solStock.pop();c.faceUp=true;solWaste.push(c);}
-    solSelected=null;solRender();
+    if(solStock.length===0){
+        if(!solWaste.length) return;
+        solPushHistory();
+        solStock=solWaste.reverse(); solWaste=[]; solStock.forEach(c=>c.faceUp=false);
+        solScore=Math.max(0,solScore-(solDrawMode===3?0:20));
+    } else {
+        solPushHistory(); solStartTimer();
+        const n=Math.min(solDrawMode, solStock.length);
+        for(let i=0;i<n;i++){ const c=solStock.pop(); c.faceUp=true; solWaste.push(c); }
+    }
+    solRender();
+}
+function solSetDraw(mode){ solDrawMode=mode; solCloseMenus(); sndClick(); showNotif('🃏 Paciência','Modo Comprar '+mode+' ativado. Vale a partir das próximas compras.'); solRender(); }
+function solCheckWin(){ if(solFound.every(f=>f.length===13)){ clearInterval(solTimerInt); solWinAnim(); } }
+function solWinAnim(){
+    playTone('sine',523,0.2,0.12); setTimeout(()=>playTone('sine',659,0.2,0.12),150); setTimeout(()=>playTone('sine',784,0.2,0.12),300); setTimeout(()=>playTone('sine',1047,0.4,0.14),450);
+    showNotif('🃏 Paciência','Você venceu! Tempo: '+solTimer+'s, Pontos: '+solScore);
+    let n=0;
+    const spawner=setInterval(()=>{
+        if(n>=44){ clearInterval(spawner); return; }
+        n++;
+        const f=n%4; const fEl=document.getElementById('sol-f'+f); if(!fEl||!solFound[f].length) return;
+        const top=solFound[f][solFound[f].length-1];
+        const card=solGhostCard(top); card.style.position='fixed'; card.style.zIndex=99999; card.style.margin='0';
+        const fr=fEl.getBoundingClientRect();
+        let x=fr.left, y=fr.top, vx=(Math.random()*8-4), vy=-(Math.random()*5+2);
+        document.body.appendChild(card);
+        const anim=setInterval(()=>{
+            vy+=0.5; x+=vx; y+=vy;
+            if(y>window.innerHeight-70){ vy=-(vy*0.55); y=window.innerHeight-70; }
+            card.style.left=x+'px'; card.style.top=y+'px';
+            if(x<-90||x>window.innerWidth+90){ clearInterval(anim); card.remove(); }
+        }, 30);
+        setTimeout(()=>{ clearInterval(anim); card.remove(); }, 7000);
+    }, 110);
+}
+function solToggleMenu(e,id){
+    e.stopPropagation();
+    const want=document.getElementById(id);
+    const wasOpen=want&&want.style.display==='block';
+    solCloseMenus();
+    if(want&&!wasOpen){
+        want.style.display='block';
+        const d1=document.getElementById('sol-dd-d1'); if(d1) d1.innerHTML=(solDrawMode===1?'<span class="mine-dd-check">●</span>':'')+'Comprar 1 carta';
+        const d3=document.getElementById('sol-dd-d3'); if(d3) d3.innerHTML=(solDrawMode===3?'<span class="mine-dd-check">●</span>':'')+'Comprar 3 cartas';
+    }
+}
+function solCloseMenus(){ document.querySelectorAll('#win-solitaire .mine-dropdown').forEach(d=>d.style.display='none'); }
+function solShowAbout(){
+    solCloseMenus();
+    mineModal('Paciência (Klondike)',
+        '<div style="font-size:11px;line-height:1.6">Paciência clássica do Windows XP.<br><br>'
+        +'Arraste cartas entre as colunas montando sequências decrescentes de cores alternadas. '
+        +'Leve A, 2, 3... até K para as bases (canto superior direito).<br><br>'
+        +'Clique duplo (ou simples) envia a carta direto para a base. '
+        +'Use Comprar 1/3, Desfazer e o cronômetro no menu Jogo.<br><br>'
+        +'<i>Recriado por Matheus Teixeira.</i></div>',
+        [{txt:'OK',fn:mineCloseModal,primary:true}]);
 }
 
 /* ══════════════════════════════════════
@@ -3835,6 +4050,12 @@ function triggerBSOD() {
         location.reload();
     });
 }
+function exitBsod() {
+    const b = document.getElementById('bsod');
+    if (b) b.style.display = 'none';
+    const o = document.getElementById('bsod-overlay');
+    if (o) o.style.display = 'none';
+}
 
 /* ══════════════════════════════════════
     CLIPPY — ASSISTENTE DO OFFICE
@@ -3947,7 +4168,7 @@ function msnNudge() {
         document.body.classList.remove('screen-shake');
     }, 600);
     /* adiciona msg no chat */
-    const log = document.getElementById('msn-chat-log');
+    const log = document.getElementById('msn-chat-msgs');
     if (log) {
         const div = document.createElement('div');
         div.style.cssText = 'color:#888;font-style:italic;font-size:11px;padding:4px 0;';
@@ -4097,17 +4318,17 @@ function msnCloseWebcam() {
 ══════════════════════════════════════ */
 const _cmdExtras = {
     'about': `
-    Matheus Teixeira dos Santos, 26 anos
+    Matheus Teixeira dos Santos, 27 anos
     Natural de Nova Iguaçu/RJ | Mora em São Paulo/SP
-    Desenvolvedor Full Stack | PHP/Laravel specialist
+    Desenvolvedor & Consultor PHP · Laravel
 
     Comecei a programar aos 12 anos, inspirado pelo iCarly.
     Minha mãe me deu um livro de PHP e MySQL e eu criei
     meu primeiro blog nesse Windows XP.
 
     Hoje sou fundador do Mestre Oficina (SaaS) e atuo como
-    dev pleno na MUPER, trabalhando com Laravel, Docker,
-    Python, React e integrações com IA.
+    consultor independente, trabalhando com Laravel, Docker,
+    Python, n8n e integrações com IA.
 `,
     'skills': `
     ═══════════════════════════════════════
@@ -4147,17 +4368,18 @@ const _cmdExtras = {
     ═══════════════════════════════════════
     TRAJETÓRIA PROFISSIONAL
     ═══════════════════════════════════════
-    2018     SC Brasil — Estagiário de Suporte
-    2019-20  CEBRAT Educação — Suporte & Dev
-    2020-22  BPO Innova — Dev Backend Júnior → Pleno
-    2023-24  SENAC Rio — Instrutor de Programação
-    2023-24  Agilizza — Dev Full Stack Pleno
-    2024+    MUPER — Dev Full Stack Pleno
-    2024+    Mestre Oficina — Fundador & Dev Principal
+    2017-18  SC Brasil — Estagiário de Dev e Suporte
+    2019-20  CEBRAT Educação — Dev PHP Júnior
+    2020-24  BPO Innova Brasil — Dev PHP Júnior → Pleno
+    2023-24  SENAC Rio — Professor temporário
+    2023-24  Agilizza — Dev PHP Pleno
+    2024-25  MUPER — Dev PHP Pleno
+    2025+    Consultoria independente — PHP · Laravel
+    2025+    Mestre Oficina — Fundador & Desenvolvedor
 
     Formação:
-    • ADS — Estácio de Sá (2023)
-    • Pós-grad Cloud Computing — Gran (em andamento)
+    • ADS — Estácio (2020-2023)
+    • Pós-grad Cloud Computing — Gran (2024)
 `,
     'contact': `
     ═══════════════════════════════════════
@@ -4356,11 +4578,13 @@ function runInstProgress() {
     ];
     let prog = 0;
     const iv = setInterval(() => {
+        if (!bar || !bar.isConnected) { clearInterval(iv); return; }
         prog += 5 + Math.random() * 10;
         if (prog >= 100) prog = 100;
         bar.style.width = prog + '%';
-        fileEl.textContent = fakeFiles[Math.floor(Math.random() * fakeFiles.length)];
-        if (prog < 30) label.textContent = 'Copiando arquivos...';
+        if (fileEl) fileEl.textContent = fakeFiles[Math.floor(Math.random() * fakeFiles.length)];
+        if (!label) { /* skip */ }
+        else if (prog < 30) label.textContent = 'Copiando arquivos...';
         else if (prog < 60) label.textContent = 'Registrando componentes...';
         else if (prog < 85) label.textContent = 'Criando atalhos...';
         else label.textContent = 'Finalizando instalação...';
@@ -4381,8 +4605,8 @@ let _pbFlipLAnim = 0.35, _pbFlipRAnim = Math.PI - 0.35;
 let _pbLaunching = false, _pbLaunchPower = 0;
 let _pbMultiplier = 1, _pbParticles = [];
 const PB_W = 400, PB_H = 520;
-const PB_GRAVITY = 0.18;
-const PB_FLIP_SPEED = 0.25;
+const PB_GRAVITY = 0.21;
+const PB_FLIP_SPEED = 0.32;
 /* Flipper pivots closer together */
 const PB_FL_X = 130, PB_FR_X = 270, PB_FLIP_Y = 465, PB_FLIP_LEN = 55;
 /* Walls: left outer wall, right outer wall, and angled gutters leading to flippers */
@@ -4422,6 +4646,7 @@ const PB_SLINGS = [
 
 function pinballInit() {
     _pbScore = 0; _pbBalls = 3; _pbMultiplier = 1; _pbParticles = [];
+    _pbHigh = parseInt(localStorage.getItem('mt_pb_high')) || _pbHigh || 0;
     PB_TARGETS.forEach(t => t.hit = false);
     PB_BUMPERS.forEach(b => { b._flash = 0; });
     document.getElementById('pb-score').textContent = '0';
@@ -4442,8 +4667,8 @@ function pinballLoop() {
     const canvas = document.getElementById('pinball-canvas');
     if (!canvas || canvas.offsetParent === null) { _pbRunning = false; return; }
     const ctx = canvas.getContext('2d');
-    pinballUpdate();
-    pinballDraw(ctx);
+    if (!ctx) { _pbRunning = false; return; }
+    if (!document.hidden) { pinballUpdate(); pinballDraw(ctx); }
     _pbRAF = requestAnimationFrame(pinballLoop);
 }
 
@@ -5380,6 +5605,10 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
             c3d._kd = e => {
                 keys[e.code] = true;
                 if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
+                if (e.code && e.code.indexOf('Digit') === 0) {
+                    const n = parseInt(e.code.slice(5));
+                    if (n >= 1 && n <= HOTBAR.length) { selSlot = n - 1; buildHotbar3d(); if (blockLbl3d) blockLbl3d.textContent = 'Bloco: ' + HNAMES[selSlot]; }
+                }
             };
             c3d._ku = e => { keys[e.code] = false; };
         }
@@ -5416,3 +5645,282 @@ const _origCmdProcess = typeof cmdProcess === 'function' ? cmdProcess : null;
         if (document.pointerLockElement === c3d) document.exitPointerLock();
     };
 })();
+
+/* ══════════════════════════════════════════════════════════════
+   NAVEGADOR USÁVEL — Chrome com abas reais, histórico, busca
+   estilo Google clássico e embed de sites com fallback IE6
+   ══════════════════════════════════════════════════════════════ */
+(function initBrowserEngineCSS(){
+  const css = `
+  .chrome-newtab{width:28px;height:26px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;color:#5f6368;cursor:pointer;border-radius:50%;margin:4px 2px 0 4px;flex:none;user-select:none}
+  .chrome-newtab:hover{background:rgba(0,0,0,.10)}
+  .cweb{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff;overflow:hidden}
+  .cweb-frame{flex:1;width:100%;border:0;background:#fff}
+  .cweb-home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding-top:80px;background:#fff;overflow:auto}
+  .cweb-logo{font-size:70px;font-weight:500;letter-spacing:-5px;margin-bottom:22px;font-family:Arial,Helvetica,sans-serif}
+  .cweb-logo .b1{color:#4285f4}.cweb-logo .b2{color:#ea4335}.cweb-logo .b3{color:#fbbc05}
+  .cweb-logo .b4{color:#4285f4}.cweb-logo .b5{color:#34a853}.cweb-logo .b6{color:#ea4335}
+  .cweb-searchbar{display:flex;align-items:center;gap:10px;width:560px;max-width:82%;
+    border:1px solid #dfe1e5;border-radius:24px;padding:9px 16px;box-shadow:0 1px 6px rgba(32,33,36,.12)}
+  .cweb-searchbar:focus-within{box-shadow:0 1px 10px rgba(32,33,36,.22);border-color:transparent}
+  .cweb-searchbar input{flex:1;border:0;outline:0;font-size:15px;color:#202124;font-family:Arial,sans-serif;background:transparent}
+  .cweb-searchbar .mag{color:#9aa0a6;font-size:16px}
+  .cweb-btns{margin-top:26px;display:flex;gap:12px}
+  .cweb-btn{background:#f8f9fa;border:1px solid #f8f9fa;border-radius:4px;color:#3c4043;
+    font-size:13px;padding:9px 18px;cursor:pointer;font-family:Arial,sans-serif}
+  .cweb-btn:hover{border-color:#dadce0;box-shadow:0 1px 1px rgba(0,0,0,.1)}
+  .cweb-quick{margin-top:32px;color:#70757a;font-size:12px;font-family:Arial,sans-serif;text-align:center;line-height:1.8}
+  .cweb-quick a{color:#1a0dab;text-decoration:none;margin:0 6px;cursor:pointer}
+  .cweb-quick a:hover{text-decoration:underline}
+  .cweb-err{flex:1;overflow:auto;background:#fff;color:#000;font-family:'Times New Roman',Georgia,serif;padding:26px 34px}
+  .cweb-err h2{font-size:20px;color:#000;font-weight:bold;margin-bottom:10px}
+  .cweb-err p{font-size:13px;margin:8px 0;line-height:1.5}
+  .cweb-err .ie-rule{border:0;border-top:1px solid #aaa;margin:14px 0}
+  .cweb-err .ie-ico{float:left;font-size:40px;margin:0 16px 10px 0}
+  .cweb-err a{color:#0000ee}
+  .cweb-loading{position:absolute;left:0;top:0;height:3px;background:#4285f4;width:0;transition:width .25s;z-index:5}
+  .cb-hist-row:hover{background:#f1f3f4}
+  `;
+  const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  if (typeof window.cbVisited === 'undefined') window.cbVisited = [];
+})();
+
+/* palavras-chave -> aba estática existente */
+const CHROME_INTERNAL = {
+  'portfolio':0,'matheusteixeira.com.br':0,'matheusteixeira':0,'inicio':0,'início':0,'home':0,
+  'baixaki':1,'baixaki.com.br':1,
+  'gmail':2,'mail.google.com':2,'email':2,'e-mail':2,
+  'pudim':3,'pudim.com.br':3,
+  'clube do hardware':4,'clubedohardware':4,'clubedohardware.com.br':4,
+  'orkut':5,'orkut.com.br':5,
+  'youtube':6,'youtube.com':6,'viniccius13':6,
+  'historico':7,'histórico':7,'history':7,'chrome://history':7
+};
+
+function chromeActiveIndex(){
+  const tabs=[...document.querySelectorAll('.chrome-tab')];
+  const idx=tabs.findIndex(t=>t.classList.contains('active'));
+  return idx<0?0:idx;
+}
+
+function chromeNewTab(){
+  sndClick();
+  const tabbar=document.querySelector('.chrome-tabbar');
+  const content=document.getElementById('chrome-content')||document.querySelector('#win-about .chrome-body');
+  if(!tabbar||!content) return;
+  const newBtn=document.getElementById('chrome-newtab-btn');
+
+  const tab=document.createElement('div');
+  tab.className='chrome-tab chrome-tab-dyn';
+  tab.innerHTML='<span class="chrome-tab-fav">🌐</span>'
+    +'<span class="chrome-tab-lbl">Nova guia</span>'
+    +'<span class="chrome-tab-x" onclick="event.stopPropagation();chromeCloseDyn(this)">✕</span>';
+  tab.onclick=function(){ const i=[...document.querySelectorAll('.chrome-tab')].indexOf(tab); chromeTab(i); };
+  if(newBtn) tabbar.insertBefore(tab,newBtn); else tabbar.appendChild(tab);
+
+  const page=document.createElement('div');
+  page.className='chrome-page cweb-page';
+  page.style.display='none';
+  page.innerHTML=_chromeHomeHTML();
+  page._cbHist=[]; page._cbPos=-1;
+  content.appendChild(page);
+
+  const idx=[...document.querySelectorAll('.chrome-tab')].indexOf(tab);
+  chromeTabUrls[idx]=''; chromeTitles[idx]='Nova guia — Google Chrome';
+  chromeTab(idx);
+  setTimeout(()=>{const inp=page.querySelector('.cweb-home-input'); if(inp) inp.focus();},60);
+}
+
+function _chromeHomeHTML(){
+  return '<div class="cweb"><div class="cweb-loading"></div>'
+    +'<div class="cweb-home">'
+    +'<div class="cweb-logo"><span class="b1">G</span><span class="b2">o</span><span class="b3">o</span>'
+    +'<span class="b4">g</span><span class="b5">l</span><span class="b6">e</span></div>'
+    +'<form class="cweb-searchbar" onsubmit="return chromeHomeSearch(this)">'
+    +'<span class="mag">🔍</span>'
+    +'<input class="cweb-home-input" type="text" placeholder="Pesquise no Google ou digite uma URL" spellcheck="false" autocomplete="off">'
+    +'</form>'
+    +'<div class="cweb-btns">'
+    +'<button class="cweb-btn" type="button" onclick="chromeHomeSearchBtn(this)">Pesquisa Google</button>'
+    +'<button class="cweb-btn" type="button" onclick="chromeLucky(this)">Estou com sorte</button>'
+    +'</div>'
+    +'<div class="cweb-quick">Atalhos: '
+    +'<a onclick="chromeNavigate(\'portfolio\')">Portfólio</a>·'
+    +'<a onclick="chromeNavigate(\'orkut\')">Orkut</a>·'
+    +'<a onclick="chromeNavigate(\'youtube\')">YouTube</a>·'
+    +'<a onclick="chromeNavigate(\'gmail\')">Gmail</a>·'
+    +'<a onclick="chromeOpenUrlActive(\'https://pt.wikipedia.org/wiki/Windows_XP\')">Wikipédia</a>'
+    +'</div></div></div>';
+}
+
+function chromeAddrKey(e){
+  if(e.key!=='Enter') return;
+  chromeNavigate((e.target.value||'').trim());
+}
+
+function chromeNavigate(raw){
+  if(!raw) return;
+  const low=raw.toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');
+  if(CHROME_INTERNAL[low]!==undefined){ chromeTab(CHROME_INTERNAL[low]); return; }
+  for(const k in CHROME_INTERNAL){ if(low===k||low.startsWith(k+'/')){ chromeTab(CHROME_INTERNAL[k]); return; } }
+  const looksUrl=/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(raw)||/^https?:\/\//i.test(raw);
+  const url=looksUrl?(/^https?:\/\//i.test(raw)?raw:'https://'+raw)
+    :('https://www.google.com/search?q='+encodeURIComponent(raw));
+  chromeOpenUrlActive(url);
+}
+
+function chromeOpenUrlActive(url){
+  let idx=chromeActiveIndex();
+  let page=document.querySelectorAll('.chrome-page')[idx];
+  if(!page||!page.classList.contains('cweb-page')){
+    chromeNewTab();
+    idx=chromeActiveIndex();
+    page=document.querySelectorAll('.chrome-page')[idx];
+  }
+  _chromeLoad(page, idx, url, true);
+}
+
+function chromeHomeSearch(form){
+  const inp=form.querySelector('.cweb-home-input');
+  chromeNavigate((inp.value||'').trim());
+  return false;
+}
+function chromeHomeSearchBtn(btn){
+  const inp=btn.closest('.cweb').querySelector('.cweb-home-input');
+  chromeNavigate((inp.value||'').trim());
+}
+function chromeLucky(btn){
+  const inp=btn.closest('.cweb').querySelector('.cweb-home-input');
+  const q=(inp.value||'').trim();
+  chromeNavigate(q||'portfolio');
+}
+
+function _chromeLoad(page, idx, url, pushHist){
+  const wrap=page.querySelector('.cweb');
+  if(!wrap) return;
+  const host=url.replace(/^https?:\/\//,'').split('/')[0];
+  if(pushHist){
+    page._cbHist=page._cbHist||[]; if(page._cbPos==null) page._cbPos=-1;
+    page._cbHist=page._cbHist.slice(0,page._cbPos+1);
+    page._cbHist.push(url); page._cbPos=page._cbHist.length-1;
+    window.cbVisited.unshift({url:url, host:host, t:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});
+    if(window.cbVisited.length>40) window.cbVisited.pop();
+  }
+  chromeTabUrls[idx]=url;
+  chromeTitles[idx]=host+' — Google Chrome';
+  const addr=document.getElementById('chrome-addr'); if(addr) addr.value=url.replace(/^https?:\/\//,'');
+  const titleEl=document.querySelector('#win-about .xp-titlebar-txt'); if(titleEl) titleEl.textContent=chromeTitles[idx];
+  const tabEl=document.querySelectorAll('.chrome-tab')[idx];
+  if(tabEl){const L=tabEl.querySelector('.chrome-tab-lbl'); if(L)L.textContent=host;}
+
+  wrap.innerHTML='<div class="cweb-loading"></div><iframe class="cweb-frame" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+  const bar=wrap.querySelector('.cweb-loading');
+  const frame=wrap.querySelector('.cweb-frame');
+  if(bar){ bar.style.width='12%'; setTimeout(()=>{ if(bar.isConnected) bar.style.width='70%'; },150); }
+  let done=false;
+  const fail=()=>{ if(done) return; done=true; _chromeError(wrap, host, url); };
+  const ok=()=>{ if(done) return; done=true; if(bar){bar.style.width='100%'; setTimeout(()=>{ if(bar.isConnected) bar.remove(); },250);} };
+  frame.addEventListener('load',()=>{
+    try{
+      const href=frame.contentWindow.location.href;
+      if(!href||href==='about:blank'){ fail(); return; }
+      ok();
+    }catch(err){ ok(); } /* cross-origin acessível = embed funcionou */
+  });
+  frame.addEventListener('error', fail);
+  setTimeout(()=>{ if(!done) fail(); }, 5000);
+  frame.src=url;
+  sndClick();
+}
+
+function _chromeError(wrap, host, url){
+  wrap.innerHTML='<div class="cweb-err">'
+    +'<div class="ie-ico">🚫</div>'
+    +'<h2>Esta página não pode ser exibida</h2>'
+    +'<p>Não foi possível abrir <b>'+escHtml(host)+'</b> dentro do navegador. '
+    +'O site recusou a conexão incorporada (X-Frame-Options / CSP) — algo bem comum em sites grandes como Google, YouTube e bancos.</p>'
+    +'<hr class="ie-rule">'
+    +'<p>Tente o seguinte:</p>'
+    +'<p>• Clique no botão <b>Recarregar</b> ou tente novamente mais tarde.<br>'
+    +'• Verifique se o endereço foi digitado corretamente.<br>'
+    +'• <a href="'+escHtml(url)+'" target="_blank" rel="noopener">Abrir o site em uma janela real do navegador</a>.</p>'
+    +'<hr class="ie-rule">'
+    +'<p style="color:#777;font-size:11px">Internet Explorer não pôde exibir o conteúdo incorporado. (HTTP 403 — Embedding negado)</p>'
+    +'</div>';
+}
+
+function chromeBack(){
+  const idx=chromeActiveIndex(), page=document.querySelectorAll('.chrome-page')[idx];
+  if(page&&page._cbHist&&page._cbPos>0){ page._cbPos--; _chromeLoad(page,idx,page._cbHist[page._cbPos],false); }
+  else sndClick();
+}
+function chromeFwd(){
+  const idx=chromeActiveIndex(), page=document.querySelectorAll('.chrome-page')[idx];
+  if(page&&page._cbHist&&page._cbPos<page._cbHist.length-1){ page._cbPos++; _chromeLoad(page,idx,page._cbHist[page._cbPos],false); }
+  else sndClick();
+}
+function chromeReload(){
+  const idx=chromeActiveIndex(), page=document.querySelectorAll('.chrome-page')[idx];
+  if(page&&page._cbHist&&page._cbPos>=0){ _chromeLoad(page,idx,page._cbHist[page._cbPos],false); }
+  else { sndClick(); showNotif('🔄 Recarregar','Página atualizada.'); }
+}
+function chromeHome(){
+  const idx=chromeActiveIndex(), page=document.querySelectorAll('.chrome-page')[idx];
+  if(page&&page.classList.contains('cweb-page')){ page.innerHTML=_chromeHomeHTML(); page._cbHist=[];page._cbPos=-1;
+    const a=document.getElementById('chrome-addr'); if(a)a.value=''; sndClick();
+    setTimeout(()=>{const inp=page.querySelector('.cweb-home-input'); if(inp) inp.focus();},50); }
+  else chromeNewTab();
+}
+
+function chromeBmGo(key){
+  sndClick();
+  switch(key){
+    case 'inicio': chromeTab(0); break;
+    case 'curriculo': openWindow('win-cv'); break;
+    case 'pudim': chromeTab(3); break;
+    case 'github': chromeOpenUrlActive('https://github.com/aeusteixeira'); break;
+    case 'linkedin': chromeOpenUrlActive('https://www.linkedin.com/in/aeusteixeira'); break;
+    default: chromeTab(0);
+  }
+}
+
+function chromeCloseDyn(xEl){
+  const tab=xEl.closest('.chrome-tab');
+  const idx=[...document.querySelectorAll('.chrome-tab')].indexOf(tab);
+  const page=document.querySelectorAll('.chrome-page')[idx];
+  if(tab) tab.remove();
+  if(page) page.remove();
+  chromeTabUrls.splice(idx,1); chromeTitles.splice(idx,1);
+  const tabs=[...document.querySelectorAll('.chrome-tab')];
+  const vis=tabs.findIndex(t=>t.style.display!=='none');
+  if(vis>=0) chromeTab(vis); else closeWin('win-about');
+  sndClick();
+}
+
+function renderHistory(){
+  const page=document.getElementById('cpage-7'); if(!page) return;
+  let host=page.querySelector('.cb-hist-list');
+  if(!host){
+    page.innerHTML='<div style="padding:18px 26px;font-family:Arial,sans-serif">'
+      +'<h2 style="font-size:20px;color:#202124;margin-bottom:4px">Histórico</h2>'
+      +'<div style="color:#5f6368;font-size:12px;margin-bottom:14px">Páginas visitadas nesta sessão</div>'
+      +'<div class="cb-hist-list"></div></div>';
+    host=page.querySelector('.cb-hist-list');
+  }
+  const v=window.cbVisited||[];
+  if(!v.length){ host.innerHTML='<div style="color:#70757a;font-size:13px">Nenhuma página visitada ainda. Abra uma nova guia (+) e navegue!</div>'; return; }
+  host.innerHTML=v.map(h=>'<div class="cb-hist-row" style="display:flex;gap:10px;padding:7px 4px;border-bottom:1px solid #eee;font-size:13px;cursor:pointer" onclick="chromeOpenUrlActive(\''+escHtml(h.url)+'\')">'
+    +'<span style="color:#70757a;width:46px;flex:none">'+h.t+'</span>'
+    +'<span style="color:#1a0dab;flex:none">'+escHtml(h.host)+'</span>'
+    +'<span style="color:#5f6368;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(h.url)+'</span></div>').join('');
+}
+
+/* Ctrl+T abre nova guia quando o Chrome está visível */
+window.addEventListener('keydown', e=>{
+  if(e.ctrlKey && (e.key==='t'||e.key==='T')){
+    const chrome=document.getElementById('win-about');
+    if(chrome && chrome.style.display!=='none'){ e.preventDefault(); chromeNewTab(); }
+  }
+});

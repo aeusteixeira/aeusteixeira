@@ -125,6 +125,7 @@
   <link rel="shortcut icon" href="src/img/system/win-xp-logo.png">
 
   <link rel="stylesheet" href="src/app.css">
+  <link rel="stylesheet" href="src/luna.css">
 
   <!-- ============================================================
        GOOGLE ANALYTICS
@@ -287,19 +288,21 @@
           <span class="chrome-tab-lbl">Histórico</span>
           <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(7)">✕</span>
         </div>
-        <div class="chrome-newtab" title="Nova aba">+</div>
+        <div class="chrome-newtab" id="chrome-newtab-btn" title="Nova guia (Ctrl+T)" onclick="chromeNewTab()">+</div>
       </div>
       <!-- Chrome Nav Bar -->
       <div class="chrome-navbar">
         <div class="chrome-nav-btns">
-          <button class="chrome-nav-btn" title="Voltar">←</button>
-          <button class="chrome-nav-btn" title="Avançar" style="opacity:.4">→</button>
-          <button class="chrome-nav-btn" title="Recarregar">↺</button>
+          <button class="chrome-nav-btn" title="Voltar" onclick="chromeBack()">←</button>
+          <button class="chrome-nav-btn" title="Avançar" onclick="chromeFwd()">→</button>
+          <button class="chrome-nav-btn" title="Recarregar" onclick="chromeReload()">↺</button>
+          <button class="chrome-nav-btn" title="Página inicial" onclick="chromeHome()">⌂</button>
         </div>
         <div class="chrome-omnibox-wrap">
           <span class="chrome-lock">🔒</span>
-          <input class="chrome-omnibox" id="chrome-addr" value="matheusteixeira.com.br" readonly onclick="this.select()"
-            spellcheck="false" autocomplete="off">
+          <input class="chrome-omnibox" id="chrome-addr" value="matheusteixeira.com.br" onclick="this.select()"
+            spellcheck="false" autocomplete="off" placeholder="Pesquise no Google ou digite uma URL"
+            onkeydown="chromeAddrKey(event)">
         </div>
         <div class="chrome-nav-extra">
           <button class="chrome-nav-btn" title="Favoritos">☆</button>
@@ -353,9 +356,12 @@
         <span class="chrome-bm" onclick="sndClick();showNotif('💼 LinkedIn','linkedin.com/in/aeusteixeira')"><img
             src="src/img/system/estrela-favorito.ico"
             style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">LinkedIn</span>
+        <span class="chrome-bm" onclick="sndClick();window.open('site.html','_blank')"><img
+            src="src/img/system/estrela-favorito.ico"
+            style="width:12px;height:12px;vertical-align:middle;margin-right:2px;">🌐 Site Institucional</span>
       </div>
       <!-- Chrome Body -->
-      <div class="xp-body chrome-body">
+      <div class="xp-body chrome-body" id="chrome-content">
 
         <!-- TAB 0: Portfolio Site -->
         <div class="chrome-page active" id="cpage-0" style="display:block">
@@ -493,83 +499,91 @@
                 <div class="gta-page" id="gp-sobre">
                   <div class="gta-section-hd">👤 SOBRE MIM</div>
                   <div class="gta-bio">
-                    Me chamo <strong>Matheus Teixeira dos Santos</strong>, desenvolvedor back-end com <strong>8+ anos de
-                      experiência</strong>, apaixonado por sistemas bem arquitetados e código que dura. Comecei em
-                    <strong>2016</strong> com PHP e nunca olhei para trás — hoje trabalho com toda a stack moderna de
-                    back-end, automações, integrações e arquitetura de software.<br><br>
-                    Formado em <strong>Análise e Desenvolvimento de Sistemas</strong> pela Universidade Estácio de Sá e
-                    cursando <strong>Pós-Graduação em Arquitetura Cloud</strong> na Gran Faculdade. Palestrante ativo no
+                    Me chamo <strong>Matheus Teixeira dos Santos</strong>, desenvolvedor &amp; consultor PHP · Laravel com
+                    <strong>8+ anos de experiência</strong>, apaixonado por sistemas bem arquitetados e código que dura.
+                    Comecei em <strong>2016</strong> com PHP e nunca olhei para trás — hoje atuo como consultor para
+                    empresas que precisam de desenvolvimento back-end, automações e integração de IA.<br><br>
+                    Formado em <strong>Análise e Desenvolvimento de Sistemas</strong> pela Estácio e pós-graduado em
+                    <strong>Arquitetura e Projetos de Cloud Computing</strong> pela Gran Faculdade. Palestrante ativo no
                     <strong>PHPSP</strong>, <strong>PHP Rio</strong> e <strong>Hack in Rio</strong>.
                   </div>
                   <div class="gta-section-hd">💼 EXPERIÊNCIA PROFISSIONAL</div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">🔧</div>
                     <div>
-                      <div class="gta-xp-co">MESTRE OFICINA — Fundador &amp; Technical Lead</div>
-                      <div class="gta-xp-role">Nov 2024 – Presente &nbsp;·&nbsp; Plataforma SaaS para Oficinas Mecânicas
-                      </div>
-                      <div class="gta-xp-desc">Concebi e construí uma solução SaaS completa do zero. Responsável por
-                        toda a arquitetura: backend Laravel/PHP/MySQL, APIs RESTful, fluxos de automação n8n, CI/CD,
-                        infraestrutura Docker e monitoramento de segurança.</div>
+                      <div class="gta-xp-co">MESTRE OFICINA — Fundador &amp; Desenvolvedor</div>
+                      <div class="gta-xp-role">Dez 2025 – Presente &nbsp;·&nbsp; SaaS para Oficinas Mecânicas</div>
+                      <div class="gta-xp-desc">SaaS desenvolvido do zero para gestão de oficinas mecânicas. Arquitetura,
+                        banco de dados, integração com API do WhatsApp, emissão de NF-e em 945+ municípios, automações
+                        com n8n, filas assíncronas e pipeline CI/CD com testes automatizados.</div>
+                    </div>
+                  </div>
+                  <div class="gta-xp-row">
+                    <div class="gta-xp-ico">💼</div>
+                    <div>
+                      <div class="gta-xp-co">MATHEUS TEIXEIRA — Desenvolvedor &amp; Consultor PHP · Laravel</div>
+                      <div class="gta-xp-role">Out 2025 – Presente &nbsp;·&nbsp; Consultoria Técnica</div>
+                      <div class="gta-xp-desc">Consultoria sob medida para empresas: desenvolvimento back-end com PHP e
+                        Laravel, automação de processos com n8n e Python, integração de IA em sistemas existentes e
+                        revisão técnica para equipes.</div>
                     </div>
                   </div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">💻</div>
                     <div>
-                      <div class="gta-xp-co">MUPER — Desenvolvedor Back-End Pleno</div>
-                      <div class="gta-xp-role">Jul 2024 – Presente &nbsp;·&nbsp; Desenvolvimento de Sistemas
-                        Empresariais</div>
-                      <div class="gta-xp-desc">Desenvolvimento de APIs, integrações com modelos de IA (local + cloud),
-                        automações n8n, mentoria técnica, code reviews, decisões de arquitetura e planejamento de
-                        sprint.</div>
-                    </div>
-                  </div>
-                  <div class="gta-xp-row">
-                    <div class="gta-xp-ico">🎓</div>
-                    <div>
-                      <div class="gta-xp-co">SENAC Rio — Instrutor de Desenvolvimento Web</div>
-                      <div class="gta-xp-role">2023 – 2024 &nbsp;·&nbsp; Ensino técnico profissionalizante</div>
-                      <div class="gta-xp-desc">Ministrei aulas de HTML, CSS, JavaScript e PHP para turmas do curso
-                        técnico em Desenvolvimento de Sistemas, desenvolvendo material didático e projetos práticos.
-                      </div>
+                      <div class="gta-xp-co">MUPER — Desenvolvedor PHP Pleno</div>
+                      <div class="gta-xp-role">Ago 2024 – Out 2025 &nbsp;·&nbsp; Sistemas Empresariais</div>
+                      <div class="gta-xp-desc">Implementação de funcionalidades com foco em performance e segurança.
+                        APIs RESTful, automações com n8n, integração de IA, mentoria de desenvolvedores, revisão de
+                        código e participação em decisões de arquitetura.</div>
                     </div>
                   </div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">🤖</div>
                     <div>
-                      <div class="gta-xp-co">AGILIZZA (ex-BPO Innova) — Coordenador de TI / Desenvolvedor</div>
-                      <div class="gta-xp-role">2023 – 2024 &nbsp;·&nbsp; Automação fiscal e contábil</div>
-                      <div class="gta-xp-desc">Coordenação do setor de tecnologia, liderança de equipe de devs,
-                        desenvolvimento e manutenção de robôs fiscais/contábeis e plataformas internas de BPO.</div>
+                      <div class="gta-xp-co">AGILIZZA — Desenvolvedor PHP Pleno</div>
+                      <div class="gta-xp-role">Jun 2023 – Ago 2024 &nbsp;·&nbsp; Automação e Microserviços</div>
+                      <div class="gta-xp-desc">Atuação desde a concepção da plataforma principal, construída do zero.
+                        Definição de arquitetura, modelagem de banco de dados e plataforma de automação e orquestração
+                        de processos com microserviços.</div>
+                    </div>
+                  </div>
+                  <div class="gta-xp-row">
+                    <div class="gta-xp-ico">🎓</div>
+                    <div>
+                      <div class="gta-xp-co">SENAC Rio — Professor temporário</div>
+                      <div class="gta-xp-role">Nov 2023 – Fev 2024 &nbsp;·&nbsp; Ensino técnico</div>
+                      <div class="gta-xp-desc">Aulas de Lógica de Programação, PHP e MySQL. Métodos interativos de
+                        ensino, elaboração de materiais didáticos e acompanhamento do progresso dos alunos.</div>
                     </div>
                   </div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">⚙️</div>
                     <div>
-                      <div class="gta-xp-co">BPO INNOVA — Desenvolvedor Back-End</div>
-                      <div class="gta-xp-role">2020 – 2022 &nbsp;·&nbsp; Automação de processos empresariais</div>
-                      <div class="gta-xp-desc">Desenvolvimento de sistemas de automação para processos fiscais e
-                        contábeis, APIs de integração com ERPs e construção da plataforma interna de gestão de robôs.
-                      </div>
+                      <div class="gta-xp-co">BPO INNOVA BRASIL — Desenvolvedor PHP</div>
+                      <div class="gta-xp-role">Out 2020 – Mar 2024 &nbsp;·&nbsp; Júnior → Pleno</div>
+                      <div class="gta-xp-desc">Refatoração do sistema financeiro central, desenvolvimento do
+                        Orquestrador (plataforma de automação fiscal/contábil), CI/CD com GitHub Actions, ferramentas
+                        internas e apoio na implementação da ISO 27001.</div>
                     </div>
                   </div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">📚</div>
                     <div>
-                      <div class="gta-xp-co">CEBRAT EDUCACAO — Desenvolvedor Full Stack</div>
-                      <div class="gta-xp-role">2019 – 2020 &nbsp;·&nbsp; Plataforma educacional</div>
-                      <div class="gta-xp-desc">Desenvolvimento e manutenção da plataforma de cursos online da
-                        instituicao, com sistemas de matricula, progresso de alunos e integracao de pagamentos.</div>
+                      <div class="gta-xp-co">CEBRAT EDUCAÇÃO — Desenvolvedor PHP Júnior</div>
+                      <div class="gta-xp-role">Mai 2019 – Jul 2020 &nbsp;·&nbsp; Plataforma e site institucional</div>
+                      <div class="gta-xp-desc">Plataforma interna para controle de qualidade de leads, site
+                        institucional com foco em SEO, desenvolvimento com Laravel, PHP e MySQL, administração de
+                        servidores.</div>
                     </div>
                   </div>
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">🏗️</div>
                     <div>
-                      <div class="gta-xp-co">SC BRASIL — Desenvolvedor Junior</div>
-                      <div class="gta-xp-role">2018 &nbsp;·&nbsp; Desenvolvimento de sistemas</div>
-                      <div class="gta-xp-desc">Primeiro emprego formal como desenvolvedor. Atuei na manutencao de
-                        sistemas legados em PHP e no desenvolvimento de funcionalidades para sistemas internos da
-                        empresa.</div>
+                      <div class="gta-xp-co">SC BRASIL — Estagiário de Desenvolvimento e Suporte</div>
+                      <div class="gta-xp-role">Out 2017 – Out 2018 &nbsp;·&nbsp; Sistemas internos</div>
+                      <div class="gta-xp-desc">Desenvolvimento e manutenção de sistemas internos com PHP e Laravel.
+                        Apoio à equipe de TI em suporte técnico e correção de sistemas.</div>
                     </div>
                   </div>
                   <div class="gta-section-hd">🎯 INTERESSES PESSOAIS</div>
@@ -691,8 +705,8 @@
                   <div class="gta-xp-row">
                     <div class="gta-xp-ico">☁️</div>
                     <div>
-                      <div class="gta-xp-co">Pós-Graduação em Arquitetura Cloud</div>
-                      <div class="gta-xp-role">Gran Faculdade &nbsp;·&nbsp; Em andamento</div>
+                      <div class="gta-xp-co">Pós-Graduação em Arquitetura e Projetos de Cloud Computing</div>
+                      <div class="gta-xp-role">Gran Faculdade &nbsp;·&nbsp; Concluído (2024)</div>
                     </div>
                   </div>
                   <div class="gta-section-hd">🎤 COMUNIDADE</div>
@@ -726,9 +740,8 @@
                   </div>
                   <div class="gta-section-hd">👤 RESUMO</div>
                   <div class="gta-bio">
-                    <strong>Matheus Teixeira dos Santos</strong> — Especialista Laravel | Desenvolvedor Back-End Pleno /
-                    Tech Lead<br>
-                    São Paulo, SP &nbsp;·&nbsp; contato@matheusteixeira.com.br<br><br>
+                    <strong>Matheus Teixeira dos Santos</strong> — Desenvolvedor &amp; Consultor PHP · Laravel<br>
+                    São Paulo, SP &nbsp;·&nbsp; contato.matheusteixeira@gmail.com<br><br>
                     Especialista em <strong>Laravel</strong> com <strong>8+ anos</strong> de experiência em
                     desenvolvimento back-end. PHP, Laravel, MySQL, APIs RESTful e arquitetura de sistemas. Experiência
                     em liderança técnica, mentoria de times e criação de produtos
@@ -736,8 +749,8 @@
                   </div>
                   <div class="gta-section-hd">🎓 FORMAÇÃO</div>
                   <div class="gta-bio">
-                    <strong>Análise e Desenvolvimento de Sistemas</strong> — Estácio de Sá (concluído)<br>
-                    <strong>Pós-Graduação em Arquitetura Cloud</strong> — Gran Faculdade (em andamento)
+                    <strong>Pós-Graduação em Arquitetura e Projetos de Cloud Computing</strong> — Gran Faculdade (2024)<br>
+                    <strong>Análise e Desenvolvimento de Sistemas</strong> — Estácio (2020-2023)
                   </div>
                 </div>
 
@@ -747,10 +760,10 @@
                   <div class="gta-bio" style="margin-bottom:10px;">Aberto a projetos com propósito. Prefiro qualidade a
                     velocidade.</div>
                   <div class="gta-xp-row" style="cursor:pointer;"
-                    onclick="window.open('mailto:contato@matheusteixeira.com.br')">
+                    onclick="window.open('mailto:contato.matheusteixeira@gmail.com')">
                     <div class="gta-xp-ico">✉️</div>
                     <div>
-                      <div class="gta-xp-co">contato@matheusteixeira.com.br</div>
+                      <div class="gta-xp-co">contato.matheusteixeira@gmail.com</div>
                       <div class="gta-xp-role">E-mail principal</div>
                     </div>
                   </div>
@@ -785,10 +798,10 @@
 
             <!-- FOOTER -->
             <div class="gta-footer">
-              <span>© 2003–2024 Matheus Teixeira™ &nbsp;·&nbsp; Todos os direitos reservados &nbsp;·&nbsp; <a
+              <span>© 2003–2026 Matheus Teixeira™ &nbsp;·&nbsp; Todos os direitos reservados &nbsp;·&nbsp; <a
                   href="#">Política de Privacidade</a> &nbsp;·&nbsp; <a href="#">Termos de Uso</a> &nbsp;·&nbsp; <a
                   href="#">Mapa do Site</a></span>
-              <span>Melhor visualizado no Internet Explorer 6 em 800×600 &nbsp;·&nbsp; Última atualização: 15/11/2024
+              <span>Melhor visualizado no Internet Explorer 6 em 800×600 &nbsp;·&nbsp; Última atualização: 12/04/2026
                 &nbsp;·&nbsp; Feito com ❤️ no Notepad.exe</span>
             </div>
 
@@ -1373,7 +1386,7 @@
                 </tr>
                 <tr>
                   <td class="ok-info-label">idade:</td>
-                  <td class="ok-info-value">26 anos</td>
+                  <td class="ok-info-value">27 anos</td>
                 </tr>
                 <tr class="ok-info-highlight">
                   <td class="ok-info-label">nascido em:</td>
@@ -1873,7 +1886,7 @@
             </div>
 
           </div>
-        </div><!-- /cpage-6 -->
+        </div><!-- /cpage-7 -->
 
       </div><!-- /chrome-body -->
       <div class="xp-resize" onmousedown="startResize(event,'win-about')"></div>
@@ -2641,8 +2654,8 @@
 
           <p>Atuo com foco em <strong>PHP</strong>, <strong>Laravel</strong>, <strong>MySQL</strong> e arquitetura de
             software, tendo participado de projetos que vão desde plataformas SaaS até integrações fiscais e sistemas de
-            gestão. Possuo formação em Análise e Desenvolvimento de Sistemas e estou em processo de conclusão da
-            Pós-Graduação em Arquitetura Cloud.</p>
+            gestão. Possuo formação em Análise e Desenvolvimento de Sistemas e pós-graduação em Arquitetura e Projetos
+            de Cloud Computing.</p>
 
           <p>Minha experiência inclui liderança técnica, definição de padrões de código, mentoria de desenvolvedores e
             participação ativa em decisões de arquitetura. Tenho familiaridade com automações (n8n), containers
@@ -2657,8 +2670,8 @@
 
           <p style="margin-top:24px">Atenciosamente,</p>
           <p><strong>Matheus Teixeira dos Santos</strong><br>
-            Desenvolvedor Back-End<br>
-            contato@matheusteixeira.com.br<br>
+            Desenvolvedor &amp; Consultor PHP · Laravel<br>
+            contato.matheusteixeira@gmail.com<br>
             São Paulo, SP</p>
         </div>
       </div>
@@ -3593,95 +3606,127 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
 
         <div class="cv-section">Formação</div>
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>Gran Faculdade</span><span class="cv-entry-date">Em andamento</span></div>
+          <div class="cv-entry-hd"><span>Gran Faculdade</span><span class="cv-entry-date">06/2024 – 12/2024</span></div>
           <div class="cv-entry-role">Pós-graduação em Arquitetura e Projetos de Cloud Computing</div>
         </div>
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>Universidade Estácio de Sá</span><span class="cv-entry-date">2023</span></div>
+          <div class="cv-entry-hd"><span>Estácio</span><span class="cv-entry-date">2020 – 07/2023</span></div>
           <div class="cv-entry-role">Análise e Desenvolvimento de Sistemas</div>
+        </div>
+        <div class="cv-entry">
+          <div class="cv-entry-hd"><span>Senac RJ</span><span class="cv-entry-date">2017 – 2018</span></div>
+          <div class="cv-entry-role">Técnico em Informática</div>
+        </div>
+        <div class="cv-entry">
+          <div class="cv-entry-hd"><span>SENAI Vicente de Carvalho</span><span class="cv-entry-date">2017</span></div>
+          <div class="cv-entry-role">Técnico em Manutenção e Suporte em Informática</div>
         </div>
 
         <div class="cv-section">Experiência Profissional</div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>Mestre Oficina</span><span class="cv-entry-date">11/2024 – atual</span></div>
-          <div class="cv-entry-role">Fundador &amp; Líder Técnico / Desenvolvedor Backend Principal</div>
+          <div class="cv-entry-hd"><span>Mestre Oficina</span><span class="cv-entry-date">12/2025 – atual</span></div>
+          <div class="cv-entry-role">Fundador &amp; Desenvolvedor</div>
           <ul class="cv-list">
-            <li>Idealização, concepção e desenvolvimento de plataforma SaaS para gestão de oficinas mecânicas;</li>
-            <li>Definição de arquitetura do sistema, modelagem de dados e padrões técnicos;</li>
-            <li>Desenvolvimento backend em Laravel, PHP e MySQL, com APIs RESTful e integrações externas;</li>
-            <li>Implementação de automações com n8n, webhooks e serviços de mensageria;</li>
-            <li>Estruturação de ambiente produtivo, versionamento, CI/CD, segurança e monitoramento.</li>
+            <li>SaaS para gestão de oficinas mecânicas, desenvolvido do zero;</li>
+            <li>Arquitetura, modelagem de banco de dados, segurança e padrões de código;</li>
+            <li>Integração com API do WhatsApp para comunicação automatizada com clientes;</li>
+            <li>Emissão de nota fiscal integrada a serviços fiscais em 945+ municípios;</li>
+            <li>Automações com n8n para tarefas operacionais e notificações;</li>
+            <li>Filas e jobs assíncronos para processamento de alto volume;</li>
+            <li>Pipeline CI/CD com GitHub Actions e testes automatizados a cada push;</li>
+            <li>Infraestrutura em VPS configurada e gerenciada por mim.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>MUPER</span><span class="cv-entry-date">07/2024 – atual</span></div>
-          <div class="cv-entry-role">Desenvolvedor Back End Pleno</div>
+          <div class="cv-entry-hd"><span>Matheus Teixeira</span><span class="cv-entry-date">10/2025 – atual</span></div>
+          <div class="cv-entry-role">Desenvolvedor &amp; Consultor PHP · Laravel</div>
+          <ul class="cv-list">
+            <li>Desenvolvimento e consultoria técnica sob medida para empresas;</li>
+            <li>Desenvolvimento back-end com PHP e Laravel;</li>
+            <li>Automação de processos com n8n e Python;</li>
+            <li>Integração de IA em sistemas existentes;</li>
+            <li>Arquitetura de software e revisão técnica para equipes.</li>
+          </ul>
+        </div>
+
+        <div class="cv-entry">
+          <div class="cv-entry-hd"><span>MUPER</span><span class="cv-entry-date">08/2024 – 10/2025</span></div>
+          <div class="cv-entry-role">Desenvolvedor PHP Pleno</div>
           <ul class="cv-list">
             <li>Implementação de novas funcionalidades com foco em performance, segurança e usabilidade;</li>
             <li>Criação e consumo de APIs RESTful, integração com bancos de dados e serviços externos;</li>
-            <li>Automações com n8n e integração de soluções de IA, incluindo modelos locais personalizados;</li>
-            <li>Definição de padrões técnicos, mentoria de devs e revisão de código;</li>
-            <li>Participação ativa nas decisões de arquitetura e planejamento de sprints.</li>
+            <li>Automações com n8n, integração de IA e definição de padrões técnicos;</li>
+            <li>Mentoria de desenvolvedores e revisão de código;</li>
+            <li>Participação em decisões de arquitetura e planejamento de sprints.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>AGILIZZA TECNOLOGIA</span><span class="cv-entry-date">06/2023 – 08/2024</span>
-          </div>
-          <div class="cv-entry-role">Desenvolvedor Full Stack Pleno</div>
+          <div class="cv-entry-hd"><span>Agilizza</span><span class="cv-entry-date">06/2023 – 08/2024</span></div>
+          <div class="cv-entry-role">Desenvolvedor PHP Pleno</div>
           <ul class="cv-list">
-            <li>Desenvolvimento com PHP, Laravel e MySQL; automatização de tarefas com Python;</li>
-            <li>Mapeamento de pontos críticos e implementação de sistema de notificações;</li>
-            <li>Desenvolvimento e manutenção contínua do site institucional.</li>
+            <li>Atuação desde a concepção da plataforma principal da empresa, construída do zero;</li>
+            <li>Definição de arquitetura, modelagem de banco de dados e padrões de desenvolvimento;</li>
+            <li>Plataforma de automação e orquestração de processos com microserviços.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>SENAC Rio</span><span class="cv-entry-date">11/2023 – 03/2024</span></div>
-          <div class="cv-entry-role">Instrutor de Programação (temporário)</div>
+          <div class="cv-entry-hd"><span>Senac RJ</span><span class="cv-entry-date">11/2023 – 02/2024</span></div>
+          <div class="cv-entry-role">Professor temporário</div>
           <ul class="cv-list">
-            <li>Lógica de Programação, PHP, MySQL e WordPress com foco em design responsivo;</li>
-            <li>Apoio aos alunos no desenvolvimento de projetos práticos.</li>
+            <li>Aulas de Lógica de Programação, PHP e MySQL, promovendo aprendizado prático;</li>
+            <li>Métodos interativos de ensino e elaboração de materiais didáticos atualizados;</li>
+            <li>Avaliação do progresso dos alunos e feedback para otimizar desenvolvimento.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>BPO INNOVA</span><span class="cv-entry-date">01/2022 – 03/2024</span></div>
-          <div class="cv-entry-role">Desenvolvedor Back End Pleno</div>
+          <div class="cv-entry-hd"><span>BPO Innova Brasil</span><span class="cv-entry-date">01/2022 – 03/2024</span></div>
+          <div class="cv-entry-role">Desenvolvedor PHP Pleno</div>
           <ul class="cv-list">
-            <li>Desenvolvimento e otimização de APIs RESTful para integração com sistemas externos;</li>
-            <li>CI/CD com GitHub Actions; revisões de código e implementação de soluções de segurança;</li>
-            <li>Contribuição para arquitetura de sistemas de alta disponibilidade e performance.</li>
+            <li>Refatoração do sistema financeiro central da empresa (arquitetura, segurança e desempenho);</li>
+            <li>Desenvolvimento do Orquestrador, plataforma que centralizou e automatizou processos fiscais e contábeis;</li>
+            <li>Implantação de CI/CD com GitHub Actions;</li>
+            <li>Ferramentas internas de automação e produtividade;</li>
+            <li>Apoio na implementação da ISO 27001.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>BPO INNOVA</span><span class="cv-entry-date">10/2020 – 01/2022</span></div>
-          <div class="cv-entry-role">Desenvolvedor Back End Junior</div>
+          <div class="cv-entry-hd"><span>BPO Innova Brasil</span><span class="cv-entry-date">10/2020 – 01/2022</span></div>
+          <div class="cv-entry-role">Desenvolvedor PHP Junior</div>
           <ul class="cv-list">
+            <li>Suporte e manutenção do sistema legado da empresa;</li>
+            <li>Desenvolvimento do novo site institucional, com layout responsivo e otimizado;</li>
+            <li>Ferramentas internas: gerador de assinatura de e-mail, wallpaper corporativo, app Microsoft Teams, app ISO 27001;</li>
+            <li>Automação de relatórios e notificações internas;</li>
             <li>Desenvolvimento com Laravel, Livewire, Docker e MySQL;</li>
-            <li>Participação na implementação da norma ISO 27001 e cultura de segurança da informação;</li>
-            <li>Testes automatizados e padrões de qualidade de código.</li>
+            <li>Apoio na implementação da ISO 27001, incluindo palestras de conscientização em segurança;</li>
+            <li>Adoção de testes automatizados e boas práticas de versionamento.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>CEBRAT Educação</span><span class="cv-entry-date">05/2019 – 07/2020</span>
-          </div>
-          <div class="cv-entry-role">Técnico de Suporte e Desenvolvimento</div>
+          <div class="cv-entry-hd"><span>CEBRAT Educação</span><span class="cv-entry-date">05/2019 – 07/2020</span></div>
+          <div class="cv-entry-role">Desenvolvedor PHP Júnior</div>
           <ul class="cv-list">
-            <li>Desenvolvimento de plataformas com Laravel, PHP e MySQL;</li>
-            <li>Criação e manutenção do site institucional; administração de servidores.</li>
+            <li>Desenvolvimento de plataforma interna para controle de qualidade de leads;</li>
+            <li>Criação e manutenção do site institucional, com foco em SEO e design responsivo;</li>
+            <li>Desenvolvimento com Laravel, PHP e MySQL, garantindo performance e segurança;</li>
+            <li>Administração de servidores e práticas de segurança da informação.</li>
           </ul>
         </div>
 
         <div class="cv-entry">
-          <div class="cv-entry-hd"><span>SC Brasil</span><span class="cv-entry-date">02/2018 – 08/2018</span></div>
-          <div class="cv-entry-role">Estagiário de Suporte Técnico</div>
+          <div class="cv-entry-hd"><span>SC Brasil</span><span class="cv-entry-date">10/2017 – 10/2018</span></div>
+          <div class="cv-entry-role">Estagiário de Desenvolvimento e Suporte Técnico</div>
           <ul class="cv-list">
-            <li>Suporte técnico a hardware e software; atendimento via acesso remoto.</li>
+            <li>Desenvolvimento e manutenção de sistemas internos com PHP e Laravel;</li>
+            <li>Apoio à equipe de TI em rotinas de suporte técnico e correção de sistemas;</li>
+            <li>Atendimento remoto e manutenção preventiva de dispositivos.</li>
           </ul>
         </div>
 
@@ -3758,6 +3803,8 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
         <span class="tray-ico" id="vol-ico" onclick="toggleVolPopup(event)">🔊</span>
         <span class="tray-ico" title="CD-ROM (D:)" onclick="openWindow('win-cdrom')" style="cursor:pointer;"><img
             src="src/img/system/cd-dvd.ico" style="width:14px;height:14px;vertical-align:middle;"></span>
+        <span class="tray-ico" title="avast! Antivírus" onclick="openApp('win-avast')" style="cursor:pointer;"><img
+            src="src/img/system/avast-icon.svg" style="width:15px;height:15px;vertical-align:middle;"></span>
         <span class="tray-ico">📶</span>
         <div id="tray-clock">00:00</div>
       </div>
@@ -3846,7 +3893,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
         </div>
       </div>
       <div class="sm-footer">
-        <div class="sm-foot-btn" onclick="closeStartMenu()"><img src="src/img/system/logout.ico"
+        <div class="sm-foot-btn" onclick="closeStartMenu();doLogoff()"><img src="src/img/system/logout.ico"
             style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">Fazer logoff</div>
         <div class="sm-foot-btn" onclick="doShutdown()"><img src="src/img/system/desligar.ico"
             style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">Desligar computador</div>
@@ -3946,7 +3993,7 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
     </div>
 
     <!-- WINDOW: CAMPO MINADO -->
-    <div class="xp-win" id="win-mine" style="width:280px;top:80px;left:200px;display:none">
+    <div class="xp-win" id="win-mine" style="width:auto;top:80px;left:200px;display:none">
       <div class="xp-titlebar" onmousedown="startDrag(event,'win-mine')">
         <span class="xp-titlebar-ico">💣</span>
         <span class="xp-titlebar-txt">Campo Minado</span>
@@ -3958,9 +4005,23 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
       </div>
       <!-- Menu -->
       <div class="mine-menu">
-        <span onclick="mineNewGame()">Novo</span>
-        <span>Jogo</span>
-        <span>Ajuda</span>
+        <span onclick="mineToggleMenu(event,'mine-dd-jogo')">Jogo</span>
+        <span onclick="mineToggleMenu(event,'mine-dd-ajuda')">Ajuda</span>
+        <div class="mine-dropdown" id="mine-dd-jogo" style="display:none">
+          <div onclick="mineNewGame();mineCloseMenus()">Novo</div>
+          <div class="mine-dd-sep"></div>
+          <div id="mine-dd-beginner" onclick="mineSetDiff('beginner');mineCloseMenus()">Iniciante</div>
+          <div id="mine-dd-intermediate" onclick="mineSetDiff('intermediate');mineCloseMenus()">Intermediário</div>
+          <div id="mine-dd-expert" onclick="mineSetDiff('expert');mineCloseMenus()">Especialista</div>
+          <div class="mine-dd-sep"></div>
+          <div id="mine-dd-q" onclick="mineToggleQuestion()">Marcas (?)</div>
+          <div onclick="mineShowBest();mineCloseMenus()">Melhores tempos...</div>
+          <div class="mine-dd-sep"></div>
+          <div onclick="closeWin('win-mine');mineCloseMenus()">Sair</div>
+        </div>
+        <div class="mine-dropdown" id="mine-dd-ajuda" style="display:none">
+          <div onclick="mineShowAbout();mineCloseMenus()">Sobre o Campo Minado</div>
+        </div>
       </div>
       <!-- Header: contador de minas, smiley, timer -->
       <div class="mine-header">
@@ -4205,8 +4266,24 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
           <div class="xp-wbtn wcls" onclick="closeWin('win-solitaire')">✕</div>
         </div>
       </div>
+      <div class="mine-menu" style="position:relative">
+        <span onclick="solToggleMenu(event,'sol-dd-jogo')">Jogo</span>
+        <span onclick="solToggleMenu(event,'sol-dd-ajuda')">Ajuda</span>
+        <div class="mine-dropdown" id="sol-dd-jogo" style="display:none">
+          <div onclick="solNewGame();solCloseMenus()">Novo jogo</div>
+          <div onclick="solUndo();solCloseMenus()">Desfazer (Ctrl+Z)</div>
+          <div class="mine-dd-sep"></div>
+          <div id="sol-dd-d1" onclick="solSetDraw(1)">Comprar 1 carta</div>
+          <div id="sol-dd-d3" onclick="solSetDraw(3)">Comprar 3 cartas</div>
+          <div class="mine-dd-sep"></div>
+          <div onclick="closeWin('win-solitaire');solCloseMenus()">Sair</div>
+        </div>
+        <div class="mine-dropdown" id="sol-dd-ajuda" style="display:none">
+          <div onclick="solShowAbout()">Sobre a Paciência</div>
+        </div>
+      </div>
       <div
-        style="background:#1a6b1a;width:100%;height:calc(100% - 28px);display:flex;flex-direction:column;gap:8px;padding:10px;overflow:hidden;user-select:none;">
+        style="background:#1a6b1a;width:100%;height:calc(100% - 48px);display:flex;flex-direction:column;gap:8px;padding:10px;overflow:hidden;user-select:none;">
         <div style="display:flex;gap:10px;align-items:flex-start;">
           <div id="sol-stock" class="sol-pile sol-stock" onclick="solStockClick()" title="Comprar carta">🂠</div>
           <div id="sol-waste" class="sol-pile sol-waste"></div>
@@ -4223,6 +4300,9 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
         <div id="sol-tableau" style="display:flex;gap:10px;flex:1;align-items:flex-start;"></div>
         <div style="display:flex;align-items:center;gap:10px;">
           <div id="sol-score" style="color:#90ee90;font-size:12px;font-family:Tahoma,sans-serif;">Pontos: 0</div>
+          <div id="sol-timer" style="color:#90ee90;font-size:12px;font-family:Tahoma,sans-serif;">Tempo: 0s</div>
+          <button onclick="solUndo()"
+            style="background:#c0c0c0;border:2px solid #888;padding:3px 10px;font-size:11px;font-family:Tahoma,sans-serif;cursor:pointer;">Desfazer</button>
           <button onclick="solNewGame()"
             style="background:#c0c0c0;border:2px solid #888;padding:3px 10px;font-size:11px;font-family:Tahoma,sans-serif;cursor:pointer;">Novo
             Jogo</button>
@@ -5227,6 +5307,7 @@ pause</pre>
     </div>
 
     <script src="src/app.js"></script>
+    <script src="src/apps.js"></script>
 </body>
 
 </html>

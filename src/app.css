@@ -3863,16 +3863,61 @@ a,
     display: flex;
     font-size: 11px;
     flex-shrink: 0;
+    position: relative;
 }
 
-.mine-menu span {
+.mine-menu > span {
     padding: 2px 8px;
     cursor: pointer;
+    position: relative;
 }
 
-.mine-menu span:hover {
+.mine-menu > span:hover {
     background: #0a246a;
     color: #fff;
+}
+
+.mine-dropdown {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    background: #ece9d8;
+    border: 1px solid #888;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 500;
+    min-width: 180px;
+    padding: 2px;
+    font-size: 11px;
+    color: #000;
+}
+
+.mine-dropdown > div {
+    padding: 4px 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+}
+
+.mine-dropdown > div:hover {
+    background: #316ac5;
+    color: #fff;
+}
+
+.mine-dd-sep {
+    height: 0 !important;
+    border-top: 1px solid #aca899;
+    margin: 3px 2px !important;
+    padding: 0 !important;
+    cursor: default !important;
+}
+
+.mine-dd-sep:hover {
+    background: transparent !important;
+}
+
+.mine-dd-check {
+    position: absolute;
+    left: 7px;
 }
 
 .mine-header {
@@ -3912,17 +3957,19 @@ a,
 
 .mine-grid {
     display: grid;
-    grid-template-columns: repeat(9, 28px);
+    grid-template-columns: repeat(9, 24px);
+    grid-auto-rows: 24px;
     gap: 0;
     padding: 8px;
     background: #d4d0c8;
     border-top: 3px solid;
     border-color: #fff #888 #888 #fff;
+    width: max-content;
 }
 
 .mine-cell {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     box-sizing: border-box;
     border: 2px outset #ccc;
     background: #d4d0c8;
@@ -5818,8 +5865,18 @@ a,
     box-sizing: border-box;
 }
 .sol-card:hover { box-shadow: 1px 2px 8px rgba(0,0,0,.5); }
+.sol-card { cursor: grab; }
 .sol-card.sol-sel { outline: 3px solid #ffff00; box-shadow: 0 0 10px #ffff00; }
-.sol-card.sol-back { background: linear-gradient(135deg, #1a3fa5 25%, #2255cc 50%, #1a3fa5 75%); border-color: #0a2080; cursor: pointer; display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,.5); }
+.sol-card.sol-back {
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 6px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,.12) 0 3px, transparent 3px 6px),
+      linear-gradient(135deg, #1a3fa5 0%, #2761d8 50%, #1a3fa5 100%);
+    border: 2px solid #fff; box-shadow: inset 0 0 0 1px #0a2080; cursor: pointer;
+}
+.sol-drag-ghost { position: fixed; z-index: 99999; pointer-events: none; opacity: .9; width: 52px; }
+.sol-drag-ghost .sol-card { box-shadow: 2px 4px 10px rgba(0,0,0,.5); }
+.sol-recycle { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#bff5bf; font-size:24px; cursor:pointer; border:2px dashed rgba(255,255,255,.4); border-radius:5px; box-sizing:border-box; }
 .sol-card.sol-red { color: #cc0000; }
 .sol-card-tl { font-size: 12px; line-height: 1.1; }
 .sol-card-ctr { font-size: 24px; text-align: center; line-height: 1; }
