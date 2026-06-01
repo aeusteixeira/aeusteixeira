@@ -4080,21 +4080,69 @@ const clippyPhrases = [
     'Se quiser contratar ele, manda um e-mail. Eu sou só um clipe de papel.',
 ];
 let _trayBalloonTimer = null;
-let _clippyTimer = null;
+/* Clippy animado: sprite sheet oficial (clippy-atlas.png, 22x41, célula 124x93,
+   exibida a 100x75). Fica fixo no canto, com idle + gestos + clique. */
+const CLP_COLS = 22, CLP_DW = 100, CLP_DH = 75, CLP_TOTAL = 22 * 41;
+const CLP_IDLE = [0, 1, 2, 3, 4];
+const CLP_EMPTY = new Set([541, 674]);
+let _clippyTimer = null, _clpAnim = null, _clpGestTimer = null, _clpVisible = false;
+function _clpSetFrame(i) {
+    const s = document.getElementById('clippy-sprite'); if (!s) return;
+    const c = i % CLP_COLS, r = (i / CLP_COLS) | 0;
+    s.style.backgroundPosition = (-(c * CLP_DW)) + 'px ' + (-(r * CLP_DH)) + 'px';
+}
+function _clpStop() { if (_clpAnim) { clearInterval(_clpAnim); _clpAnim = null; } }
+function _clpPlay(frames, fps, loop, onDone) {
+    _clpStop();
+    if (!frames || !frames.length) { if (onDone) onDone(); return; }
+    let i = 0; _clpSetFrame(frames[0]);
+    _clpAnim = setInterval(function () {
+        i++;
+        if (i >= frames.length) { if (loop) { i = 0; } else { _clpStop(); if (onDone) onDone(); return; } }
+        _clpSetFrame(frames[i]);
+    }, 1000 / fps);
+}
+function _clpTrick(len) {
+    len = len || 16; let s = 0, t = 0;
+    do { s = Math.floor(Math.random() * (CLP_TOTAL - len)); t++; } while (CLP_EMPTY.has(s) && t < 25);
+    const f = []; for (let k = 0; k < len; k++) { const idx = s + k; if (!CLP_EMPTY.has(idx)) f.push(idx); }
+    return f.length ? f : CLP_IDLE;
+}
+function _clpIdle() {
+    if (!_clpVisible) return;
+    _clpPlay(CLP_IDLE, 3, true);
+    clearTimeout(_clpGestTimer);
+    _clpGestTimer = setTimeout(_clpGesture, 2500 + Math.random() * 3500);
+}
+function _clpGesture() {
+    if (!_clpVisible) return;
+    _clpPlay(_clpTrick(14 + Math.floor(Math.random() * 8)), 10, false, _clpIdle);
+}
 function showClippy() {
     const el = document.getElementById('clippy');
     const txt = document.getElementById('clippy-text');
     txt.textContent = clippyPhrases[Math.floor(Math.random() * clippyPhrases.length)];
-    el.style.display = 'block';
+    el.style.display = 'flex';
+    _clpVisible = true; _clpIdle();
     if (_clippyTimer) clearTimeout(_clippyTimer);
-    _clippyTimer = setTimeout(hideClippy, 12000);
+    _clippyTimer = setTimeout(hideClippy, 16000);
 }
 function hideClippy() {
+    _clpVisible = false; _clpStop(); clearTimeout(_clpGestTimer);
     document.getElementById('clippy').style.display = 'none';
     if (_clippyTimer) { clearTimeout(_clippyTimer); _clippyTimer = null; }
     /* agenda próxima aparição */
     setTimeout(showClippy, 30000 + Math.random() * 40000);
 }
+function clippyTrick() {
+    if (!_clpVisible) return;
+    const txt = document.getElementById('clippy-text');
+    if (txt) txt.textContent = clippyPhrases[Math.floor(Math.random() * clippyPhrases.length)];
+    _clpPlay(_clpTrick(16), 11, false, _clpIdle);
+    if (_clippyTimer) clearTimeout(_clippyTimer);
+    _clippyTimer = setTimeout(hideClippy, 16000);
+}
+window.clippyTrick = clippyTrick;
 
 /* ══════════════════════════════════════
     WINRAR — POPUP DE LICENÇA EXPIRADA
@@ -6029,6 +6077,12 @@ function _initWeatherWidget() {
 }
 
 function _initDesktopWidgets() {
+  /* move widgets e post-its pra DENTRO do #desktop (eles vêm no body, fora dele).
+     Assim o z-index baixo deles passa a valer contra as janelas (que ficam no #desktop). */
+  const _dk = document.getElementById('desktop');
+  if (_dk) ['widget-clock', 'widget-weather', 'sticky-1', 'sticky-2', 'sticky-3'].forEach(function (id) {
+    const e = document.getElementById(id); if (e && e.parentElement !== _dk) _dk.appendChild(e);
+  });
   _buildClockTicks();
   _initWeatherWidget();
   _updateWidgetClock();
@@ -6036,16 +6090,16 @@ function _initDesktopWidgets() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ROCKY — o cão assistente do Microsoft Office, como pet de área de
-   trabalho. Usa o sprite sheet oficial (enviado pelo usuário), com
-   o fundo magenta removido, montado num atlas 29x36 (célula 124x93).
-   Anda em perfil, senta de frente, late e toca as demais animações
-   do sheet como "truques". Clique = truque + fala.
+   ROCKY — pet híbrido. Usa as ANIMAÇÕES REAIS do Microsoft Agent
+   (ROCKY.acd → rocky-anims.js + atlas rocky-anim.png, frames BMP
+   completos) pro idle e os gestos (acenar, procurar, pensar, olhar,
+   comemorar...), E uma faixa dedicada (rocky-walk.png) pro andar.
    ══════════════════════════════════════════════════════════════ */
-const RK_COLS = 29, RK_ROWS = 36, RK_CW = 124, RK_CH = 93, RK_TOTAL = RK_COLS * RK_ROWS;
-const RK_IDLE = [58, 59, 60];               /* sentado de frente (linha 2, col 0-2) */
-const RK_WALK = [73, 74, 75, 76, 77, 78, 79, 80]; /* ciclo de corrida limpo em perfil (sprite olha p/ direita) */
-const RK_EMPTY = new Set([28,57,86,115,144,169,173,202,231,260,289,318,347,376,405,434,463,492,521,542,550,579,608,637,666,681,695,724,753,782,811,840,865,869,879,882,898,927,956,985,1014,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043]);
+const RKA = window.ROCKY_ANIMS || {};
+const RKA_COLS = window.ROCKY_ANIM_COLS || 16, RKA_CW = window.ROCKY_ANIM_CW || 124, RKA_CH = window.ROCKY_ANIM_CH || 93;
+const RK_WSTRIP = 'src/img/rocky-walk.png', RK_WW = 147, RK_WH = 81, RK_WN = 8;
+const RK_GESTURES = ['Wave', 'Greeting', 'Thinking', 'Congratulate', 'Searching', 'GetAttention', 'LookLeft', 'LookRight', 'LookUp', 'LookDown', 'Explain', 'Hearing_1', 'Save', 'CheckingSomething'].filter(function (n) { return RKA[n]; });
+const RK_FIDGET = ['Idle(7)', 'Idle(3)'].filter(function (n) { return RKA[n]; });
 const _RK_PHRASES = [
   'Au au! 🐾',
   'Posso ajudar a pesquisar?',
@@ -6058,7 +6112,7 @@ const _RK_PHRASES = [
   'Tô de olho na sua área de trabalho.'
 ];
 const _RK_CLICK = ['Au au au! 🐾', 'Olha meu truque!', 'rsrs, de novo?', 'Woof!', 'Pronto, chefe!'];
-let _rkEl = null, _rkAnim = null, _rkTimer = null, _rkSayT = null, _rkAlive = false, _rkBusy = false;
+let _rkEl = null, _rkAnim = null, _rkWalkId = null, _rkTimer = null, _rkSayT = null, _rkAlive = false, _rkBusy = false;
 function _rkPick(a) { return a[Math.floor(Math.random() * a.length)]; }
 function _rkWidth() { const d = document.getElementById('desktop'); return d ? d.clientWidth : window.innerWidth; }
 
@@ -6071,7 +6125,7 @@ function _rkInjectCss() {
   .rocky.face-left .rk-flip{transform:scaleX(-1);}
   .rocky.hop .rk-sprite{animation:rkHop .45s ease-out;}
   @keyframes rkHop{0%{transform:translateY(0)}45%{transform:translateY(-15px)}100%{transform:translateY(0)}}
-  .rk-sprite{width:${RK_CW}px;height:${RK_CH}px;background-image:url('src/img/rocky-atlas.png');
+  .rk-sprite{width:${RKA_CW}px;height:${RKA_CH}px;background-image:url('src/img/rocky-anim.png');
     background-repeat:no-repeat;filter:drop-shadow(2px 4px 2px rgba(0,0,0,.3));}
   .rk-bubble{position:absolute;bottom:88px;left:50%;transform:translateX(-50%) scale(.8);transform-origin:bottom center;
     background:#fffef0;border:1px solid #c9b97a;border-radius:10px;padding:6px 11px;
@@ -6083,21 +6137,42 @@ function _rkInjectCss() {
   document.head.appendChild(s);
 }
 
-function _rkSetFrame(i) {
-  const s = _rkEl && _rkEl.querySelector('.rk-sprite'); if (!s) return;
-  const c = i % RK_COLS, r = (i / RK_COLS) | 0;
-  s.style.backgroundPosition = (-(c * RK_CW)) + 'px ' + (-(r * RK_CH)) + 'px';
+function _rkStop() {
+  if (_rkAnim) { clearTimeout(_rkAnim); _rkAnim = null; }
+  if (_rkWalkId) { clearInterval(_rkWalkId); _rkWalkId = null; }
 }
-function _rkStopAnim() { if (_rkAnim) { clearInterval(_rkAnim); _rkAnim = null; } }
-function _rkPlay(frames, fps, loop, onDone) {
-  _rkStopAnim();
-  if (!frames || !frames.length) { if (onDone) onDone(); return; }
-  let i = 0; _rkSetFrame(frames[0]);
-  _rkAnim = setInterval(function () {
-    i++;
-    if (i >= frames.length) { if (loop) { i = 0; } else { _rkStopAnim(); if (onDone) onDone(); return; } }
-    _rkSetFrame(frames[i]);
-  }, 1000 / fps);
+/* alterna a sprite entre o atlas de animações e a faixa do andar */
+function _rkSetSprite(mode) {
+  const s = _rkEl && _rkEl.querySelector('.rk-sprite'); if (!s) return;
+  if (mode === 'walk') {
+    s.style.width = RK_WW + 'px'; s.style.height = RK_WH + 'px';
+    s.style.backgroundImage = "url('" + RK_WSTRIP + "')";
+    s.style.backgroundSize = (RK_WN * RK_WW) + 'px ' + RK_WH + 'px';
+  } else {
+    if (_rkEl) _rkEl.classList.remove('face-left');
+    s.style.width = RKA_CW + 'px'; s.style.height = RKA_CH + 'px';
+    s.style.backgroundImage = "url('src/img/rocky-anim.png')";
+    s.style.backgroundSize = 'auto';
+  }
+}
+function _rkAnimCell(cell) {
+  const s = _rkEl && _rkEl.querySelector('.rk-sprite'); if (!s) return;
+  const c = cell % RKA_COLS, r = (cell / RKA_COLS) | 0;
+  s.style.backgroundPosition = (-(c * RKA_CW)) + 'px ' + (-(r * RKA_CH)) + 'px';
+}
+/* toca uma animação real do ACD (sequência de [célula, ms]) */
+function _rkPlayAnim(name, onDone) {
+  _rkStop();
+  const seq = RKA[name];
+  if (!seq || !seq.length) { if (onDone) onDone(); return; }
+  _rkSetSprite('anim');
+  let i = 0;
+  (function step() {
+    if (!_rkAlive) return;
+    _rkAnimCell(seq[i][0]); const ms = seq[i][1]; i++;
+    if (i >= seq.length) { _rkAnim = null; if (onDone) onDone(); return; }
+    _rkAnim = setTimeout(step, ms);
+  })();
 }
 function rockySay(t) {
   if (!_rkEl) return;
@@ -6108,41 +6183,46 @@ function rockySay(t) {
 }
 function _rkHop() { if (!_rkEl) return; _rkEl.classList.add('hop'); setTimeout(function () { if (_rkEl) _rkEl.classList.remove('hop'); }, 460); }
 
-/* monta a sequência de um "truque": trecho contíguo do sheet, pulando frames vazios */
-function _rkTrickFrames(len) {
-  len = len || 16;
-  let start = 0, tries = 0;
-  do { start = Math.floor(Math.random() * (RK_TOTAL - len)); tries++; }
-  while (RK_EMPTY.has(start) && tries < 25);
-  const f = [];
-  for (let k = 0; k < len; k++) { const idx = start + k; if (!RK_EMPTY.has(idx)) f.push(idx); }
-  return f.length ? f : RK_IDLE;
-}
-
 function _rkIdle() {
   if (!_rkAlive) return;
-  _rkBusy = false; _rkEl.classList.remove('walk');
-  _rkPlay(RK_IDLE, 2.2, true);
+  _rkBusy = false; _rkStop(); _rkSetSprite('anim');
+  _rkAnimCell((RKA['RestPose'] && RKA['RestPose'][0][0]) || 0);
   clearTimeout(_rkTimer);
-  _rkTimer = setTimeout(_rkAct, 2600 + Math.random() * 4200);
+  _rkTimer = setTimeout(_rkAct, 2400 + Math.random() * 4200);
 }
 function _rkAct() {
   if (!_rkAlive || _rkBusy) return;
   const r = Math.random();
-  if (r < 0.5) _rkWalk();
-  else if (r < 0.85) _rkGesture();
+  if (r < 0.45) _rkWalk();
+  else if (r < 0.9) _rkGesture();
+  else if (RK_FIDGET.length) { _rkBusy = true; _rkPlayAnim(_rkPick(RK_FIDGET), _rkIdle); }
   else _rkIdle();
+}
+function _rkGesture() {
+  if (!_rkEl || !RK_GESTURES.length) { _rkIdle(); return; }
+  _rkBusy = true;
+  if (Math.random() < 0.5) rockySay(_rkPick(_RK_PHRASES));
+  _rkPlayAnim(_rkPick(RK_GESTURES), _rkIdle);
+}
+function _rkWalkLoop(fps) {
+  _rkStop();
+  const s = _rkEl && _rkEl.querySelector('.rk-sprite'); if (!s) return;
+  let i = 0; s.style.backgroundPosition = '0px 0px';
+  _rkWalkId = setInterval(function () {
+    i = (i + 1) % RK_WN;
+    s.style.backgroundPosition = (-(i * RK_WW)) + 'px 0px';
+  }, 1000 / fps);
 }
 function _rkWalk() {
   if (!_rkEl) return;
   _rkBusy = true;
-  const w = _rkWidth(), max = Math.max(20, w - 140);
+  const w = _rkWidth(), max = Math.max(20, w - 160);
   const cur = parseFloat(_rkEl.style.left) || (w * 0.5);
   let target = 10 + Math.random() * (max - 10);
-  if (Math.abs(target - cur) < 120) { target = cur < w / 2 ? Math.min(max, cur + 220) : Math.max(10, cur - 220); }
-  const dur = Math.max(1.4, Math.abs(target - cur) / 55);
-  _rkEl.classList.toggle('face-left', target < cur); /* sprite olha p/ direita; espelha ao ir p/ esquerda */
-  _rkPlay(RK_WALK, 12, true);
+  if (Math.abs(target - cur) < 140) { target = cur < w / 2 ? Math.min(max, cur + 240) : Math.max(10, cur - 240); }
+  const dur = Math.max(1.6, Math.abs(target - cur) / 55);
+  _rkEl.classList.toggle('face-left', target < cur); /* faixa olha p/ direita; espelha ao ir p/ esquerda */
+  _rkSetSprite('walk'); _rkWalkLoop(12);
   _rkEl.style.transition = 'left ' + dur.toFixed(2) + 's linear';
   _rkEl.style.left = Math.round(target) + 'px';
   clearTimeout(_rkTimer);
@@ -6151,12 +6231,6 @@ function _rkWalk() {
     if (Math.random() < 0.4) rockySay(_rkPick(_RK_PHRASES));
     _rkIdle();
   }, dur * 1000 + 50);
-}
-function _rkGesture() {
-  if (!_rkEl) return;
-  _rkBusy = true; _rkEl.classList.remove('walk');
-  if (Math.random() < 0.5) rockySay(_rkPick(_RK_PHRASES));
-  _rkPlay(_rkTrickFrames(14 + Math.floor(Math.random() * 8)), 10, false, _rkIdle);
 }
 
 function rockyStart() {
@@ -6168,13 +6242,14 @@ function rockyStart() {
   host.appendChild(el);
   _rkEl = el; _rkAlive = true;
   el.style.left = Math.round(_rkWidth() * 0.5) + 'px';
-  _rkSetFrame(RK_IDLE[0]);
+  _rkSetSprite('anim'); _rkAnimCell((RKA['RestPose'] && RKA['RestPose'][0][0]) || 0);
   el.addEventListener('click', function () {
+    if (!RK_GESTURES.length) return;
     _rkBusy = true; _rkHop(); rockySay(_rkPick(_RK_CLICK));
-    _rkPlay(_rkTrickFrames(16), 11, false, _rkIdle);
+    _rkPlayAnim(_rkPick(RK_GESTURES), _rkIdle);
   });
-  setTimeout(function () { rockySay('Au au! 🐾 Oi, eu sou o Rocky!'); }, 800);
-  _rkTimer = setTimeout(_rkIdle, 1800);
+  if (RKA['Show']) { _rkBusy = true; _rkPlayAnim('Show', function () { rockySay('Au au! 🐾 Oi, eu sou o Rocky!'); _rkIdle(); }); }
+  else { setTimeout(function () { rockySay('Au au! 🐾 Oi, eu sou o Rocky!'); _rkIdle(); }, 600); }
   if (!window._rkChatTimer) window._rkChatTimer = setInterval(function () { if (_rkAlive && !_rkBusy && Math.random() < 0.5) rockySay(_rkPick(_RK_PHRASES)); }, 48000);
 }
 window.rockyStart = rockyStart; window.rockySay = rockySay;

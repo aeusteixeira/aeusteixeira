@@ -5904,7 +5904,7 @@ a,
     background: #fef08a; border: 1px solid #d4b800;
     box-shadow: 3px 3px 8px rgba(0,0,0,.25);
     font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 12px;
-    z-index: 400; border-radius: 2px; cursor: default;
+    z-index: 4; border-radius: 2px; cursor: default;
 }
 .sticky-note.sticky-blue { background: #bfdbfe; border-color: #3b82f6; }
 .sticky-note.sticky-pink { background: #fce7f3; border-color: #ec4899; }
@@ -5932,7 +5932,7 @@ a,
    estilo Yahoo! Widgets / Rainmeter
 ═══════════════════════════════ */
 .xp-widget {
-    position: absolute; z-index: 380; cursor: move;
+    position: absolute; z-index: 4; cursor: move;
     user-select: none; -webkit-user-select: none;
     color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif;
 }
@@ -6143,6 +6143,11 @@ a,
   transition: transform .2s;
 }
 #clippy-body:hover { transform: scale(1.1) rotate(-5deg); }
+#clippy-sprite {
+  width: 100px; height: 75px;
+  background-image: url('img/clippy-atlas.png'); background-repeat: no-repeat;
+  background-size: 2200px 3075px;
+}
 #clippy-balloon {
   position: relative;
   background: #fefcd0; border: 2px solid #000; border-radius: 12px;
