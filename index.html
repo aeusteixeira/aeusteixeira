@@ -215,7 +215,7 @@
         <div class="d-icon-lbl">Lixeira</div>
       </div>
       <div class="d-icon" data-tip="error.exe" ondblclick="openErrorExe()">
-        <div class="d-icon-img">⛔</div>
+        <div class="d-icon-img"><img src="src/img/system/error.png" alt="error.exe" style="width:32px;height:32px;"></div>
         <div class="d-icon-lbl">error.exe</div>
       </div>
       <div class="d-icon" data-tip="Sobre o Matheus" ondblclick="openWindow('win-sobre-matheus')">
@@ -3073,7 +3073,7 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
               <td style="padding:4px 8px;border:1px solid #c0d0e0">🔧 Mestre Oficina</td>
               <td style="padding:4px 8px;border:1px solid #c0d0e0;text-align:center">⭐⭐⭐⭐</td>
               <td style="padding:4px 8px;border:1px solid #c0d0e0;text-align:center">⭐⭐⭐⭐⭐</td>
-              <td style="padding:4px 8px;border:1px solid #c0d0e0;color:#2a8a2a">Em andamento</td>
+              <td style="padding:4px 8px;border:1px solid #c0d0e0;color:#2a8a2a;font-weight:bold">🚀 LANÇADO!</td>
             </tr>
             <tr style="background:#f8f8f0">
               <td style="padding:4px 8px;border:1px solid #c0d0e0">🤖 Recepti (clínicas)</td>
@@ -3118,8 +3118,8 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
             5. PRÓXIMOS PASSOS (v7)</div>
           <p>[x] Definir o produto<br>
             [x] Criar MVP funcional<br>
-            [ ] Conseguir primeiro cliente pagante<br>
-            [ ] NÃO refatorar tudo antes do primeiro cliente<br>
+            [x] Conseguir primeiro cliente pagante <b style="color:#2a8a2a">&lt;- UPDATE 2025: CONSEGUIMOS! (abre o mestre_oficina_LANÇADO.txt aqui da pasta)</b><br>
+            [x] NÃO refatorar tudo antes do primeiro cliente (milagre aconteceu)<br>
             [ ] Criar landing page que preste<br>
             [ ] Dormir mais de 6h por noite durante o processo</p>
 
@@ -3131,6 +3131,233 @@ IDÉIAS ALEATÓRIAS QUE NÃO FORAM A LUGAR NENHUM:
         </div>
       </div>
       <div class="wp-statusbar">Para obter Ajuda, pressione F1 &nbsp;&nbsp;&nbsp; Página 1</div>
+    </div>
+
+    <!-- WINDOW: MESTRE OFICINA (diário de bordo) -->
+    <div class="xp-win" id="win-mestre-oficina" style="width:540px;top:60px;left:155px;display:none">
+      <div class="xp-titlebar" onmousedown="startDrag(event,'win-mestre-oficina')">
+        <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png"
+            style="width:16px;height:16px;vertical-align:middle"></span>
+        <span class="xp-titlebar-txt">mestre_oficina_LANÇADO.txt — Bloco de Notas</span>
+        <div class="xp-wbtns">
+          <div class="xp-wbtn wmin" onclick="minimizeWin('win-mestre-oficina')">_</div>
+          <div class="xp-wbtn wmax" onclick="maximizeWin('win-mestre-oficina')">□</div>
+          <div class="xp-wbtn wcls" onclick="closeWin('win-mestre-oficina')">✕</div>
+        </div>
+      </div>
+      <div class="notepad-menu">
+        <div class="notepad-menu-item">Arquivo</div>
+        <div class="notepad-menu-item">Editar</div>
+        <div class="notepad-menu-item">Formatar</div>
+        <div class="notepad-menu-item">Exibir</div>
+        <div class="notepad-menu-item">Ajuda</div>
+      </div>
+      <textarea class="notepad-textarea" readonly
+        style="height:440px;font-family:'Courier New',monospace;font-size:12px">MESTRE OFICINA  ::  DIÁRIO DE BORDO
+====================================================
+de "ideia rabiscada num guardanapo" pra "tá no ar
+e tem oficina pagando todo mês". demorou. mas DEU CERTO.
+
+----------------------------------------------------
+2019  ::  A FAÍSCA
+  Levei meu carro numa oficina e o mecânico anotava
+  tudo num caderno encardido. Ordem de serviço no
+  papel, cliente ligando "já ficou pronto?". Pensei:
+  isso vira software fácil. Anotei no celular e...
+  esqueci por completo.
+
+2021  ::  O GUARDANAPO
+  Voltei pra ideia. Desenhei o banco de dados num
+  guardanapo num bar em São Paulo (o Edmundo tem
+  foto, eu juro que não existe). Comprei o domínio.
+  E não mexi por mais um ano. clássico.
+
+2023  ::  git init
+  Laravel novo em folha. Prometi pra mim mesmo que
+  DESSA vez eu ia terminar de verdade.
+  (a gente conhece esse filme, né.)
+
+2024  ::  O MVP QUE QUASE ME QUEBROU
+  Ordem de serviço digital, controle de estoque,
+  agendamento, e o pulo do gato: um fluxo no n8n
+  que avisa o cliente no WhatsApp na hora que o
+  carro fica pronto. Testei na oficina do seu Zé.
+  Ele falou "rapaz, isso mudou meu negócio".
+  Quase chorei (era medo do deploy de sexta).
+
+====================================================
+&gt;&gt;&gt;   2025  ::  LANÇADO. OFICIALMENTE. NO AR.   &lt;&lt;&lt;
+====================================================
+  v1.0 em produção. Primeira oficina assinou em
+  março. Aí veio a segunda, a terceira...  Hoje:
+
+     Oficinas ativas .......... 14
+     Ordens de serviço / mês .. 2.300+
+     Uptime ................... 99,7%  (orgulho)
+     Churn .................... baixinho (chorei de novo)
+     Receita .................. paga o café E o aluguel
+
+  Não é o "milhão" do outro arquivo aqui da pasta
+  (ainda não). Mas é REAL. Tem gente do outro lado
+  da tela trabalhando melhor por causa de um código
+  que eu escrevi às 2h da manhã. Isso vale mais que
+  qualquer projeção otimista demais de plano v7.
+
+----------------------------------------------------
+PRÓXIMO CAPÍTULO:
+  [ ] Chegar em 100 oficinas até o fim de 2026
+  [ ] Emitir NF-e dentro do próprio sistema
+  [ ] Contratar alguém pra eu poder dormir
+  [ ] NÃO reescrever tudo num framework novo
+       (respira, Matheus. respira.)
+
+====================================================
+"Software de verdade é o que sai do localhost."
+   eu, finalmente entendendo isso, em 2025.
+====================================================</textarea>
+      <div class="notepad-statusbar">
+        <span>Somente leitura</span>
+        <span>Linha 1, Col 1</span>
+      </div>
+    </div>
+
+    <!-- WINDOW: CARTA PRO EU DO FUTURO -->
+    <div class="xp-win" id="win-carta-futuro" style="width:500px;top:80px;left:185px;display:none">
+      <div class="xp-titlebar" onmousedown="startDrag(event,'win-carta-futuro')">
+        <span class="xp-titlebar-ico"><img src="src/img/system/bloco-de-notas-icon.png"
+            style="width:16px;height:16px;vertical-align:middle"></span>
+        <span class="xp-titlebar-txt">carta_pro_meu_eu_de_2035.txt — Bloco de Notas</span>
+        <div class="xp-wbtns">
+          <div class="xp-wbtn wmin" onclick="minimizeWin('win-carta-futuro')">_</div>
+          <div class="xp-wbtn wmax" onclick="maximizeWin('win-carta-futuro')">□</div>
+          <div class="xp-wbtn wcls" onclick="closeWin('win-carta-futuro')">✕</div>
+        </div>
+      </div>
+      <div class="notepad-menu">
+        <div class="notepad-menu-item">Arquivo</div>
+        <div class="notepad-menu-item">Editar</div>
+        <div class="notepad-menu-item">Formatar</div>
+        <div class="notepad-menu-item">Exibir</div>
+        <div class="notepad-menu-item">Ajuda</div>
+      </div>
+      <textarea class="notepad-textarea" readonly
+        style="height:380px;font-family:'Courier New',monospace;font-size:12px">Pro Matheus de 2035.
+
+Se você tá lendo isso, primeiro: respira. A gente
+chegou até aqui, então alguma coisa deu certo.
+
+Lembra de Nova Iguaçu? Do monitor que você levou de
+São Paulo de volta pro Rio dentro da sacola de feira
+do seu pai? Da primeira vez que um site SEU abriu no
+navegador e você gritou sozinho no quarto? Não esquece
+disso nunca. É de onde a gente veio.
+
+Espero que, aí no seu 2035:
+  &gt; o Mestre Oficina tenha passado das 100 oficinas
+  &gt; você e o Edmundo tenham feito Cusco e Machu Picchu
+    (e um monte de lugar depois)
+  &gt; você tenha aprendido Rust de uma vez
+    (kkkk falando isso desde 2021)
+  &gt; você ainda ligue pra mãe. LIGA.
+  &gt; você não tenha virado aquele dev amargo de internet
+
+E se nada saiu como a gente planejou, tudo bem também.
+A gente sempre deu um jeito. Sempre.
+
+Abraço apertado,
+Matheus de 2025 (cansado, mas muito feliz)
+
+PS: se inventaram um framework novo da moda, NÃO
+reescreve tudo. Por favor. Eu te imploro.</textarea>
+      <div class="notepad-statusbar">
+        <span>Somente leitura</span>
+        <span>Linha 1, Col 1</span>
+      </div>
+    </div>
+
+    <!-- WINDOW: PRIMEIRO SITE 2012 (HTML retrô) -->
+    <div class="xp-win" id="win-primeiro-site" style="width:600px;height:470px;top:46px;left:130px;display:none">
+      <div class="xp-titlebar" onmousedown="startDrag(event,'win-primeiro-site')">
+        <span class="xp-titlebar-ico"><img src="src/img/system/chrome-icon.png"
+            style="width:16px;height:16px;vertical-align:middle"></span>
+        <span class="xp-titlebar-txt">primeiro_site.html (2012)</span>
+        <div class="xp-wbtns">
+          <div class="xp-wbtn wmin" onclick="minimizeWin('win-primeiro-site')">_</div>
+          <div class="xp-wbtn wmax" onclick="maximizeWin('win-primeiro-site')">□</div>
+          <div class="xp-wbtn wcls" onclick="closeWin('win-primeiro-site')">✕</div>
+        </div>
+      </div>
+      <div class="xp-body" style="padding:0;overflow:auto;background:#000080">
+        <div
+          style="font-family:'Comic Sans MS','Comic Sans',cursive;color:#ffff00;text-align:center;padding:10px 14px 26px;background-image:repeating-linear-gradient(45deg,#000080 0,#000080 18px,#000070 18px,#000070 36px)">
+          <div
+            style="background:#cc0000;color:#fff;border:3px ridge #ffff00;padding:4px;font-size:11px;font-weight:bold;overflow:hidden;white-space:nowrap">
+            <marquee>&#9733; &#9733; &#9733; BEM-VINDO AO SITE OFICIAL DO MATHEUS TEIXEIRA &#9733; &#9733; &#9733;
+              &nbsp;&nbsp; obrigado por visitar!! deixa um recado no meu livro de visitas!! &nbsp;</marquee>
+          </div>
+
+          <div
+            style="margin:16px 0 4px;font-size:30px;font-weight:bold;font-style:italic;background:linear-gradient(90deg,#ff0000,#ff9900,#ffff00,#33ff00,#00ccff,#cc00ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:2px 2px 0 rgba(0,0,0,.35)">
+            Matheus.com</div>
+          <div style="color:#00ffff;font-size:12px">~ o melhor site sobre mim da internet inteira ~</div>
+
+          <div style="margin:14px auto;width:78%;border-top:2px dashed #ffff00"></div>
+
+          <table align="center" cellpadding="6" cellspacing="3" style="margin:0 auto">
+            <tr>
+              <td style="background:#ffcc00;border:2px outset #fff"><a href="#" onclick="return false"
+                  style="color:#000;text-decoration:none;font-weight:bold;font-size:12px">[ INÍCIO ]</a></td>
+              <td style="background:#ffcc00;border:2px outset #fff"><a href="#" onclick="return false"
+                  style="color:#000;text-decoration:none;font-weight:bold;font-size:12px">[ SOBRE MIM ]</a></td>
+              <td style="background:#ffcc00;border:2px outset #fff"><a href="#" onclick="return false"
+                  style="color:#000;text-decoration:none;font-weight:bold;font-size:12px">[ MEUS GAMES ]</a></td>
+              <td style="background:#ffcc00;border:2px outset #fff"><a href="#" onclick="return false"
+                  style="color:#000;text-decoration:none;font-weight:bold;font-size:12px">[ FOTOS ]</a></td>
+              <td style="background:#ffcc00;border:2px outset #fff"><a href="#" onclick="return false"
+                  style="color:#000;text-decoration:none;font-weight:bold;font-size:12px">[ CONTATO ]</a></td>
+            </tr>
+          </table>
+
+          <div
+            style="margin:18px auto;max-width:360px;background:repeating-linear-gradient(45deg,#000,#000 12px,#ffcc00 12px,#ffcc00 24px);padding:3px">
+            <div style="background:#000;color:#ffcc00;font-weight:bold;font-size:13px;padding:6px">!! PÁGINA EM
+              CONSTRUÇÃO !!</div>
+          </div>
+
+          <div
+            style="color:#fff;font-size:12px;line-height:1.6;max-width:430px;margin:0 auto;text-align:left;background:rgba(0,0,0,.28);border:1px solid #5555aa;padding:10px">
+            E aí!! Meu nome é Matheus, tenho 14 anos e esse é o MEU site que eu fiz sozinho no Bloco de Notas!! Aqui eu
+            vou postar sobre programação, os jogos que eu jogo e umas paradas de HTML que to aprendendo.<br><br>
+            Um dia eu vou ser programador de verdade e fazer sites profissionais.<br>
+            <span style="color:#00ffaa">(recado do futuro: deu certo, moleque. valeu por começar.)</span>
+          </div>
+
+          <div style="margin:18px 0 6px;color:#00ffff;font-size:11px">Você é o visitante número:</div>
+          <div
+            style="display:inline-block;background:#000;border:2px inset #888;padding:4px 8px;font-family:'Courier New',monospace;font-size:20px;color:#00ff00;letter-spacing:5px">
+            0 0 1 3 3 7</div>
+
+          <div style="margin:16px 0;color:#ffff00;font-size:11px">&#9834; tocando agora: linkin_park_numb.mid &#9834;
+          </div>
+
+          <div style="margin:10px 0">
+            <span
+              style="display:inline-block;background:#000;color:#00ff00;border:1px solid #00ff00;font-size:9px;padding:3px 6px;margin:2px;font-family:monospace">Best
+              viewed in IE6</span>
+            <span
+              style="display:inline-block;background:#1a1a1a;color:#fff;border:1px solid #888;font-size:9px;padding:3px 6px;margin:2px;font-family:monospace">Feito
+              no Notepad</span>
+            <span
+              style="display:inline-block;background:#cc6600;color:#fff;border:1px solid #fff;font-size:9px;padding:3px 6px;margin:2px;font-family:monospace">HTML
+              4.01</span>
+            <span
+              style="display:inline-block;background:#000099;color:#ffff00;border:1px solid #ffff00;font-size:9px;padding:3px 6px;margin:2px;font-family:monospace">800x600</span>
+          </div>
+
+          <div style="margin-top:14px;font-size:10px;color:#aaaacc">&copy; 2012 Matheus Teixeira. Todos os direitos
+            reservados.<br>Não copie meu código (vai que né).<br>Melhor visualizado no Internet Explorer 6.0</div>
+        </div>
+      </div>
     </div>
 
     <!-- WINDOW: README.md (Notepad++) -->
@@ -3800,12 +4027,12 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
       <div class="tb-sep"></div>
       <div id="tb-items"></div>
       <div id="tray">
-        <span class="tray-ico" id="vol-ico" onclick="toggleVolPopup(event)">🔊</span>
+        <span class="tray-ico" id="vol-ico" onclick="toggleVolPopup(event)"><img src="src/img/system/volume.png" style="width:14px;height:14px;vertical-align:middle;"></span>
         <span class="tray-ico" title="CD-ROM (D:)" onclick="openWindow('win-cdrom')" style="cursor:pointer;"><img
             src="src/img/system/cd-dvd.ico" style="width:14px;height:14px;vertical-align:middle;"></span>
         <span class="tray-ico" title="avast! Antivírus" onclick="openApp('win-avast')" style="cursor:pointer;"><img
             src="src/img/system/avast-icon.svg" style="width:15px;height:15px;vertical-align:middle;"></span>
-        <span class="tray-ico">📶</span>
+        <span class="tray-ico"><img src="src/img/system/network.png" style="width:14px;height:14px;vertical-align:middle;"></span>
         <div id="tray-clock">00:00</div>
       </div>
       <!-- VOLUME POPUP -->
@@ -3843,15 +4070,15 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
                 src="src/img/system/paint.webp"></span> Paint</div>
           <div class="sm-item" onclick="closeStartMenu();toggleWMP()"><span class="sm-item-ico"><img
                 src="src/img/system/media-player-icon.png"></span> Windows Media Player</div>
-          <div class="sm-item" onclick="openFromMenu('win-calc')"><span class="sm-item-ico">🧮</span> Calculadora</div>
+          <div class="sm-item" onclick="openFromMenu('win-calc')"><span class="sm-item-ico"><img src="src/img/system/calc.png"></span> Calculadora</div>
           <div class="sm-item" onclick="openFromMenu('win-npp')"><span class="sm-item-ico"><img
                 src="src/img/system/bloco-de-notas-icon.png"></span> Notepad++</div>
-          <div class="sm-item" onclick="openFromMenu('win-mine')"><span class="sm-item-ico">💣</span> Campo Minado</div>
-          <div class="sm-item" onclick="openFromMenu('win-pinball')"><span class="sm-item-ico">🏓</span> Pinball</div>
+          <div class="sm-item" onclick="openFromMenu('win-mine')"><span class="sm-item-ico"><img src="src/img/system/minesweeper.png"></span> Campo Minado</div>
+          <div class="sm-item" onclick="openFromMenu('win-pinball')"><span class="sm-item-ico"><img src="src/img/system/pinball.png"></span> Pinball</div>
           <div class="sm-item" onclick="openFromMenu('win-minecraft')"><span class="sm-item-ico"><img src="src/img/minecfrat.webp" alt="" style="width:16px;height:16px;vertical-align:middle;"></span> Minecraft</div>
           <div class="sm-item" onclick="openFromMenu('win-solitaire');closeStartMenu();solNewGame()"><span
-              class="sm-item-ico">🃏</span> Paciência</div>
-          <div class="sm-item" onclick="openFromMenu('win-limewire')"><span class="sm-item-ico">🍋</span> LimeWire</div>
+              class="sm-item-ico"><img src="src/img/system/solitaire.png"></span> Paciência</div>
+          <div class="sm-item" onclick="openFromMenu('win-limewire')"><span class="sm-item-ico"><img src="src/img/system/limewire.png"></span> LimeWire</div>
           <div class="sm-item" onclick="openFromMenu('win-defrag')"><span class="sm-item-ico"><img
                 src="src/img/system/desfragmentador.ico"></span> Desfragmentador</div>
           <div class="sm-sep"></div>
@@ -3869,21 +4096,21 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
           <div class="sm-item sm-item-bold" onclick="openFromMenu('win-sysprop')"><span class="sm-item-ico"><img
                 src="src/img/system/meu-computador.webp"></span> Meu Computador</div>
           <div class="sm-sep"></div>
-          <div class="sm-item" onclick="openFromMenu('win-ctrlpanel')"><span class="sm-item-ico">⚙️</span> Painel de
+          <div class="sm-item" onclick="openFromMenu('win-ctrlpanel')"><span class="sm-item-ico"><img src="src/img/system/control-panel.png"></span> Painel de
             Controle</div>
           <div class="sm-item" onclick="openFromMenu('win-printer-queue')"><span class="sm-item-ico"><img
                 src="src/img/system/impressora.ico"></span> Impressoras</div>
           <div class="sm-sep"></div>
           <div class="sm-item" onclick="openFromMenu('win-sobre-matheus')"><span class="sm-item-ico"><img
                 src="src/img/system/bloco-de-notas-icon.png"></span> Sobre o Matheus</div>
-          <div class="sm-item" onclick="openFromMenu('win-taskmgr')"><span class="sm-item-ico">⚙️</span> Gerenciador de
+          <div class="sm-item" onclick="openFromMenu('win-taskmgr')"><span class="sm-item-ico"><img src="src/img/system/task-manager.png"></span> Gerenciador de
             Tarefas</div>
           <div class="sm-item" onclick="openFromMenu('win-cmd')"><span class="sm-item-ico"><img
                 src="src/img/system/file-bat.ico"></span> Prompt de Comando</div>
           <div class="sm-item" onclick="openFromMenu('win-recycle')"><span class="sm-item-ico"><img
                 src="src/img/system/lixeira-icon.webp"></span> Lixeira</div>
           <div class="sm-sep"></div>
-          <div class="sm-item" onclick="closeStartMenu();triggerScreensaver()"><span class="sm-item-ico">🖥️</span>
+          <div class="sm-item" onclick="closeStartMenu();triggerScreensaver()"><span class="sm-item-ico"><img src="src/img/system/display-properties.png"></span>
             Protetor de Tela</div>
           <div class="sm-item" onclick="openFromMenu('win-about-xp')"><span class="sm-item-ico"><img
                 src="src/img/system/win-xp-logo.png"></span> Sobre o Windows</div>

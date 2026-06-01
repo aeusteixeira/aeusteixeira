@@ -169,11 +169,11 @@ const winMeta = {
     'wmp': { ico: _ico('media-player-icon.png'), lbl: 'Windows Media Player' },
     'win-blog': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'Blog' },
     'win-projects': { ico: _ico('pasta-vazia.ico'), lbl: 'Projetos' },
-    'win-stack': { ico: '⚙️', lbl: 'Painel de Controle' },
-    'win-contact': { ico: '✉️', lbl: 'Contato' },
-    'win-calc': { ico: '🧮', lbl: 'Calculadora' },
+    'win-stack': { ico: _ico('control-panel.png'), lbl: 'Painel de Controle' },
+    'win-contact': { ico: _ico('contact.png'), lbl: 'Contato' },
+    'win-calc': { ico: _ico('calc.png'), lbl: 'Calculadora' },
     'win-paint': { ico: _ico('paint.webp'), lbl: 'Paint' },
-    'win-mine': { ico: '💣', lbl: 'Campo Minado' },
+    'win-mine': { ico: _ico('minesweeper.png'), lbl: 'Campo Minado' },
     'win-npp': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'Notepad++' },
     'win-mydocs': { ico: _ico('meus-documentos-icon.ico'), lbl: 'Meus Documentos' },
     'win-carta-edmundo': { ico: _ico('wordpad.webp'), lbl: 'Carta_Apresentacao.rtf — WordPad' },
@@ -181,26 +181,29 @@ const winMeta = {
     'win-dev-projects': { ico: _ico('pasta-vazia.ico'), lbl: 'Projetos de Desenvolvimento' },
     'win-todo-doc': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'TODO_vida_2025.txt' },
     'win-saas-plan': { ico: _ico('wordpad.webp'), lbl: 'PlanoNegociosMilhao — WordPad' },
+    'win-mestre-oficina': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'mestre_oficina_LANÇADO.txt' },
+    'win-carta-futuro': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'carta_pro_meu_eu_de_2035.txt' },
+    'win-primeiro-site': { ico: _ico('chrome-icon.png'), lbl: 'primeiro_site.html (2012)' },
     'win-readme': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'README.md — Notepad++' },
     'win-compose': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'docker-compose.yml — Notepad++' },
     'win-doc': { ico: _ico('wordpad.webp'), lbl: 'WordPad' },
-    'win-taskmgr': { ico: '⚙️', lbl: 'Gerenciador de Tarefas' },
+    'win-taskmgr': { ico: _ico('task-manager.png'), lbl: 'Gerenciador de Tarefas' },
     'win-cmd': { ico: _ico('file-bat.ico'), lbl: 'Prompt de Comando' },
-    'win-solitaire': { ico: '🃏', lbl: 'Paciência' },
+    'win-solitaire': { ico: _ico('solitaire.png'), lbl: 'Paciência' },
     'win-about-xp': { ico: _ico('win-xp-logo.png'), lbl: 'Sobre o Windows' },
-    'win-ctrlpanel': { ico: '⚙️', lbl: 'Painel de Controle' },
+    'win-ctrlpanel': { ico: _ico('control-panel.png'), lbl: 'Painel de Controle' },
     'win-printer-queue': { ico: _ico('impressora.ico'), lbl: 'Impressoras' },
     'win-cdrom': { ico: _ico('cd-dvd.ico'), lbl: 'CD-ROM (D:)' },
     'win-sobre-matheus': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'sobre_o_matheus.txt' },
     'win-virus-src': { ico: _ico('file-bat.ico'), lbl: 'virus.bat' },
-    'win-cp-addremove': { ico: '📦', lbl: 'Adicionar/Remover Programas' },
-    'win-cp-datetime': { ico: '📅', lbl: 'Data e Hora' },
-    'win-cp-usuarios': { ico: '👤', lbl: 'Contas de Usuário' },
+    'win-cp-addremove': { ico: _ico('add-remove.png'), lbl: 'Adicionar/Remover Programas' },
+    'win-cp-datetime': { ico: _ico('datetime.png'), lbl: 'Data e Hora' },
+    'win-cp-usuarios': { ico: _ico('user-accounts.png'), lbl: 'Contas de Usuário' },
     'win-receita': { ico: _ico('bloco-de-notas-icon.png'), lbl: 'receitas_bacalhau_mae.txt' },
-    'win-limewire': { ico: '🍋', lbl: 'LimeWire 4.18.8' },
+    'win-limewire': { ico: _ico('limewire.png'), lbl: 'LimeWire 4.18.8' },
     'win-defrag': { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' },
     'win-pendrive': { ico: _ico('pasta-vazia.ico'), lbl: 'Disco removível (E:)' },
-    'win-pinball': { ico: '🏓', lbl: '3D Pinball — Space Cadet' },
+    'win-pinball': { ico: _ico('pinball.png'), lbl: '3D Pinball — Space Cadet' },
     'win-minecraft': { ico: '<img src="src/img/minecfrat.webp" alt="" style="width:16px;height:16px;vertical-align:middle;">', lbl: 'Minecraft — Windows Edition' },
 };
 
@@ -2301,8 +2304,8 @@ const mydocsTree = {
     root: {
         addr: 'C:\\Documents and Settings\\Matheus\\Meus Documentos\\',
         label: 'Meus Documentos',
-        detail: 'Meus Documentos<br>Pasta do sistema<br><br>10 objetos',
-        count: '10 objetos',
+        detail: 'Meus Documentos<br>Pasta do sistema<br><br>11 objetos',
+        count: '11 objetos',
         items: [
             { ico: _ico('pasta-vazia.ico'), name: 'Downloads',                type: 'Pasta de arquivos', size: '',      action: () => openWindow('win-downloads') },
             { ico: _ico('pasta-vazia.ico'), name: 'Projetos de Desenvolvimento', type: 'Pasta de arquivos', size: '',   action: () => openWindow('win-dev-projects') },
@@ -2312,8 +2315,9 @@ const mydocsTree = {
             { ico: _ico('bloco-de-notas-icon.png'), name: 'TODO_vida_2025.txt',       type: 'Arquivo de Texto',   size: '3 KB',  action: () => openWindow('win-todo-doc') },
             { ico: _ico('wordpad.webp'), name: 'PlanoNegociosMilhao_v7_DEFINITIVO.doc', type: 'Documento Word', size: '28 KB', action: () => openWindow('win-saas-plan') },
             { ico: _ico('bloco-de-notas-icon.png'), name: 'receitas_bacalhau_mae.txt',type: 'Arquivo de Texto',   size: '2 KB',  action: () => openReceitaDoc() },
-            { ico: '🌐', name: 'primeiro_site.html',       type: 'Documento HTML',     size: '4 KB',  action: () => { showNotif('🌐 primeiro_site.html','<marquee>Bem vindo ao site do Matheus!!</marquee><br>Feito em 2012 com Notepad e muito amor. Tabelas dentro de tabelas dentro de tabelas.'); sndClick(); } },
-            { ico: _ico('bloco-de-notas-icon.png'), name: 'plano_mestre_oficina.txt', type: 'Arquivo de Texto',   size: '6 KB',  action: () => { showNotif('🔧 Mestre Oficina','Plano de Negócio v12 — SaaS para gestão de oficinas mecânicas. Laravel + MySQL + n8n. Meta: 100 oficinas até 2026.'); sndClick(); } },
+            { ico: '🌐', name: 'primeiro_site.html',       type: 'Documento HTML',     size: '4 KB',  action: () => openWindow('win-primeiro-site') },
+            { ico: _ico('bloco-de-notas-icon.png'), name: 'mestre_oficina_LANÇADO.txt', type: 'Arquivo de Texto',   size: '6 KB',  action: () => openWindow('win-mestre-oficina') },
+            { ico: _ico('bloco-de-notas-icon.png'), name: 'carta_pro_meu_eu_de_2035.txt', type: 'Arquivo de Texto', size: '2 KB', action: () => openWindow('win-carta-futuro') },
         ]
     },
     imagens: {
@@ -2502,7 +2506,7 @@ Salvo em: 24/12/2019
           <span>Linha 1, Col 1</span>
         </div>`;
         document.getElementById('desktop').appendChild(w);
-        winMeta[existingId] = { ico: '📄', lbl: 'receitas_bacalhau_mae.txt' };
+        winMeta[existingId] = { ico: _ico('bloco-de-notas-icon.png'), lbl: 'receitas_bacalhau_mae.txt' };
         const newW = document.getElementById(existingId);
         ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach(dir => {
             const h = document.createElement('div');
@@ -3269,7 +3273,7 @@ function bkDownload(id) {
         </div>
         <div class="xp-resize" onmousedown="startResize(event,'${winId}')"></div>`;
     document.body.appendChild(w);
-    winMeta[winId] = { ico:'📥', lbl: s.name + ' — Download' };
+    winMeta[winId] = { ico: _ico('download.png'), lbl: s.name + ' — Download' };
     openWindow(winId);
     let pct = 0;
     const speeds = ['248 KB/s','312 KB/s','198 KB/s','421 KB/s','287 KB/s','364 KB/s'];
@@ -4100,12 +4104,12 @@ function showWinRAR() {
 /* ══════════════════════════════════════
     LIMEWIRE
 ══════════════════════════════════════ */
-winMeta['win-limewire'] = { ico: '🍋', lbl: 'LimeWire' };
+winMeta['win-limewire'] = { ico: _ico('limewire.png'), lbl: 'LimeWire' };
 
 /* ══════════════════════════════════════
     DESFRAGMENTADOR DE DISCO
 ══════════════════════════════════════ */
-winMeta['win-defrag'] = { ico: '🟦', lbl: 'Desfragmentador de Disco' };
+winMeta['win-defrag'] = { ico: _ico('desfragmentador.ico'), lbl: 'Desfragmentador de Disco' };
 function _drawDefrag(canvasId, fragmented) {
     const c = document.getElementById(canvasId);
     if (!c) return;

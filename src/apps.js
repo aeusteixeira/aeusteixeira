@@ -192,7 +192,7 @@
       `<button class="ax-btn" onclick="closeWin('win-display')">Cancelar</button>` +
       `<button class="ax-btn" onclick="dispApply()">Aplicar</button></div>` +
       `</div>`;
-    const w = makeWin('win-display', 'Propriedades de Vídeo', '🖥️', 420, 460, { body: body, top: 50, left: 200 });
+    const w = makeWin('win-display', 'Propriedades de Vídeo', _ico('display-properties.png'), 420, 460, { body: body, top: 50, left: 200 });
     const sc = localStorage.getItem('mt_scheme'); if (sc) { const sel = document.getElementById('disp-scheme'); if (sel) sel.value = sc; }
     return w;
   }
@@ -219,7 +219,7 @@
       `<div id="wp-editor" contenteditable="true" spellcheck="false" style="flex:1;background:#fff;padding:18px 24px;overflow:auto;font-family:Tahoma;font-size:13px;line-height:1.5;outline:none"></div>` +
       `<div style="flex:none;background:#ece9d8;border-top:1px solid #aca899;padding:2px 8px;color:#555">Pronto</div>` +
       `</div>`;
-    makeWin('win-wordpad', 'Documento - WordPad', '📝', 560, 440, { body: body, top: 50, left: 180 });
+    makeWin('win-wordpad', 'Documento - WordPad', _ico('wordpad.webp'), 560, 440, { body: body, top: 50, left: 180 });
     const ed = document.getElementById('wp-editor');
     const saved = localStorage.getItem('mt_wordpad');
     ed.innerHTML = saved || '<h2 style="margin:0 0 8px">Bem-vindo ao WordPad</h2><p>Este é um editor de texto formatado de verdade. Experimente <b>negrito</b>, <i>itálico</i>, cores e fontes na barra acima. O que você escrever fica salvo no navegador.</p>';
@@ -240,7 +240,7 @@
       `<button class="ax-btn" onclick="cmCopy()">Copiar</button>` +
       `<button class="ax-btn" onclick="document.getElementById('cm-out').value=''">Limpar</button></div>` +
       `</div>`;
-    makeWin('win-charmap', 'Mapa de Caracteres', '🔤', 440, 420, { body: body, top: 70, left: 240 });
+    makeWin('win-charmap', 'Mapa de Caracteres', _ico('charmap.png'), 440, 420, { body: body, top: 70, left: 240 });
   }
   window.cmPick = function (ch) { const o = document.getElementById('cm-out'); if (o) o.value += ch; click(); };
   window.cmCopy = function () {
@@ -265,7 +265,7 @@
       `</div>` +
       `<div id="sr-status" style="color:#555">Pronto para gravar</div>` +
       `</div></div>`;
-    makeWin('win-soundrec', 'Gravador de Som', '🎙️', 320, 280, { body: body, top: 90, left: 280 });
+    makeWin('win-soundrec', 'Gravador de Som', _ico('sound-recorder.png'), 320, 280, { body: body, top: 90, left: 280 });
   }
   function srTick() {
     const vu = document.getElementById('sr-vu'); if (!vu) return;
@@ -326,7 +326,7 @@
       `<div class="exp-link" onclick="openWindow('win-mydocs')">Meus Documentos</div>` +
       `<div class="exp-link" onclick="openWindow('win-recycle')">Lixeira</div>` +
       `</div><div class="exp-main" id="exp-main"></div></div></div>`;
-    makeWin('win-meucomp', 'Meu Computador', '🖥️', 560, 400, { body: body, top: 50, left: 150 });
+    makeWin('win-meucomp', 'Meu Computador', _ico('meu-computador.webp'), 560, 400, { body: body, top: 50, left: 150 });
     window.expGo('root');
   }
   window.expGo = function (key) {
@@ -501,7 +501,7 @@
       `<div class="fc-cols">${cols}</div>` +
       `<div style="flex:none;padding:6px 10px;color:#bff5bf;font-size:11px">Clique numa carta e depois no destino. As bases preenchem sozinhas.</div>` +
       `</div>`;
-    makeWin('win-freecell', 'FreeCell', '🎴', 620, 500, { body: body, top: 40, left: 120 });
+    makeWin('win-freecell', 'FreeCell', _ico('freecell.png'), 620, 500, { body: body, top: 40, left: 120 });
     fcNew();
   }
   window.fcNewMenu = function () { fcNew(); click(); };
@@ -712,12 +712,12 @@
   /* ════════════════ REGISTRO: ícones, menu iniciar, atalhos ════════════════ */
   function lazy(id, builder) { return function () { builder(); openWindow(id); }; }
   const APPS = [
-    { id: 'win-display', ico: '🖥️', lbl: 'Propriedades de Vídeo', build: buildDisplay, desktop: false },
-    { id: 'win-wordpad', ico: '📝', lbl: 'WordPad', build: buildWordpad, desktop: true },
-    { id: 'win-meucomp', ico: '🖥️', lbl: 'Meu Computador', build: buildExplorer, desktop: true },
-    { id: 'win-freecell', ico: '🎴', lbl: 'FreeCell', build: buildFreeCell, desktop: false },
-    { id: 'win-charmap', ico: '🔤', lbl: 'Mapa de Caracteres', build: buildCharmap, desktop: false },
-    { id: 'win-soundrec', ico: '🎙️', lbl: 'Gravador de Som', build: buildSoundRec, desktop: false },
+    { id: 'win-display', ico: _ico('display-properties.png'), lbl: 'Propriedades de Vídeo', build: buildDisplay, desktop: false },
+    { id: 'win-wordpad', ico: _ico('wordpad.webp'), lbl: 'WordPad', build: buildWordpad, desktop: true },
+    { id: 'win-meucomp', ico: _ico('meu-computador.webp'), lbl: 'Meu Computador', build: buildExplorer, desktop: true },
+    { id: 'win-freecell', ico: _ico('freecell.png'), lbl: 'FreeCell', build: buildFreeCell, desktop: false },
+    { id: 'win-charmap', ico: _ico('charmap.png'), lbl: 'Mapa de Caracteres', build: buildCharmap, desktop: false },
+    { id: 'win-soundrec', ico: _ico('sound-recorder.png'), lbl: 'Gravador de Som', build: buildSoundRec, desktop: false },
     { id: 'win-avast', ico: avico(16), lbl: 'avast! Antivírus', build: buildAvast, desktop: true }
   ];
   /* registra openers globais */
@@ -750,28 +750,28 @@
   /* Lista completa do menu: aponta para janelas existentes + apps novos */
   const ALL_PROGRAMS = [
     { lbl: 'Acessórios', header: true },
-    { lbl: 'Bloco de Notas', ico: '📝', open: () => openWindow('win-notepad') },
-    { lbl: 'WordPad', ico: '📝', open: () => openApp('win-wordpad') },
-    { lbl: 'Paint', ico: '🎨', open: () => openWindow('win-paint') },
-    { lbl: 'Calculadora', ico: '🧮', open: () => openWindow('win-calc') },
-    { lbl: 'Mapa de Caracteres', ico: '🔤', open: () => openApp('win-charmap') },
-    { lbl: 'Gravador de Som', ico: '🎙️', open: () => openApp('win-soundrec') },
-    { lbl: 'Prompt de Comando', ico: '⌨️', open: () => openWindow('win-cmd') },
-    { lbl: 'Notepad++', ico: '📝', open: () => openWindow('win-npp') },
+    { lbl: 'Bloco de Notas', ico: _ico('bloco-de-notas-icon.png'), open: () => openWindow('win-notepad') },
+    { lbl: 'WordPad', ico: _ico('wordpad.webp'), open: () => openApp('win-wordpad') },
+    { lbl: 'Paint', ico: _ico('paint.webp'), open: () => openWindow('win-paint') },
+    { lbl: 'Calculadora', ico: _ico('calc.png'), open: () => openWindow('win-calc') },
+    { lbl: 'Mapa de Caracteres', ico: _ico('charmap.png'), open: () => openApp('win-charmap') },
+    { lbl: 'Gravador de Som', ico: _ico('sound-recorder.png'), open: () => openApp('win-soundrec') },
+    { lbl: 'Prompt de Comando', ico: _ico('file-bat.ico'), open: () => openWindow('win-cmd') },
+    { lbl: 'Notepad++', ico: _ico('bloco-de-notas-icon.png'), open: () => openWindow('win-npp') },
     { lbl: 'Jogos', header: true },
-    { lbl: 'Campo Minado', ico: '💣', open: () => openWindow('win-mine') },
-    { lbl: 'Paciência', ico: '🃏', open: () => openWindow('win-solitaire') },
-    { lbl: 'FreeCell', ico: '🎴', open: () => openApp('win-freecell') },
-    { lbl: 'Pinball', ico: '🌌', open: () => openWindow('win-pinball') },
-    { lbl: 'Minecraft', ico: '⛏️', open: () => openWindow('win-minecraft') },
+    { lbl: 'Campo Minado', ico: _ico('minesweeper.png'), open: () => openWindow('win-mine') },
+    { lbl: 'Paciência', ico: _ico('solitaire.png'), open: () => openWindow('win-solitaire') },
+    { lbl: 'FreeCell', ico: _ico('freecell.png'), open: () => openApp('win-freecell') },
+    { lbl: 'Pinball', ico: _ico('pinball.png'), open: () => openWindow('win-pinball') },
+    { lbl: 'Minecraft', ico: '<img src="src/img/minecfrat.webp" style="width:16px;height:16px;vertical-align:middle">', open: () => openWindow('win-minecraft') },
     { lbl: 'Segurança', header: true },
     { lbl: 'avast! Antivírus', ico: avico(16), open: () => openApp('win-avast') },
     { lbl: 'Sistema', header: true },
-    { lbl: 'Meu Computador', ico: '🖥️', open: () => openApp('win-meucomp') },
-    { lbl: 'Propriedades de Vídeo', ico: '🖥️', open: () => openApp('win-display') },
-    { lbl: 'Painel de Controle', ico: '⚙️', open: () => openWindow('win-ctrlpanel') },
-    { lbl: 'Gerenciador de Tarefas', ico: '⚙️', open: () => openWindow('win-taskmgr') },
-    { lbl: 'Desfragmentador', ico: '🧩', open: () => openWindow('win-defrag') }
+    { lbl: 'Meu Computador', ico: _ico('meu-computador.webp'), open: () => openApp('win-meucomp') },
+    { lbl: 'Propriedades de Vídeo', ico: _ico('display-properties.png'), open: () => openApp('win-display') },
+    { lbl: 'Painel de Controle', ico: _ico('control-panel.png'), open: () => openWindow('win-ctrlpanel') },
+    { lbl: 'Gerenciador de Tarefas', ico: _ico('task-manager.png'), open: () => openWindow('win-taskmgr') },
+    { lbl: 'Desfragmentador', ico: _ico('desfragmentador.ico'), open: () => openWindow('win-defrag') }
   ];
 
   function setupAllPrograms() {
