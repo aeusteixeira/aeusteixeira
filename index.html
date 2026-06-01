@@ -5126,26 +5126,41 @@ Sem `node_modules` de 300 MB. <span style="color:#f44747">Glorioso.</span>
       </div>
     </div>
 
+    <!-- DESKTOP WIDGETS (relógio + clima) -->
+    <div id="widget-clock" class="xp-widget" style="top:18px;right:18px;" onmousedown="startDrag(event,'widget-clock')">
+      <div class="wclock-face">
+        <div class="wclock-hand wclock-h" id="wclock-h"></div>
+        <div class="wclock-hand wclock-m" id="wclock-m"></div>
+        <div class="wclock-hand wclock-s" id="wclock-s"></div>
+        <div class="wclock-center"></div>
+      </div>
+      <div class="wclock-digital" id="wclock-digital">--:--:--</div>
+      <div class="wclock-date" id="wclock-date">&nbsp;</div>
+    </div>
+    <div id="widget-weather" class="xp-widget" style="top:188px;right:18px;"
+      onmousedown="startDrag(event,'widget-weather')"></div>
+
     <!-- STICKY NOTES -->
-    <div id="sticky-1" class="sticky-note" style="top:180px;right:24px;" onmousedown="startDrag(event,'sticky-1')">
+    <div id="sticky-3" class="sticky-note sticky-pink" style="top:14px;right:222px;transform:rotate(1.5deg);"
+      onmousedown="startDrag(event,'sticky-3')">
+      <div class="sticky-top"><span class="sticky-title">☎ Recados</span><span class="sticky-close"
+          onclick="document.getElementById('sticky-3').style.display='none'">✕</span></div>
+      <div class="sticky-body">Edmundo: (21) 98877-0042<br>Carla: (21) 99124-8831<br>Mãe: (21)
+        2527-4490<br><br>Churrasco sábado: levar<br>carvão + gelo + guaraná</div>
+    </div>
+    <div id="sticky-1" class="sticky-note" style="top:216px;right:222px;transform:rotate(-1.5deg);"
+      onmousedown="startDrag(event,'sticky-1')">
       <div class="sticky-top"><span class="sticky-title">📌 TODO</span><span class="sticky-close"
           onclick="document.getElementById('sticky-1').style.display='none'">✕</span></div>
       <div class="sticky-body">☐ Comprar leite e pão<br>☑ <s>Pagar internet (NET)</s><br>☐ Ligar pro Edmundo<br>☐
         Devolver DVD na locadora<br>☐ Lasanha na mãe domingo</div>
     </div>
-    <div id="sticky-2" class="sticky-note sticky-blue" style="top:360px;right:24px;"
+    <div id="sticky-2" class="sticky-note sticky-blue" style="top:412px;right:222px;transform:rotate(1deg);"
       onmousedown="startDrag(event,'sticky-2')">
       <div class="sticky-top"><span class="sticky-title">💡 Ideia</span><span class="sticky-close"
           onclick="document.getElementById('sticky-2').style.display='none'">✕</span></div>
       <div class="sticky-body">Senha Wi-Fi: MatheusNet2006<br>Senha do PC: ********<br><br>NÃO esquecer de gravar
         o<br>Lost antes de formatar o PC!</div>
-    </div>
-    <div id="sticky-3" class="sticky-note sticky-pink" style="top:180px;right:200px;"
-      onmousedown="startDrag(event,'sticky-3')">
-      <div class="sticky-top"><span class="sticky-title">☎ Recados</span><span class="sticky-close"
-          onclick="document.getElementById('sticky-3').style.display='none'">✕</span></div>
-      <div class="sticky-body">Edmundo — (21) 98877-0042<br>Carla — (21) 99124-8831<br>Mãe — (21)
-        2527-4490<br><br>Churrasco sábado: levar<br>carvão + gelo + guaraná</div>
     </div>
 
     <!-- VIRUS.BAT OVERLAY -->

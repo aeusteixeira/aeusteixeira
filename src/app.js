@@ -119,6 +119,7 @@ function enterDesktop() {
     document.getElementById('desktop').style.display = 'block';
     document.getElementById('taskbar').style.display = 'flex';
     updateClock(); setInterval(updateClock, 10000);
+    _initDesktopWidgets();
     loadNotepad();
     const startSnd = new Audio('src/sounds/windows-xp-startup.mp3');
     startSnd.volume = 0.65;
@@ -134,6 +135,8 @@ function enterDesktop() {
     setTimeout(() => { paintInit(); }, 100);
     setTimeout(() => { showTrayBalloon(); _trayBalloonTimer = setInterval(showTrayBalloon, 40000); }, 20000);
     startAutoConversations();
+    /* Rocky, o cachorrinho, entra na área de trabalho */
+    setTimeout(() => { try { rockyStart(); } catch (e) {} }, 6000);
     /* Clippy aparece depois de um tempo */
     setTimeout(showClippy, 15000 + Math.random() * 10000);
     /* WinRAR popup clássico */
@@ -5944,3 +5947,234 @@ window.addEventListener('keydown', e=>{
     if(chrome && chrome.style.display!=='none'){ e.preventDefault(); chromeNewTab(); }
   }
 });
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGETS DA ÁREA DE TRABALHO — relógio analógico + clima
+   (estilo Yahoo! Widgets / Rainmeter da época do XP)
+   ══════════════════════════════════════════════════════════════ */
+function _wxIcon(kind, size) {
+  const s = size || 40;
+  const sun = '<circle cx="20" cy="20" r="8.5" fill="#ffd24d"/>' +
+    '<g stroke="#ffd24d" stroke-width="2.4" stroke-linecap="round">' +
+    '<line x1="20" y1="3" x2="20" y2="7.5"/><line x1="20" y1="32.5" x2="20" y2="37"/>' +
+    '<line x1="3" y1="20" x2="7.5" y2="20"/><line x1="32.5" y1="20" x2="37" y2="20"/>' +
+    '<line x1="8" y1="8" x2="11" y2="11"/><line x1="29" y1="29" x2="32" y2="32"/>' +
+    '<line x1="8" y1="32" x2="11" y2="29"/><line x1="29" y1="11" x2="32" y2="8"/></g>';
+  const cloud = '<path d="M12 31 a8 8 0 0 1 0.6 -15.9 a10 10 0 0 1 19.4 2.2 a7 7 0 0 1 -1.6 13.7 z" fill="#eef3fb"/>';
+  const cloudSun = '<circle cx="13" cy="13.5" r="6" fill="#ffd24d"/>' +
+    '<g stroke="#ffd24d" stroke-width="2" stroke-linecap="round">' +
+    '<line x1="13" y1="2.5" x2="13" y2="5.5"/><line x1="3" y1="13.5" x2="6" y2="13.5"/>' +
+    '<line x1="5.5" y1="6" x2="7.7" y2="8.2"/></g>' +
+    '<path d="M14 32 a7.5 7.5 0 0 1 0.5 -15 a9 9 0 0 1 17.2 2 a6.5 6.5 0 0 1 -1.4 13 z" fill="#eef3fb"/>';
+  const rain = cloud +
+    '<g stroke="#5aa0ff" stroke-width="2.3" stroke-linecap="round">' +
+    '<line x1="13" y1="32" x2="11" y2="37"/><line x1="20" y1="32.5" x2="18" y2="37.5"/>' +
+    '<line x1="27" y1="32" x2="25" y2="37"/></g>';
+  const map = { sun: sun, cloud: cloud, 'cloud-sun': cloudSun, rain: rain };
+  return '<svg viewBox="0 0 40 40" width="' + s + '" height="' + s + '">' + (map[kind] || cloudSun) + '</svg>';
+}
+
+function _buildClockTicks() {
+  const face = document.querySelector('#widget-clock .wclock-face');
+  if (!face || face.dataset.ticked) return;
+  for (let i = 0; i < 12; i++) {
+    const t = document.createElement('div');
+    t.className = 'wclock-tick' + (i % 3 === 0 ? ' major' : '');
+    t.style.transform = 'rotate(' + (i * 30) + 'deg)';
+    face.insertBefore(t, face.firstChild);
+  }
+  face.dataset.ticked = '1';
+}
+
+function _updateWidgetClock() {
+  const h = document.getElementById('wclock-h');
+  if (!h) return;
+  const m = document.getElementById('wclock-m'), s = document.getElementById('wclock-s');
+  const now = new Date();
+  const sec = now.getSeconds(), min = now.getMinutes(), hr = now.getHours();
+  s.style.transform = 'rotate(' + (sec * 6) + 'deg)';
+  m.style.transform = 'rotate(' + (min * 6 + sec * 0.1) + 'deg)';
+  h.style.transform = 'rotate(' + ((hr % 12) * 30 + min * 0.5) + 'deg)';
+  const dig = document.getElementById('wclock-digital');
+  if (dig) dig.textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dt = document.getElementById('wclock-date');
+  if (dt) { const d = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); dt.textContent = d.charAt(0).toUpperCase() + d.slice(1); }
+}
+
+function _initWeatherWidget() {
+  const el = document.getElementById('widget-weather');
+  if (!el || el.dataset.init) return;
+  el.dataset.init = '1';
+  const conds = [
+    { t: 24, c: 'Parcialmente nublado', k: 'cloud-sun', mn: 18, mx: 27 },
+    { t: 22, c: 'Nublado', k: 'cloud', mn: 17, mx: 24 },
+    { t: 27, c: 'Ensolarado', k: 'sun', mn: 19, mx: 30 },
+    { t: 21, c: 'Pancadas de chuva', k: 'rain', mn: 16, mx: 23 }
+  ];
+  const w = conds[Math.floor(Math.random() * conds.length)];
+  const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const now = new Date();
+  let fc = '';
+  for (let i = 1; i <= 3; i++) {
+    const dd = days[(now.getDay() + i) % 7];
+    const f = conds[Math.floor(Math.random() * conds.length)];
+    fc += '<div><div class="d">' + dd + '</div><div class="i">' + _wxIcon(f.k, 22) + '</div><div>' + f.mx + '°</div></div>';
+  }
+  el.innerHTML =
+    '<div class="wx-city">São Paulo, SP</div><div class="wx-sub">Agora</div>' +
+    '<div class="wx-main"><div class="wx-ico">' + _wxIcon(w.k, 48) + '</div><div class="wx-temp">' + w.t + '°</div></div>' +
+    '<div class="wx-cond">' + w.c + '</div>' +
+    '<div class="wx-minmax">Mín ' + w.mn + '°  ·  Máx ' + w.mx + '°</div>' +
+    '<div class="wx-fc">' + fc + '</div>';
+}
+
+function _initDesktopWidgets() {
+  _buildClockTicks();
+  _initWeatherWidget();
+  _updateWidgetClock();
+  if (!window._widgetClockTimer) window._widgetClockTimer = setInterval(_updateWidgetClock, 1000);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ROCKY — o cão assistente do Microsoft Office, como pet de área de
+   trabalho. Usa o sprite sheet oficial (enviado pelo usuário), com
+   o fundo magenta removido, montado num atlas 29x36 (célula 124x93).
+   Anda em perfil, senta de frente, late e toca as demais animações
+   do sheet como "truques". Clique = truque + fala.
+   ══════════════════════════════════════════════════════════════ */
+const RK_COLS = 29, RK_ROWS = 36, RK_CW = 124, RK_CH = 93, RK_TOTAL = RK_COLS * RK_ROWS;
+const RK_IDLE = [58, 59, 60];               /* sentado de frente (linha 2, col 0-2) */
+const RK_WALK = [73, 74, 75, 76, 77, 78, 79, 80]; /* ciclo de corrida limpo em perfil (sprite olha p/ direita) */
+const RK_EMPTY = new Set([28,57,86,115,144,169,173,202,231,260,289,318,347,376,405,434,463,492,521,542,550,579,608,637,666,681,695,724,753,782,811,840,865,869,879,882,898,927,956,985,1014,1019,1020,1021,1022,1023,1024,1025,1026,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043]);
+const _RK_PHRASES = [
+  'Au au! 🐾',
+  'Posso ajudar a pesquisar?',
+  'Já viu os projetos do Matheus?',
+  'Rocky na área! 🐶',
+  'Clica em mim que eu faço um truque!',
+  'Farejando uns bugs por aqui...',
+  'Que tal abrir o currículo?',
+  'au au! adoro esse Windows XP',
+  'Tô de olho na sua área de trabalho.'
+];
+const _RK_CLICK = ['Au au au! 🐾', 'Olha meu truque!', 'rsrs, de novo?', 'Woof!', 'Pronto, chefe!'];
+let _rkEl = null, _rkAnim = null, _rkTimer = null, _rkSayT = null, _rkAlive = false, _rkBusy = false;
+function _rkPick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function _rkWidth() { const d = document.getElementById('desktop'); return d ? d.clientWidth : window.innerWidth; }
+
+function _rkInjectCss() {
+  if (document.getElementById('rocky-css')) return;
+  const s = document.createElement('style'); s.id = 'rocky-css';
+  s.textContent = `
+  .rocky{position:absolute;bottom:36px;left:50%;z-index:390;cursor:pointer;user-select:none;-webkit-user-select:none;}
+  .rocky .rk-flip{transition:transform .12s;}
+  .rocky.face-left .rk-flip{transform:scaleX(-1);}
+  .rocky.hop .rk-sprite{animation:rkHop .45s ease-out;}
+  @keyframes rkHop{0%{transform:translateY(0)}45%{transform:translateY(-15px)}100%{transform:translateY(0)}}
+  .rk-sprite{width:${RK_CW}px;height:${RK_CH}px;background-image:url('src/img/rocky-atlas.png');
+    background-repeat:no-repeat;filter:drop-shadow(2px 4px 2px rgba(0,0,0,.3));}
+  .rk-bubble{position:absolute;bottom:88px;left:50%;transform:translateX(-50%) scale(.8);transform-origin:bottom center;
+    background:#fffef0;border:1px solid #c9b97a;border-radius:10px;padding:6px 11px;
+    font:12px 'Segoe UI',Tahoma,sans-serif;color:#333;white-space:nowrap;
+    box-shadow:0 3px 10px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;}
+  .rk-bubble.show{opacity:1;transform:translateX(-50%) scale(1);}
+  .rk-bubble::after{content:'';position:absolute;bottom:-7px;left:50%;margin-left:-6px;
+    border:6px solid transparent;border-top-color:#fffef0;}`;
+  document.head.appendChild(s);
+}
+
+function _rkSetFrame(i) {
+  const s = _rkEl && _rkEl.querySelector('.rk-sprite'); if (!s) return;
+  const c = i % RK_COLS, r = (i / RK_COLS) | 0;
+  s.style.backgroundPosition = (-(c * RK_CW)) + 'px ' + (-(r * RK_CH)) + 'px';
+}
+function _rkStopAnim() { if (_rkAnim) { clearInterval(_rkAnim); _rkAnim = null; } }
+function _rkPlay(frames, fps, loop, onDone) {
+  _rkStopAnim();
+  if (!frames || !frames.length) { if (onDone) onDone(); return; }
+  let i = 0; _rkSetFrame(frames[0]);
+  _rkAnim = setInterval(function () {
+    i++;
+    if (i >= frames.length) { if (loop) { i = 0; } else { _rkStopAnim(); if (onDone) onDone(); return; } }
+    _rkSetFrame(frames[i]);
+  }, 1000 / fps);
+}
+function rockySay(t) {
+  if (!_rkEl) return;
+  const b = _rkEl.querySelector('.rk-bubble'); if (!b) return;
+  b.textContent = t; b.classList.add('show');
+  clearTimeout(_rkSayT);
+  _rkSayT = setTimeout(function () { b.classList.remove('show'); }, 3600);
+}
+function _rkHop() { if (!_rkEl) return; _rkEl.classList.add('hop'); setTimeout(function () { if (_rkEl) _rkEl.classList.remove('hop'); }, 460); }
+
+/* monta a sequência de um "truque": trecho contíguo do sheet, pulando frames vazios */
+function _rkTrickFrames(len) {
+  len = len || 16;
+  let start = 0, tries = 0;
+  do { start = Math.floor(Math.random() * (RK_TOTAL - len)); tries++; }
+  while (RK_EMPTY.has(start) && tries < 25);
+  const f = [];
+  for (let k = 0; k < len; k++) { const idx = start + k; if (!RK_EMPTY.has(idx)) f.push(idx); }
+  return f.length ? f : RK_IDLE;
+}
+
+function _rkIdle() {
+  if (!_rkAlive) return;
+  _rkBusy = false; _rkEl.classList.remove('walk');
+  _rkPlay(RK_IDLE, 2.2, true);
+  clearTimeout(_rkTimer);
+  _rkTimer = setTimeout(_rkAct, 2600 + Math.random() * 4200);
+}
+function _rkAct() {
+  if (!_rkAlive || _rkBusy) return;
+  const r = Math.random();
+  if (r < 0.5) _rkWalk();
+  else if (r < 0.85) _rkGesture();
+  else _rkIdle();
+}
+function _rkWalk() {
+  if (!_rkEl) return;
+  _rkBusy = true;
+  const w = _rkWidth(), max = Math.max(20, w - 140);
+  const cur = parseFloat(_rkEl.style.left) || (w * 0.5);
+  let target = 10 + Math.random() * (max - 10);
+  if (Math.abs(target - cur) < 120) { target = cur < w / 2 ? Math.min(max, cur + 220) : Math.max(10, cur - 220); }
+  const dur = Math.max(1.4, Math.abs(target - cur) / 55);
+  _rkEl.classList.toggle('face-left', target < cur); /* sprite olha p/ direita; espelha ao ir p/ esquerda */
+  _rkPlay(RK_WALK, 12, true);
+  _rkEl.style.transition = 'left ' + dur.toFixed(2) + 's linear';
+  _rkEl.style.left = Math.round(target) + 'px';
+  clearTimeout(_rkTimer);
+  _rkTimer = setTimeout(function () {
+    if (!_rkAlive) return;
+    if (Math.random() < 0.4) rockySay(_rkPick(_RK_PHRASES));
+    _rkIdle();
+  }, dur * 1000 + 50);
+}
+function _rkGesture() {
+  if (!_rkEl) return;
+  _rkBusy = true; _rkEl.classList.remove('walk');
+  if (Math.random() < 0.5) rockySay(_rkPick(_RK_PHRASES));
+  _rkPlay(_rkTrickFrames(14 + Math.floor(Math.random() * 8)), 10, false, _rkIdle);
+}
+
+function rockyStart() {
+  if (_rkEl) return;
+  const host = document.getElementById('desktop'); if (!host) return;
+  _rkInjectCss();
+  const el = document.createElement('div'); el.className = 'rocky'; el.id = 'rocky';
+  el.innerHTML = '<div class="rk-bubble"></div><div class="rk-flip"><div class="rk-sprite"></div></div>';
+  host.appendChild(el);
+  _rkEl = el; _rkAlive = true;
+  el.style.left = Math.round(_rkWidth() * 0.5) + 'px';
+  _rkSetFrame(RK_IDLE[0]);
+  el.addEventListener('click', function () {
+    _rkBusy = true; _rkHop(); rockySay(_rkPick(_RK_CLICK));
+    _rkPlay(_rkTrickFrames(16), 11, false, _rkIdle);
+  });
+  setTimeout(function () { rockySay('Au au! 🐾 Oi, eu sou o Rocky!'); }, 800);
+  _rkTimer = setTimeout(_rkIdle, 1800);
+  if (!window._rkChatTimer) window._rkChatTimer = setInterval(function () { if (_rkAlive && !_rkBusy && Math.random() < 0.5) rockySay(_rkPick(_RK_PHRASES)); }, 48000);
+}
+window.rockyStart = rockyStart; window.rockySay = rockySay;
