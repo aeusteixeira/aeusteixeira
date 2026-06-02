@@ -1439,9 +1439,24 @@
               <!-- Scraps -->
               <div class="ok-panel">
                 <div class="ok-panel-header">
-                  <b class="ok-panel-title">recados <span>(48)</span></b>
-                  <a href="#" onclick="sndClick();return false" class="ok-link">escrever recado</a>
+                  <b class="ok-panel-title">recados <span>(<span id="ok-scrap-count">48</span>)</span></b>
+                  <a href="#" onclick="orkutScrapForm();return false" class="ok-link">escrever recado</a>
                 </div>
+                <!-- Formulário de recado (interativo) -->
+                <div id="ok-scrap-form" class="ok-scrap-form" style="display:none;">
+                  <input id="ok-scrap-name" class="ok-scrap-input" placeholder="seu nome" maxlength="30">
+                  <textarea id="ok-scrap-text" class="ok-scrap-area" placeholder="deixe um recado pro Matheus..."
+                    maxlength="500"></textarea>
+                  <div class="ok-scrap-form-bottom">
+                    <span class="ok-scrap-emojis">
+                      <span onclick="orkutEmoji('♥')">♥</span><span onclick="orkutEmoji('😃')">😃</span><span
+                        onclick="orkutEmoji('😎')">😎</span><span onclick="orkutEmoji('s2')">s2</span><span
+                        onclick="orkutEmoji('kkkk')">kkkk</span><span onclick="orkutEmoji('☕')">☕</span>
+                    </span>
+                    <button class="ok-scrap-btn" onclick="orkutPostScrap()">postar recado</button>
+                  </div>
+                </div>
+                <div id="ok-scraps">
                 <div class="ok-scrap">
                   <div class="ok-scrap-av" style="background:#e74c3c;">E</div>
                   <div>
@@ -1483,6 +1498,7 @@
                       amanha? preciso desabafar sobre a vida</span>
                   </div>
                 </div>
+                </div><!-- /ok-scraps -->
               </div>
 
               <!-- Depoimentos -->
@@ -1547,8 +1563,15 @@
               </div>
             </div>
 
-            <!-- COLUNA DIREITA: amigos + comunidades -->
+            <!-- COLUNA DIREITA: visitantes + amigos + comunidades -->
             <div class="ok-col-right">
+              <!-- Quem visitou o perfil -->
+              <div class="ok-right-card">
+                <div class="ok-right-title">quem te visitou 👀</div>
+                <div id="ok-visitors" class="ok-visitors"></div>
+                <a href="#" onclick="sndClick();return false" class="ok-link ok-right-link">ver todas as visitas</a>
+              </div>
+
               <!-- Amigos -->
               <div class="ok-right-card">
                 <div class="ok-right-title">amigos dele (94)</div>
@@ -1591,63 +1614,63 @@
               <div class="ok-right-card">
                 <div class="ok-right-title">comunidades dele (23)</div>
                 <div class="ok-right-communities">
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('acordar')">
                     <div class="ok-rcomm-ico" style="background:#1a1a2e;">😴</div>
                     <div>
                       <div class="ok-rcomm-name">Eu odeio acordar cedo</div>
                       <div class="ok-rcomm-count">(238.419)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('cs')">
                     <div class="ok-rcomm-ico" style="background:#cc5500;">🎮</div>
                     <div>
                       <div class="ok-rcomm-name">Counter-Strike 1.6</div>
                       <div class="ok-rcomm-count">(127.884)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('1d')">
                     <div class="ok-rcomm-ico" style="background:#e91e63;">🎸</div>
                     <div>
                       <div class="ok-rcomm-name">One Direction Brasil Fã Clube</div>
                       <div class="ok-rcomm-count">(128.493)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('listas')">
                     <div class="ok-rcomm-ico" style="background:#3f51b5;">📝</div>
                     <div>
                       <div class="ok-rcomm-name">Viciado em fazer listas</div>
                       <div class="ok-rcomm-count">(89.312)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('porta')">
                     <div class="ok-rcomm-ico" style="background:#e74c3c;">🚪</div>
                     <div>
                       <div class="ok-rcomm-name">Eu já empurrei uma porta que era pra puxar</div>
                       <div class="ok-rcomm-count">(312.057)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('mergulho')">
                     <div class="ok-rcomm-ico" style="background:#00897b;">🤿</div>
                     <div>
                       <div class="ok-rcomm-name">Mergulhadores do Brasil</div>
                       <div class="ok-rcomm-count">(12.403)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('moto')">
                     <div class="ok-rcomm-ico" style="background:#f57c00;">🏍️</div>
                     <div>
                       <div class="ok-rcomm-name">Motoqueiros sem destino</div>
                       <div class="ok-rcomm-count">(67.551)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('shampoo')">
                     <div class="ok-rcomm-ico" style="background:#2980b9;">🧴</div>
                     <div>
                       <div class="ok-rcomm-name">Eu leio shampoo no banho</div>
                       <div class="ok-rcomm-count">(189.442)</div>
                     </div>
                   </div>
-                  <div class="ok-rcomm" onclick="sndClick()">
+                  <div class="ok-rcomm" onclick="orkutComm('php')">
                     <div class="ok-rcomm-ico" style="background:#7b1fa2;">💻</div>
                     <div>
                       <div class="ok-rcomm-name">PHP é a melhor linguagem (e tá tudo bem)</div>
@@ -1655,6 +1678,25 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal de comunidade -->
+          <div id="ok-comm-modal" class="ok-comm-modal" onclick="if(event.target===this)orkutCloseComm()">
+            <div class="ok-comm-card">
+              <div class="ok-comm-head">
+                <div id="ok-comm-ico" class="ok-comm-ico-big">☕</div>
+                <div class="ok-comm-headtext">
+                  <div id="ok-comm-name" class="ok-comm-title">Comunidade</div>
+                  <div id="ok-comm-meta" class="ok-comm-metatxt">categoria · membros</div>
+                </div>
+                <span class="ok-comm-close" onclick="orkutCloseComm()">✕</span>
+              </div>
+              <div id="ok-comm-desc" class="ok-comm-descbox"></div>
+              <div id="ok-comm-topics"></div>
+              <div class="ok-comm-actions">
+                <button id="ok-comm-join" class="ok-comm-join" onclick="orkutJoinComm(this)">participar</button>
               </div>
             </div>
           </div>

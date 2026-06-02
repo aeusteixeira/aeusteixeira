@@ -3514,6 +3514,134 @@ function orkutTab(tab, el) {
     if (target) target.style.display = '';
 }
 
+/* ════════════════════════════════════════════════════════════
+   ORKUT INTERATIVO — recados de verdade (localStorage),
+   quem visitou o perfil e comunidades clicáveis.
+   ════════════════════════════════════════════════════════════ */
+const OK_SCRAP_KEY = 'mt_orkut_scraps_v1';
+const OK_AV_COLORS = ['#e74c3c', '#3577e5', '#5cb85c', '#2e7d32', '#9b59b6', '#e57c3a', '#1abc9c', '#e91e63', '#607d8b', '#ff5722'];
+
+function _okEsc(s) { return (s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function _okPad(n) { return (n < 10 ? '0' : '') + n; }
+function _okNow() { const d = new Date(); return _okPad(d.getDate()) + '/' + _okPad(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + _okPad(d.getHours()) + ':' + _okPad(d.getMinutes()); }
+function _okLoadScraps() { try { return JSON.parse(localStorage.getItem(OK_SCRAP_KEY) || '[]'); } catch (e) { return []; } }
+function _okSaveScraps(l) { try { localStorage.setItem(OK_SCRAP_KEY, JSON.stringify(l.slice(0, 50))); } catch (e) { } }
+
+/* abre/fecha o formulário de recado */
+function orkutScrapForm() {
+    sndClick();
+    const f = document.getElementById('ok-scrap-form'); if (!f) return;
+    const show = f.style.display === 'none' || !f.style.display;
+    f.style.display = show ? 'block' : 'none';
+    if (show) { const t = document.getElementById('ok-scrap-text'); if (t) t.focus(); }
+}
+function orkutEmoji(e) { const t = document.getElementById('ok-scrap-text'); if (!t) return; t.value += e; t.focus(); }
+
+/* publica o recado digitado pelo visitante */
+function orkutPostScrap() {
+    const nameEl = document.getElementById('ok-scrap-name');
+    const textEl = document.getElementById('ok-scrap-text');
+    if (!textEl) return;
+    const name = (nameEl.value || '').trim() || 'Visitante anônimo';
+    const text = (textEl.value || '').trim();
+    if (!text) { textEl.focus(); return; }
+    const scrap = { name: name, text: text, date: _okNow() };
+    const list = _okLoadScraps(); list.unshift(scrap); _okSaveScraps(list);
+    _okRenderScrap(scrap);
+    const c = document.getElementById('ok-scrap-count');
+    if (c) c.textContent = (parseInt(c.textContent, 10) || 48) + 1;
+    textEl.value = ''; nameEl.value = '';
+    orkutScrapForm();
+    if (window.showNotif) showNotif('orkut', 'Seu recado foi publicado no perfil do Matheus! ♥');
+}
+
+/* insere um recado no topo da lista */
+function _okRenderScrap(s) {
+    const box = document.getElementById('ok-scraps'); if (!box) return;
+    const initial = (s.name || '?').charAt(0).toUpperCase();
+    const color = OK_AV_COLORS[(s.name || '').length % OK_AV_COLORS.length];
+    const div = document.createElement('div');
+    div.className = 'ok-scrap ok-scrap-user';
+    div.innerHTML = '<div class="ok-scrap-av" style="background:' + color + ';">' + _okEsc(initial) + '</div>'
+        + '<div><b class="ok-scrap-author">' + _okEsc(s.name) + '</b> <span class="ok-scrap-date">' + _okEsc(s.date) + '</span> '
+        + '<span class="ok-scrap-badge">novo</span><br>'
+        + '<span class="ok-scrap-text">' + _okEsc(s.text) + '</span></div>';
+    box.insertBefore(div, box.firstChild);
+}
+
+/* na abertura do Orkut: restaura recados salvos + ajusta contador */
+function orkutInit() {
+    const box = document.getElementById('ok-scraps');
+    if (box && !box.dataset.okInit) {
+        box.dataset.okInit = '1';
+        const list = _okLoadScraps();
+        for (let i = list.length - 1; i >= 0; i--) _okRenderScrap(list[i]);
+        const c = document.getElementById('ok-scrap-count');
+        if (c) c.textContent = (parseInt(c.textContent, 10) || 48) + list.length;
+    }
+    _okRenderVisitors();
+}
+
+/* ── quem visitou o perfil ── */
+const OK_VISITORS = [
+    { n: 'Edmundo ACF', c: '#e74c3c', t: 'há 2 minutos' },
+    { n: 'Carla Silva', c: '#3577e5', t: 'há 40 minutos' },
+    { n: 'Pablo Marinho', c: '#5cb85c', t: 'há 2 horas' },
+    { n: 'Kris Egidio', c: '#2e7d32', t: 'há 5 horas' },
+    { n: 'Ana Beatriz', c: '#9b59b6', t: 'ontem' },
+    { n: 'Lucas Andrade', c: '#e57c3a', t: 'ontem' },
+    { n: 'Fernanda M.', c: '#e91e63', t: 'há 2 dias' }
+];
+function _okRenderVisitors() {
+    const box = document.getElementById('ok-visitors'); if (!box) return;
+    let html = '<div class="ok-rfriend ok-visitor-you" onclick="sndClick()">'
+        + '<div class="ok-rfriend-av" style="background:#f39c12;">V</div>'
+        + '<span>Você<br><small>agora há pouco</small></span></div>';
+    OK_VISITORS.forEach(v => {
+        html += '<div class="ok-rfriend" onclick="sndClick()">'
+            + '<div class="ok-rfriend-av" style="background:' + v.c + ';">' + _okEsc(v.n.charAt(0)) + '</div>'
+            + '<span>' + _okEsc(v.n) + '<br><small>' + _okEsc(v.t) + '</small></span></div>';
+    });
+    box.innerHTML = html;
+}
+
+/* ── comunidades clicáveis ── */
+const OK_COMMS = {
+    'acordar': { ico: '😴', bg: '#1a1a2e', name: 'Eu odeio acordar cedo', members: '238.419', cat: 'Cotidiano', desc: 'Pra quem o despertador é o pior inimigo. 5 alarmes e ainda chega atrasado.', topics: ['"Mais 5 minutinhos" (4.821 respostas)', 'Segunda-feira deveria ser proibida', 'Café antes de falar comigo'] },
+    'cs': { ico: '🎮', bg: '#cc5500', name: 'Counter-Strike 1.6', members: '127.884', cat: 'Jogos', desc: 'rush B, no stop! de_dust2 até o fim dos tempos. Lan house raiz.', topics: ['bomba plantada no A', 'aimbot é covardia', 'saudade de jogar na lan'] },
+    '1d': { ico: '🎸', bg: '#e91e63', name: 'One Direction Brasil Fã Clube', members: '128.493', cat: 'Música', desc: 'O maior fã clube do 1D no Brasil. O Matheus fez o blog oficial não-oficial. 💚', topics: ['Niall ou Harry?', 'Letras traduzidas', 'show no Brasil quando??'] },
+    'listas': { ico: '📝', bg: '#3f51b5', name: 'Viciado em fazer listas', members: '89.312', cat: 'Cotidiano', desc: 'Lista de listas. To-do da to-do. Se não tá na lista, não existe.', topics: ['minha lista tem sub-listas', 'app de lista favorito', 'risquei tudo, que paz'] },
+    'porta': { ico: '🚪', bg: '#e74c3c', name: 'Eu já empurrei uma porta que era pra puxar', members: '312.057', cat: 'Humor', desc: 'Aconteceu com todo mundo. Olhou o "PUXE" depois. Fingiu que nada.', topics: ['tinha gente vendo', 'a porta de vidro do shopping', 'puxei a que era automática'] },
+    'mergulho': { ico: '🤿', bg: '#00897b', name: 'Mergulhadores do Brasil', members: '12.403', cat: 'Esportes', desc: 'Cilindro nas costas e paz embaixo d\'água. Do mar de Arraial aos rios de MS.', topics: ['melhor ponto de mergulho', 'nitrox vale a pena?', 'foto do meu último mergulho'] },
+    'moto': { ico: '🏍️', bg: '#f57c00', name: 'Motoqueiros sem destino', members: '67.551', cat: 'Veículos', desc: 'Sem GPS, só estrada. Domingo de manhã é sagrado.', topics: ['rolê de domingo', 'capacete fechado x aberto', 'a Dutra de madrugada'] },
+    'shampoo': { ico: '🧴', bg: '#2980b9', name: 'Eu leio shampoo no banho', members: '189.442', cat: 'Humor', desc: 'Acabou o assunto, sobrou o rótulo. "Cabelos com brilho intenso".', topics: ['"enxágue e repita"', 'já li a tabela nutricional do sabonete', 'modo de usar decorado'] },
+    'php': { ico: '💻', bg: '#7b1fa2', name: 'PHP é a melhor linguagem (e tá tudo bem)', members: '34.890', cat: 'Tecnologia', desc: 'Falaram que ia morrer. Roda metade da internet até hoje. Laravel <3.', topics: ['Laravel mudou minha vida', '"PHP é morto" kkkk', '$_POST raiz x request nutella'] }
+};
+function orkutComm(id) {
+    sndClick();
+    const c = OK_COMMS[id]; if (!c) return;
+    const m = document.getElementById('ok-comm-modal'); if (!m) return;
+    document.getElementById('ok-comm-ico').textContent = c.ico;
+    document.getElementById('ok-comm-ico').style.background = c.bg;
+    document.getElementById('ok-comm-name').textContent = c.name;
+    document.getElementById('ok-comm-meta').textContent = c.cat + ' · ' + c.members + ' membros';
+    document.getElementById('ok-comm-desc').textContent = c.desc;
+    const tb = document.getElementById('ok-comm-topics');
+    tb.innerHTML = '<div class="ok-comm-topics-title">fóruns ativos</div>'
+        + c.topics.map(t => '<div class="ok-comm-topic" onclick="sndClick()">📌 ' + _okEsc(t) + '</div>').join('');
+    const joined = document.getElementById('ok-comm-join');
+    joined.textContent = 'participar';
+    joined.className = 'ok-comm-join';
+    m.style.display = 'flex';
+}
+function orkutCloseComm() { sndClick(); const m = document.getElementById('ok-comm-modal'); if (m) m.style.display = 'none'; }
+function orkutJoinComm(btn) {
+    sndClick();
+    btn.textContent = '✓ participando';
+    btn.className = 'ok-comm-join joined';
+    if (window.showNotif) showNotif('orkut', 'Você entrou na comunidade! ☕');
+}
+
 function chromeTab(n) {
     document.querySelectorAll('.chrome-tab').forEach((t, i) => {
         t.classList.toggle('active', i === n);
@@ -3527,6 +3655,7 @@ function chromeTab(n) {
     if (title) title.textContent = chromeTitles[n] || 'Google Chrome';
     if (n === 1) bkInit();
     if (n === 2) gmInit();
+    if (n === 5) orkutInit();
     if (n === 7) renderHistory();
     sndClick();
 }
@@ -6098,8 +6227,19 @@ function _initDesktopWidgets() {
 const RKA = window.ROCKY_ANIMS || {};
 const RKA_COLS = window.ROCKY_ANIM_COLS || 16, RKA_CW = window.ROCKY_ANIM_CW || 124, RKA_CH = window.ROCKY_ANIM_CH || 93;
 const RK_WSTRIP = 'src/img/rocky-walk.png', RK_WW = 147, RK_WH = 81, RK_WN = 8;
-const RK_GESTURES = ['Wave', 'Greeting', 'Thinking', 'Congratulate', 'Searching', 'GetAttention', 'LookLeft', 'LookRight', 'LookUp', 'LookDown', 'Explain', 'Hearing_1', 'Save', 'CheckingSomething'].filter(function (n) { return RKA[n]; });
-const RK_FIDGET = ['Idle(7)', 'Idle(3)'].filter(function (n) { return RKA[n]; });
+/* TODAS as 46 animações do ROCKY.acd estão mapeadas em rocky-anims.js.
+   Gestos = tudo que é "ação" (exclui RestPose/Show/Hide e os idles). */
+const RK_GESTURES = [
+  'Wave', 'Greeting', 'Goodbye', 'Explain', 'Congratulate', 'Print',
+  'GestureLeft', 'GestureRight', 'GestureUp', 'GestureDown',
+  'LookLeft', 'LookRight', 'LookUp', 'LookDown',
+  'LookUpLeft', 'LookUpRight', 'LookDownLeft', 'LookDownRight',
+  'GetArtsy', 'Hearing_1', 'GetAttention', 'Thinking', 'Processing',
+  'Save', 'Writing', 'CheckingSomething', 'Searching', 'SendMail',
+  'EmptyTrash', 'GetTechy', 'Alert', 'GetWizardy', 'DeepIdle1'
+].filter(function (n) { return RKA[n]; });
+/* idles curtos pro fidget entre uma coisa e outra */
+const RK_FIDGET = ['Idle(1)', 'Idle(2)', 'Idle(3)', 'Idle(4)', 'Idle(5)', 'Idle(6)', 'Idle(7)', 'Idle(8)', 'Idle(9)', 'Idle1_1'].filter(function (n) { return RKA[n]; });
 const _RK_PHRASES = [
   'Au au! 🐾',
   'Posso ajudar a pesquisar?',

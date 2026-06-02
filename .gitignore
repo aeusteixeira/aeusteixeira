@@ -4,3 +4,8 @@ Thumbs.db
 .env
 node_modules/
 .vscode/
+
+# Config local de ferramentas/agente (nao versionar)
+.claude/
+.agents/
+skills-lock.json
