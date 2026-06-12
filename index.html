@@ -1177,11 +1177,11 @@
             <div class="ok-header-left">
               <img src="src/img/system/orkut-logo.png" alt="orkut" class="ok-logo-img">
               <div class="ok-nav">
-                <a href="#" onclick="sndClick();return false" class="active">Início</a>
-                <a href="#" onclick="sndClick();return false">Perfil</a>
-                <a href="#" onclick="sndClick();return false">Página de recados</a>
-                <a href="#" onclick="sndClick();return false">Amigos</a>
-                <a href="#" onclick="sndClick();return false">Comunidades</a>
+                <a href="#" onclick="orkutHome();return false" class="active">Início</a>
+                <a href="#" onclick="orkutHome();return false">Perfil</a>
+                <a href="#" onclick="orkutHome();return false">Página de recados</a>
+                <a href="#" onclick="orkutHome();return false">Amigos</a>
+                <a href="#" onclick="orkutHome();return false">Comunidades</a>
               </div>
             </div>
             <div class="ok-header-right">
@@ -1254,8 +1254,7 @@
               <table class="ok-info-table ok-tab-content" id="ok-tab-social">
                 <tr>
                   <td class="ok-info-label">relacionamento:</td>
-                  <td class="ok-info-value"><b>Como é bom poder estar vivo e sentir o amor que eu sinto pelo Edmundo</b>
-                  </td>
+                  <td class="ok-info-value"><b>Truly Madly Deeply in love</b></td>
                 </tr>
                 <tr>
                   <td class="ok-info-label">aqui para:</td>
@@ -1284,8 +1283,7 @@
                 </tr>
                 <tr>
                   <td class="ok-info-label">paixões:</td>
-                  <td class="ok-info-value"><b>café, código, mergulho, moto, cozinhar, uma pessoa que mora longe demais
-                      🇵🇪</b></td>
+                  <td class="ok-info-value"><b>café, código, mergulho, moto, cozinhar</b></td>
                 </tr>
                 <tr class="ok-info-highlight">
                   <td class="ok-info-label">esportes:</td>
@@ -1615,7 +1613,7 @@
                 <div class="ok-right-title">comunidades dele (23)</div>
                 <div class="ok-right-communities">
                   <div class="ok-rcomm" onclick="orkutComm('acordar')">
-                    <div class="ok-rcomm-ico" style="background:#1a1a2e;">😴</div>
+                    <div class="ok-rcomm-ico ok-rcomm-ico-img"><img src="src/img/orkut/acordar.jpg" alt=""></div>
                     <div>
                       <div class="ok-rcomm-name">Eu odeio acordar cedo</div>
                       <div class="ok-rcomm-count">(238.419)</div>
@@ -1664,14 +1662,14 @@
                     </div>
                   </div>
                   <div class="ok-rcomm" onclick="orkutComm('shampoo')">
-                    <div class="ok-rcomm-ico" style="background:#2980b9;">🧴</div>
+                    <div class="ok-rcomm-ico ok-rcomm-ico-img"><img src="src/img/orkut/shampoo.jpg" alt=""></div>
                     <div>
                       <div class="ok-rcomm-name">Eu leio shampoo no banho</div>
                       <div class="ok-rcomm-count">(189.442)</div>
                     </div>
                   </div>
                   <div class="ok-rcomm" onclick="orkutComm('php')">
-                    <div class="ok-rcomm-ico" style="background:#7b1fa2;">💻</div>
+                    <div class="ok-rcomm-ico ok-rcomm-ico-img"><img src="src/img/orkut/php.png" alt=""></div>
                     <div>
                       <div class="ok-rcomm-name">PHP é a melhor linguagem (e tá tudo bem)</div>
                       <div class="ok-rcomm-count">(34.890)</div>
@@ -1682,24 +1680,8 @@
             </div>
           </div>
 
-          <!-- Modal de comunidade -->
-          <div id="ok-comm-modal" class="ok-comm-modal" onclick="if(event.target===this)orkutCloseComm()">
-            <div class="ok-comm-card">
-              <div class="ok-comm-head">
-                <div id="ok-comm-ico" class="ok-comm-ico-big">☕</div>
-                <div class="ok-comm-headtext">
-                  <div id="ok-comm-name" class="ok-comm-title">Comunidade</div>
-                  <div id="ok-comm-meta" class="ok-comm-metatxt">categoria · membros</div>
-                </div>
-                <span class="ok-comm-close" onclick="orkutCloseComm()">✕</span>
-              </div>
-              <div id="ok-comm-desc" class="ok-comm-descbox"></div>
-              <div id="ok-comm-topics"></div>
-              <div class="ok-comm-actions">
-                <button id="ok-comm-join" class="ok-comm-join" onclick="orkutJoinComm(this)">participar</button>
-              </div>
-            </div>
-          </div>
+          <!-- Página de comunidade (renderizada por JS, substitui o perfil) -->
+          <div id="ok-community-page" class="ok-cp" style="display:none;"></div>
         </div><!-- /cpage-5 -->
 
         <!-- YOUTUBE (old 2012 layout) -->
@@ -2505,9 +2487,33 @@
         <div class="msn-group" id="msn-g-online">
           <div class="msn-group-hd" onclick="msnToggleGroup('msn-g-online')">
             <span class="msn-group-ico">▼</span>
-            Online <span class="msn-group-cnt">(3)</span>
+            Online <span class="msn-group-cnt">(6)</span>
           </div>
           <div class="msn-group-body">
+            <div class="msn-contact" onclick="msnOpenChat('Galera','🎮','MATILDA tô online?? a Velha tá me reportando de novo 😤','dot-on')">
+              <div class="msn-contact-av">🎮</div>
+              <div class="msn-dot dot-on"></div>
+              <div class="msn-contact-info">
+                <div class="msn-contact-name">Galera 🎮 (Pepe + Velha)</div>
+                <div class="msn-contact-stat">se xingando na lobby como sempre</div>
+              </div>
+            </div>
+            <div class="msn-contact" onclick="msnOpenChat('Pepe','🐸','MATILDA chegou!! bora Overwatch?? 🎯','dot-on')">
+              <div class="msn-contact-av">🐸</div>
+              <div class="msn-dot dot-on"></div>
+              <div class="msn-contact-info">
+                <div class="msn-contact-name">Pepe 🎯 main DPS</div>
+                <div class="msn-contact-stat">lobby do Overwatch aberta, bora</div>
+              </div>
+            </div>
+            <div class="msn-contact" onclick="msnOpenChat('Velha','👵','MATILDA 💅 bora DBD?? tô na lobby 🔪','dot-on')">
+              <div class="msn-contact-av">👵</div>
+              <div class="msn-dot dot-on"></div>
+              <div class="msn-contact-info">
+                <div class="msn-contact-name">Velha 💅 survivor nata</div>
+                <div class="msn-contact-stat">morrendo no primeiro gancho (DBD)</div>
+              </div>
+            </div>
             <div class="msn-contact" onclick="msnOpenChat('Pablo','😎','eae bixa! tô aqui','dot-on')">
               <div class="msn-contact-av">😎</div>
               <div class="msn-dot dot-on"></div>

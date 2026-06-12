@@ -740,6 +740,18 @@ const msnContactReplies = {
     'Edmundo': ['ai você tá fofo hj 🥰', 'te extraño mucho 🥺', 'se te quieres, criança', 'ven acá gordito 🥰', 'oye para com isso jaja', 'linda 😘', 'se te quieres 🥺'],
     'Carla': ['oi', 'quando vc vem aqui em casa?', 'mãe perguntou de vc', 'ok, te falo depois', 'kkkkk que isso', '🙄', 'tá sumido hein'],
     'Kris': ['estagiário!!! saudade de vc', 'bota um try/catch nisso aí pelo amor 😤', 'vc tá usando Python pra isso? pq não tá?', 'manda o traceback que eu olho', 'lembra quando vc derrubou o banco no segundo dia? KKKK', 'orgulho de vc garoto 🥹', 'para de usar PHP pra tudo desgraça 🐍', 'eu te ensinei melhor que isso', 'quer que eu faça um code review?', 'bora um pair programming qualquer dia'],
+    'Pepe': ['MATILDA fala sério kkkk', 'bora Overwatch?? to de DPS hj 🎯', 'vc segura o tank q eu mergulho', 'a Velha já morreu no primeiro gancho de novo kkk', 'foca o suporte deles vai', 'gg ez 🐸', 'ultou pra parede de novo? KKKK', 'Fortnite depois então?'],
+    'Velha': ['MATILDA 💅', 'sou survivor nata, alguém tem q fazer gen', 'foi LAG não foi burrice 😤', 'bora DBD então 🔪', 'fica longe do gancho dessa vez', 'morri no primeiro gancho de novo 😭', 'grosso, vou te deixar pendurada', 'te amo mesmo vc sendo chato'],
+    'Galera': [
+        { who: 'Pepe', text: 'a Velha começou Matilda, eu tô de boa 😤' },
+        { who: 'Velha', text: 'MENTIRA desse sapo, eu tô calminha 💅' },
+        { who: 'Pepe', text: 'calminha vc tava ontem qnd deletou o save kkkk' },
+        { who: 'Velha', text: 'cala a boca lixo de DPS' },
+        { who: 'Pepe', text: 'Matilda vc viu?? ela me xingou primeiro' },
+        { who: 'Velha', text: 'bora jogar antes q eu te reporte de vdd Pepe' },
+        { who: 'Pepe', text: 'eu carrego vcs dois e ainda apanho 🐸' },
+        { who: 'Velha', text: 'sai pra lá vai, fedido' },
+    ],
 };
 let msnReplyIdxMap = {};
 const chatLogs = {}; // {name:[{from,text,time}]}
@@ -758,7 +770,7 @@ function msnOpenChat(name, ico, firstMsg, dotClass) {
         const b = document.createElement('div'); b.className = 'msn-msg-block';
         b.innerHTML = e.from === 'me'
         ? `<span class="msn-msg-name me-c">Matheus</span> diz:<br>${e.text}`
-        : `<span class="msn-msg-name them-c">${name}</span> diz:<br>${e.text}`;
+        : `<span class="msn-msg-name them-c">${e.who || name}</span> diz:<br>${e.text}`;
         msgs.appendChild(b);
     });
     } else {
@@ -803,21 +815,24 @@ function msnChatSend() {
     const replies = msnContactReplies[name] || ['ok', 'hm', '👍', 'entendi', 'blz'];
     const idx = (msnReplyIdxMap[name] || 0) % replies.length;
     msnReplyIdxMap[name] = (idx + 1);
+    const reply = replies[idx];
+    const rText = typeof reply === 'string' ? reply : reply.text;
+    const rWho = (reply && typeof reply === 'object' && reply.who) ? reply.who : name;
     const replyDelay = 700 + Math.random() * 1200;
-    msnShowTyping(name);
+    msnShowTyping(rWho);
     _typingTimer = setTimeout(() => {
     msnHideTyping();
     const r = document.createElement('div'); r.className = 'msn-msg-block';
-    r.innerHTML = `<span class="msn-msg-name them-c">${name}</span> diz:<br>${replies[idx]}`;
+    r.innerHTML = `<span class="msn-msg-name them-c">${rWho}</span> diz:<br>${rText}`;
     msgs.appendChild(r); msgs.scrollTop = msgs.scrollHeight;
     const now = new Date();
     const t = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     document.getElementById('msn-chat-time').textContent = t;
-    chatLogs[name].push({ from: 'them', text: replies[idx], time: t });
+    chatLogs[name].push({ from: 'them', text: rText, time: t, who: rWho });
     // só mostra notif se o chat NÃO está visível
     const ch = document.getElementById('msn-chat');
     const chatVis = ch.style.display !== 'none' && !ch.classList.contains('minimized') && msnChatContact.name === name;
-    if (!chatVis) msnShowNotif(name, msnChatContact.ico, replies[idx]);
+    if (!chatVis) msnShowNotif(rWho, msnChatContact.ico, rText);
     else try { const s = new Audio('src/sounds/msn-sound_1.mp3'); s.volume = 0.4; s.play().catch(() => { }); } catch (e) { }
     }, replyDelay);
 }
@@ -893,9 +908,64 @@ const autoScripts = {
         { from: 'them', text: 'verdade. orgulho de vc, garoto. de verdade. ♥', d: 2400 },
     ]
     },
+    'Pepe': {
+    ico: '🐸', msgs: [
+        { from: 'them', text: 'MATILDA chegou!! bora Overwatch?? 🎯', d: 0 },
+        { from: 'me', text: 'BORA, mas hoje EU sou o DPS, cansei de tank', d: 1800 },
+        { from: 'them', text: 'aff vc de DPS é só feed, fica o jogo todo no spawn kkkk', d: 2600 },
+        { from: 'me', text: 'é pressão psicológica, eles relaxam', d: 1500 },
+        { from: 'them', text: 'pressão é o cu KKKK bora logo q a Velha já tá na lobby', d: 2800 },
+        { from: 'me', text: 'ela já ultou pra parede de novo?', d: 2000 },
+        { from: 'them', text: 'OBVIO. deu Graviton no teto, sozinha 🤡', d: 2700 },
+        { from: 'me', text: 'a Velha é burra demais kkkkk ama um errinho', d: 2000 },
+        { from: 'them', text: 'KKKKKK não fala isso q ela tá no grupo lendo', d: 2400 },
+        { from: 'me', text: 'deixa ler, ela morre no DBD também', d: 1800 },
+        { from: 'them', text: 'bora cair de Genji então, double dash 🐸', d: 2200 },
+        { from: 'me', text: 'partiu, eu mergulho vc limpa', d: 1500 },
+    ]
+    },
+    'Velha': {
+    ico: '👵', msgs: [
+        { from: 'them', text: 'MATILDA 💅 bora DBD?? tô na lobby 🔪', d: 0 },
+        { from: 'me', text: 'caindo já! vc de survivor né, fica LONGE do gancho hj', d: 1800 },
+        { from: 'them', text: 'sou survivor NATA, alguém nesse time tem q fazer os gen', d: 2600 },
+        { from: 'me', text: 'FAZER GEN? vc correu PRA dentro do Trapper semana passada kkkk', d: 2200 },
+        { from: 'them', text: 'foi lag', d: 1400 },
+        { from: 'me', text: 'foi burrice. vc é burra demais Velha, te amo mas é burra 😭', d: 2200 },
+        { from: 'them', text: 'GROSSO 😤 vou te deixar no gancho de propósito agr', d: 2400 },
+        { from: 'me', text: 'aí vc me deixa no gancho e o killer te pega sozinha, pensa', d: 2000 },
+        { from: 'them', text: '...', d: 1600 },
+        { from: 'them', text: 'odeio quando vc tem razão', d: 1800 },
+        { from: 'me', text: 'kkkkk bora, Overwatch depois com a Pepe?', d: 1600 },
+        { from: 'them', text: 'bora, e hj eu fujo no primeiro gancho 💅', d: 2200 },
+        { from: 'me', text: 'vc SEMPRE foge no primeiro gancho', d: 1500 },
+        { from: 'them', text: 'e SEMPRE morro, é tradição 💅🪦', d: 2000 },
+    ]
+    },
+    'Galera': {
+    ico: '🎮', msgs: [
+        { from: 'them', who: 'Pepe', text: 'MATILDA tá online?? fala pra essa lazarenta da Velha parar de me reportar 😤', d: 0 },
+        { from: 'me', text: 'acabei de chegar kkkk oq foi dessa vez', d: 1900 },
+        { from: 'them', who: 'Velha', text: 'ele me deixou MORRER no gancho de propósito, Matilda. de propósito. 💅', d: 2600 },
+        { from: 'them', who: 'Pepe', text: 'vc já tava morta por dentro Velha, eu só agilizei o processo', d: 2400 },
+        { from: 'them', who: 'Velha', text: 'CALA A BOCA Pepe, vc erra TODO dash de Genji e cai do mapa sozinho 🤡', d: 2700 },
+        { from: 'them', who: 'Pepe', text: 'pelo menos eu não dou ult de Mercy pra parede igual VC ontem KKKKK', d: 2600 },
+        { from: 'them', who: 'Velha', text: 'foi UMA vez', d: 1400 },
+        { from: 'them', who: 'Pepe', text: 'foi ONTEM. e anteontem. e hoje de manhã. quer que eu printe? 📸', d: 2600 },
+        { from: 'me', text: 'kkkkkkkk parem vcs duas, tô passando mal aqui', d: 2000 },
+        { from: 'them', who: 'Velha', text: 'Matilda fala pra esse sapo q ele é o PIOR DPS desse servidor', d: 2500 },
+        { from: 'them', who: 'Pepe', text: 'SAPO É VC q joga de suporte e morre SEMPRE em primeiro 🐸', d: 2400 },
+        { from: 'me', text: 'na moral vcs se amam, casem logo e me chamam de madrinha', d: 2100 },
+        { from: 'them', who: 'Pepe', text: 'EU?? com a VELHA?? prefiro main Bastion o resto da vida', d: 2400 },
+        { from: 'them', who: 'Velha', text: 'ECA nem morta, esse aí cheira a derrota e desodorante vencido', d: 2600 },
+        { from: 'me', text: 'bora jogar logo antes q vcs se matem de verdade 💀', d: 1900 },
+        { from: 'them', who: 'Pepe', text: 'bora, mas a Velha fica no MEU time pra eu vigiar ela', d: 2200 },
+        { from: 'them', who: 'Velha', text: 'só se for pra eu te carregar igual sempre, lixo 💅', d: 2200 },
+    ]
+    },
 };
 // delays iniciais após entrar no desktop (ms) — bem espaçados para não chegarem várias conversas juntas
-const autoStartAt = { 'Pablo': 12000, 'Carla': 45000, 'Edmundo': 80000, 'Kris': 115000 };
+const autoStartAt = { 'Pablo': 12000, 'Carla': 45000, 'Edmundo': 80000, 'Kris': 115000, 'Pepe': 150000, 'Velha': 185000, 'Galera': 220000 };
 const scriptIdx = {};
 function startAutoConversations() {
     Object.keys(autoScripts).forEach(name => {
@@ -914,22 +984,22 @@ function runNextMsg(name) {
     const chatVis = ch && ch.style.display !== 'none' && !ch.classList.contains('minimized') && msnChatContact.name === name;
     // show typing indicator for 'them' messages when chat is visible
     const typingDelay = msg.from === 'them' && chatVis ? 900 + Math.random() * 600 : 0;
-    if (msg.from === 'them' && chatVis) msnShowTyping(name);
+    if (msg.from === 'them' && chatVis) msnShowTyping(msg.who || name);
     setTimeout(() => {
     if (chatVis) msnHideTyping();
     const t = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    chatLogs[name].push({ from: msg.from, text: msg.text, time: t });
+    chatLogs[name].push({ from: msg.from, text: msg.text, time: t, who: msg.who });
     if (chatVis) {
         const msgs = document.getElementById('msn-chat-msgs');
         const b = document.createElement('div'); b.className = 'msn-msg-block';
         b.innerHTML = msg.from === 'me'
         ? `<span class="msn-msg-name me-c">Matheus</span> diz:<br>${msg.text}`
-        : `<span class="msn-msg-name them-c">${name}</span> diz:<br>${msg.text}`;
+        : `<span class="msn-msg-name them-c">${msg.who || name}</span> diz:<br>${msg.text}`;
         msgs.appendChild(b); msgs.scrollTop = msgs.scrollHeight;
         document.getElementById('msn-chat-time').textContent = t;
         if (msg.from === 'them') try { const s = new Audio('src/sounds/msn-sound_1.mp3'); s.volume = 0.45; s.play().catch(() => { }); } catch (e) { }
     } else if (msg.from === 'them') {
-        msnShowNotif(name, sc.ico, msg.text);
+        msnShowNotif(msg.who || name, sc.ico, msg.text);
     }
     // agenda próxima mensagem
     const next = scriptIdx[name];
@@ -3605,41 +3675,411 @@ function _okRenderVisitors() {
     box.innerHTML = html;
 }
 
-/* ── comunidades clicáveis ── */
-const OK_COMMS = {
-    'acordar': { ico: '😴', bg: '#1a1a2e', name: 'Eu odeio acordar cedo', members: '238.419', cat: 'Cotidiano', desc: 'Pra quem o despertador é o pior inimigo. 5 alarmes e ainda chega atrasado.', topics: ['"Mais 5 minutinhos" (4.821 respostas)', 'Segunda-feira deveria ser proibida', 'Café antes de falar comigo'] },
-    'cs': { ico: '🎮', bg: '#cc5500', name: 'Counter-Strike 1.6', members: '127.884', cat: 'Jogos', desc: 'rush B, no stop! de_dust2 até o fim dos tempos. Lan house raiz.', topics: ['bomba plantada no A', 'aimbot é covardia', 'saudade de jogar na lan'] },
-    '1d': { ico: '🎸', bg: '#e91e63', name: 'One Direction Brasil Fã Clube', members: '128.493', cat: 'Música', desc: 'O maior fã clube do 1D no Brasil. O Matheus fez o blog oficial não-oficial. 💚', topics: ['Niall ou Harry?', 'Letras traduzidas', 'show no Brasil quando??'] },
-    'listas': { ico: '📝', bg: '#3f51b5', name: 'Viciado em fazer listas', members: '89.312', cat: 'Cotidiano', desc: 'Lista de listas. To-do da to-do. Se não tá na lista, não existe.', topics: ['minha lista tem sub-listas', 'app de lista favorito', 'risquei tudo, que paz'] },
-    'porta': { ico: '🚪', bg: '#e74c3c', name: 'Eu já empurrei uma porta que era pra puxar', members: '312.057', cat: 'Humor', desc: 'Aconteceu com todo mundo. Olhou o "PUXE" depois. Fingiu que nada.', topics: ['tinha gente vendo', 'a porta de vidro do shopping', 'puxei a que era automática'] },
-    'mergulho': { ico: '🤿', bg: '#00897b', name: 'Mergulhadores do Brasil', members: '12.403', cat: 'Esportes', desc: 'Cilindro nas costas e paz embaixo d\'água. Do mar de Arraial aos rios de MS.', topics: ['melhor ponto de mergulho', 'nitrox vale a pena?', 'foto do meu último mergulho'] },
-    'moto': { ico: '🏍️', bg: '#f57c00', name: 'Motoqueiros sem destino', members: '67.551', cat: 'Veículos', desc: 'Sem GPS, só estrada. Domingo de manhã é sagrado.', topics: ['rolê de domingo', 'capacete fechado x aberto', 'a Dutra de madrugada'] },
-    'shampoo': { ico: '🧴', bg: '#2980b9', name: 'Eu leio shampoo no banho', members: '189.442', cat: 'Humor', desc: 'Acabou o assunto, sobrou o rótulo. "Cabelos com brilho intenso".', topics: ['"enxágue e repita"', 'já li a tabela nutricional do sabonete', 'modo de usar decorado'] },
-    'php': { ico: '💻', bg: '#7b1fa2', name: 'PHP é a melhor linguagem (e tá tudo bem)', members: '34.890', cat: 'Tecnologia', desc: 'Falaram que ia morrer. Roda metade da internet até hoje. Laravel <3.', topics: ['Laravel mudou minha vida', '"PHP é morto" kkkk', '$_POST raiz x request nutella'] }
+/* ════════════════════════════════════════════════════════════
+   ORKUT — comunidades VIVAS: cada uma tem fóruns, e cada fórum
+   abre uma discussão real (várias pessoas conversando). O
+   visitante pode entrar na comunidade e responder os tópicos.
+   Tudo persiste em localStorage.
+   ════════════════════════════════════════════════════════════ */
+
+/* paleta fixa de cores por pessoa (consistência entre threads) */
+const OK_PEOPLE = {
+    'Matheus Teixeira': '#315699', 'Edmundo ACF': '#e74c3c', 'Carla Silva': '#3577e5',
+    'Pablo Marinho': '#5cb85c', 'Kris Egidio': '#2e7d32', 'Ana Beatriz': '#9b59b6',
+    'Lucas Andrade': '#e57c3a', 'Rafael Lopes': '#1abc9c', 'Fernanda M.': '#e91e63',
+    'Diego Martins': '#607d8b', 'Juliana Reis': '#ff5722', 'Bruna Teles': '#00897b'
 };
+function _okColor(name) {
+    if (OK_PEOPLE[name]) return OK_PEOPLE[name];
+    let h = 0; for (let i = 0; i < (name || '').length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    return OK_AV_COLORS[h % OK_AV_COLORS.length];
+}
+/* atalho: post = [autor, data, texto]  (OP = dono do tópico) */
+function _p(a, d, t) { return { a: a, d: d, t: t }; }
+
+const OK_COMMS = {
+    'acordar': {
+        ico: '😴', bg: '#1a1a2e', img: 'src/img/orkut/acordar.jpg', name: 'Eu odeio acordar cedo', members: '238.419', cat: 'Cotidiano',
+        desc: 'Pra quem o despertador é o pior inimigo. 5 alarmes e ainda chega atrasado. Aqui ninguém julga.',
+        forums: [
+            { id: 'alarmes', title: '5 alarmes e mesmo assim eu perco', posts: [
+                _p('Bruna Teles', '21/06/2006 08:12', 'gente eu coloco 5 alarme de 10 em 10 minuto e ainda assim acordo num sexto que eu NEM lembro de ter botado kkkk alguem mais nesse nivel?'),
+                _p('Matheus Teixeira', '21/06/2006 08:31', 'boto o celular longe da cama pra ser obrigado a levantar. resultado: levanto, desligo e volto a dormir EM PÉ tipo cavalo'),
+                _p('Bruna Teles', '21/06/2006 08:40', 'KKKKK dormir em pé é o auge da preguiça, parabens'),
+                _p('Rafael Lopes', '21/06/2006 09:02', 'o pior é o "mais 5 minutinhos"... ai vc abre o olho e passou 1h40. classico'),
+                _p('Ana Beatriz', '21/06/2006 09:15', 'eu sonho que levantei. ai acordo de verdade atrasada e com raiva do sonho')
+            ] },
+            { id: 'segunda', title: 'Segunda-feira deveria ser opcional', posts: [
+                _p('Diego Martins', '19/06/2006 22:48', 'proposta seria: semana começa quarta. quem assina embaixo?'),
+                _p('Matheus Teixeira', '19/06/2006 23:05', 'assino com as duas mãos. segunda meu cérebro só liga meio dia mesmo, antes disso é só um print da pessoa'),
+                _p('Juliana Reis', '20/06/2006 07:30', 'e o domingo a noite com aquela angustia de "amanha é segunda"... pior parte da semana inteira e nem começou')
+            ] },
+            { id: 'cafe', title: 'Não fale comigo antes do café', posts: [
+                _p('Ana Beatriz', '18/06/2006 07:22', 'aviso geral: NÃO fale comigo antes do café. eu nem sou eu ainda, sou um esboço de pessoa'),
+                _p('Matheus Teixeira', '18/06/2006 07:41', '"esboço" kkkkkk vou roubar essa. eu antes do café = 404 not found'),
+                _p('Lucas Andrade', '18/06/2006 08:03', 'minha mãe descobriu isso na marra. hoje ela só me entrega a caneca e sai de fininho')
+            ] }
+        ]
+    },
+    'cs': {
+        ico: '🎮', bg: '#cc5500', name: 'Counter-Strike 1.6', members: '127.884', cat: 'Jogos',
+        desc: 'rush B, no stop! de_dust2 até o fim dos tempos. Lan house raiz, miojo e teclado grudento.',
+        forums: [
+            { id: 'rushb', title: 'rush B e NÃO PARA (combinado é combinado)', posts: [
+                _p('Lucas Andrade', '20/06/2006 20:11', 'time: rush B e NÃO PARA. se morrer morreu, mas a gente ENTRA JUNTO. combinado?'),
+                _p('Matheus Teixeira', '20/06/2006 20:14', 'combinado. ai na hora vc é o unico que entra e morre sozinho no corredor enquanto a gente ainda tava comprando kkkk'),
+                _p('Lucas Andrade', '20/06/2006 20:16', '... foi UMA vez'),
+                _p('Pablo Marinho', '20/06/2006 20:19', 'foi toda vez Lucas. assume. vc é o flash humano que vira granada inimiga'),
+                _p('Lucas Andrade', '20/06/2006 20:22', 'traidores. desistam de mim que eu desisto de vcs 😤')
+            ] },
+            { id: 'dust2', title: 'de_dust2 é o melhor mapa, fim de papo', posts: [
+                _p('Rafael Lopes', '17/06/2006 19:40', 'não tem discussão. dust2 é perfeito. quem prefere cs_office tá errado e pronto'),
+                _p('Matheus Teixeira', '17/06/2006 19:52', 'de_inferno também é arte, mid daquele mapa é puro xadrez. mas concordo, dust2 é CASA'),
+                _p('Diego Martins', '17/06/2006 20:05', 'aim_map raiz foi onde eu aprendi a mirar. AWP only, deathmatch infinito')
+            ] },
+            { id: 'lan', title: 'saudade de lan house (quem viveu sabe)', posts: [
+                _p('Matheus Teixeira', '15/06/2006 23:10', 'saudade de pagar 1 real a hora e gritar "PAGA MAIS 30 MINUTO" pro dono no meio do clutch'),
+                _p('Bruna Teles', '15/06/2006 23:24', 'o cheiro de miojo + teclado grudento + ventilador no talo = nostalgia pura, chega a doer')
+            ] }
+        ]
+    },
+    '1d': {
+        ico: '🎸', bg: '#e91e63', name: 'One Direction Brasil Fã Clube', members: '128.493', cat: 'Música',
+        desc: 'O maior fã clube do 1D no Brasil. O Matheus fez o blog oficial não-oficial. Directioner raiz. 💚',
+        forums: [
+            { id: 'niall', title: 'Niall ou Harry?? me ajudem a decidir', posts: [
+                _p('Fernanda M.', '22/06/2006 16:02', 'GENTE decidam comigo de uma vez: Niall ou Harry? eu NÃO consigo escolher, tô em crise existencial'),
+                _p('Matheus Teixeira', '22/06/2006 16:20', 'como dono do blog eu tenho que ser neutro e imparcial MAS... Niall. aquele sorriso, gente. team irlanda 💚'),
+                _p('Fernanda M.', '22/06/2006 16:24', 'NIALL TBM AAAAA sabia que vc tinha bom gosto 💚💚'),
+                _p('Juliana Reis', '22/06/2006 16:48', 'vcs dois estão redondamente errados. é o Zayn. sempre foi o Zayn. obrigada')
+            ] },
+            { id: 'show', title: 'Show no Brasil QUANDO??? to juntando dinheiro', posts: [
+                _p('Ana Beatriz', '21/06/2006 14:33', 'alguem tem alguma noticia confiavel de turnê na america do sul?? eu PRECISO saber, minha vida depende disso'),
+                _p('Matheus Teixeira', '21/06/2006 14:50', 'tô de olho em tudo. se confirmar vir pro Brasil eu posto no blog na MESMA hora. já tô juntando pra pista premium'),
+                _p('Fernanda M.', '21/06/2006 15:01', 'a gente forma caravana!! anota meu nome ai na lista, eu e mais 3 amigas vamos com certeza')
+            ] },
+            { id: 'traducao', title: 'What Makes You Beautiful traduzida 😭', posts: [
+                _p('Juliana Reis', '20/06/2006 21:15', 'traduzi a letra inteira pra quem quiser, chorei fazendo, ficou linda demais 😭 quem quer eu mando'),
+                _p('Matheus Teixeira', '20/06/2006 21:30', 'posta aqui no fórum e me manda que eu publico no blog com seus créditos! a comunidade merece, tá lindo isso')
+            ] }
+        ]
+    },
+    'listas': {
+        ico: '📝', bg: '#3f51b5', name: 'Viciado em fazer listas', members: '89.312', cat: 'Cotidiano',
+        desc: 'Lista de listas. To-do da to-do. Se não tá na lista, não existe. Riscar item concluído é dopamina pura.',
+        forums: [
+            { id: 'sublistas', title: 'confesso: minha lista tem sub-listas', posts: [
+                _p('Matheus Teixeira', '19/06/2006 13:40', 'vou confessar aqui num lugar seguro: tenho uma lista de listas. uma lista MESTRA que aponta pras outras. isso é normal né? né??'),
+                _p('Diego Martins', '19/06/2006 13:55', '... eu tenho planilha. com aba separada. e código de cor por prioridade.'),
+                _p('Matheus Teixeira', '19/06/2006 14:01', 'VC É O CARA. me ensina o esquema das cores por favor, preciso evoluir nessa arte'),
+                _p('Ana Beatriz', '19/06/2006 14:20', 'gente isso é organização ou é doença? (pergunto pq tenho 14 listas abertas nesse exato momento)')
+            ] },
+            { id: 'app', title: 'app de lista favorito x papel e caneta', posts: [
+                _p('Bruna Teles', '16/06/2006 10:11', 'sou raiz: papel e caneta, post-it cobrindo o monitor inteiro. app pra mim não cola na alma'),
+                _p('Matheus Teixeira', '16/06/2006 10:25', 'bloco de notas .txt aberto 24h direto na area de trabalho. low tech mas NUNCA me traiu'),
+                _p('Rafael Lopes', '16/06/2006 10:40', 'o prazer fisico de riscar um item concluído no papel nenhum app reproduz. é ciência')
+            ] }
+        ]
+    },
+    'porta': {
+        ico: '🚪', bg: '#e74c3c', name: 'Eu já empurrei uma porta que era pra puxar', members: '312.057', cat: 'Humor',
+        desc: 'Aconteceu com todo mundo. Empurrou, depois olhou o "PUXE", fingiu que nada e seguiu a vida.',
+        forums: [
+            { id: 'plateia', title: 'o pior é quando tinha gente vendo', posts: [
+                _p('Juliana Reis', '18/06/2006 15:05', 'empurrei a porta do shopping 3x com força, o segurança só me olhando parado. era PUXE em letra GARRAFAL. queria sumir do planeta'),
+                _p('Matheus Teixeira', '18/06/2006 15:18', 'a pior de todas é a de vidro que vc nem vê e bate a cara em cheio. já bati. fingi que ia coçar o nariz na hora'),
+                _p('Diego Martins', '18/06/2006 15:30', 'KKKKK "fingi que ia coçar o nariz" é a desculpa universal da humanidade'),
+                _p('Ana Beatriz', '18/06/2006 15:44', 'eu uma vez agradeci a porta automática que demorou a abrir. pra NINGUÉM. ela abriu sozinha. eu disse obrigada. pro nada.')
+            ] },
+            { id: 'automatica', title: 'fiquei puxando porta automática parada', posts: [
+                _p('Matheus Teixeira', '14/06/2006 12:00', 'cena real: fiquei PUXANDO uma porta automática que tava só lenta pra abrir. quando ela abriu sozinha eu já tava vermelho até a orelha'),
+                _p('Rafael Lopes', '14/06/2006 12:15', 'a do sensor que vc passa a mão tipo mágico do nada e nada acontece... e tem fila atrás. o terror')
+            ] }
+        ]
+    },
+    'mergulho': {
+        ico: '🤿', bg: '#00897b', name: 'Mergulhadores do Brasil', members: '12.403', cat: 'Esportes',
+        desc: 'Cilindro nas costas e paz absoluta embaixo d\'água. Do mar de Arraial aos rios cristalinos de Bonito.',
+        forums: [
+            { id: 'pontos', title: 'melhor ponto de mergulho do Brasil?', posts: [
+                _p('Lucas Andrade', '20/06/2006 18:20', 'pra mim Arraial do Cabo, água azul demais, parece o caribe. mas dizem que Fernando de Noronha é outro nível, alguem foi?'),
+                _p('Matheus Teixeira', '20/06/2006 18:38', 'Arraial é meu point eterno. mergulhei lá ano passado e vi uma tartaruga de pertinho, juro que chorei dentro da máscara'),
+                _p('Rafael Lopes', '20/06/2006 18:55', 'Bonito/MS pros rios é IMBATIVEL. visibilidade absurda, vc flutua e parece um aquário gigante. recomendo demais'),
+                _p('Lucas Andrade', '20/06/2006 19:10', 'bonito já tá na minha lista (o Matheus que organizou a lista, claro kkk)')
+            ] },
+            { id: 'nitrox', title: 'curso de nitrox vale a pena?', posts: [
+                _p('Matheus Teixeira', '16/06/2006 21:00', 'alguem aqui já tirou a certificação de nitrox? tô pensando em fazer pra aumentar tempo de fundo. compensa o investimento?'),
+                _p('Diego Martins', '16/06/2006 21:18', 'vale DEMAIS se vc mergulha com frequência. fundo maior, menos nitrogênio, sai da água bem menos cansado. faz sem medo')
+            ] }
+        ]
+    },
+    'moto': {
+        ico: '🏍️', bg: '#f57c00', name: 'Motoqueiros sem destino', members: '67.551', cat: 'Veículos',
+        desc: 'Sem GPS, só estrada. Domingo de manhã cedo é sagrado. O destino é o café da padaria no meio do caminho.',
+        forums: [
+            { id: 'role', title: 'rolê de domingo de manhã (terapia)', posts: [
+                _p('Matheus Teixeira', '18/06/2006 09:00', 'domingo 6h da manhã, estrada vazia, vento na cara, fone NÃO (atenção é tudo). não existe terapia melhor que isso, mudem minha mente'),
+                _p('Rafael Lopes', '18/06/2006 09:20', 'a melhor parte é o café na padaria no meio do caminho. pão na chapa + a moto estacionada na frente. ritual sagrado'),
+                _p('Lucas Andrade', '18/06/2006 09:35', 'bora marcar um rolê em grupo então? saída bem cedo, sem pressa, sem destino mesmo, só rodar. topo')
+            ] },
+            { id: 'capacete', title: 'capacete fechado x aberto', posts: [
+                _p('Diego Martins', '15/06/2006 17:40', 'fechado SEMPRE. segurança em primeiro lugar. aberto é estiloso mas numa queda é osso, literalmente'),
+                _p('Matheus Teixeira', '15/06/2006 17:58', 'fechado, integral, sem discussão nenhuma. minha mãe agradece e eu também. estilo não conserta rosto')
+            ] }
+        ]
+    },
+    'shampoo': {
+        ico: '🧴', bg: '#2980b9', img: 'src/img/orkut/shampoo.jpg', name: 'Eu leio shampoo no banho', members: '189.442', cat: 'Humor',
+        desc: 'Acabou o assunto na cabeça, sobrou o rótulo. "Cabelos com brilho e movimento intenso". Você sabe do que falo.',
+        forums: [
+            { id: 'enxague', title: '"enxágue e repita" — você repete?', posts: [
+                _p('Ana Beatriz', '17/06/2006 22:10', 'pergunta séria: vc REPETE quando lê "enxágue e repita"? pq eu repito. eles mandaram. quem sou eu pra desobedecer'),
+                _p('Matheus Teixeira', '17/06/2006 22:25', 'claro que repito. é instrução do fabricante, sou um cidadão de bem e respeito a bula do shampoo'),
+                _p('Bruna Teles', '17/06/2006 22:40', 'já decorei "cabelos com brilho e movimento" de tanto ler no automático. sei o texto de cor que nem hino')
+            ] },
+            { id: 'sabonete', title: 'já li até a tabela do sabonete (socorro)', posts: [
+                _p('Matheus Teixeira', '13/06/2006 23:30', 'acabou o shampoo pra ler, parti pro rótulo do sabonete. depois o do amaciante. li o "modo de usar" do creme dental. SOCORRO me tirem daqui')
+            ] }
+        ]
+    },
+    'php': {
+        ico: '💻', bg: '#7b1fa2', img: 'src/img/orkut/php.png', name: 'PHP é a melhor linguagem (e tá tudo bem)', members: '34.890', cat: 'Tecnologia',
+        desc: 'Falaram que ia morrer em 2010, 2015, 2020... e roda metade da internet até hoje. Laravel <3.',
+        forums: [
+            { id: 'morto', title: '"PHP tá morto" kkkk (toda semana)', posts: [
+                _p('Matheus Teixeira', '19/06/2006 11:00', 'toda semana alguem decreta a morte do PHP num blog gringo. enquanto isso ele roda metade da web do planeta. segue o jogo, campeão'),
+                _p('Pablo Marinho', '19/06/2006 11:15', 'falaram isso em 2010, depois 2015, depois 2020... o cara tá mais vivo que nunca, ainda mais com o Laravel dominando tudo'),
+                _p('Rafael Lopes', '19/06/2006 11:30', 'PHP 8 com JIT e tipagem calou MUITA boca por ai viu. virou outra linguagem'),
+                _p('Matheus Teixeira', '19/06/2006 11:42', 'exato Rafa. enum, match, named arguments, readonly... virou linguagem séria e metade do povo nem percebeu')
+            ] },
+            { id: 'laravel', title: 'Laravel mudou minha vida (sério)', posts: [
+                _p('Matheus Teixeira', '16/06/2006 14:20', 'comecei no PHP puro com $_POST e include() jogado. quando eu conheci o Laravel eu CHOREI. Eloquent é poesia, migration é paz de espírito'),
+                _p('Pablo Marinho', '16/06/2006 14:35', 'php artisan make:tudo e tá pronto kkkk a produtividade é absurda, parece trapaça'),
+                _p('Diego Martins', '16/06/2006 14:50', 'vim do PHP raiz também, sofri na mão. migration + seeder foi o que me ganhou de vez. não volto mais')
+            ] },
+            { id: 'post', title: '$_POST raiz x request nutella', posts: [
+                _p('Pablo Marinho', '12/06/2006 16:00', 'confessa aqui entre nós: vc ainda usa $_POST direto às vezes numa pressa né'),
+                _p('Matheus Teixeira', '12/06/2006 16:12', 'jamais admitirei isso em público (uso sim, num script rápido ninguém precisa saber)')
+            ] }
+        ]
+    }
+};
+
+/* enquete de cada comunidade (votos base; o voto do visitante soma +1) */
+const OK_POLLS = {
+    'acordar': { q: 'Qual o pior horário pra acordar?', opts: [{ t: '5h da manhã', v: 18234 }, { t: '6h ainda escuro', v: 24891 }, { t: 'qualquer hora antes do café', v: 41203 }, { t: 'segunda-feira inteira', v: 33010 }] },
+    'cs': { q: 'Melhor mapa do CS 1.6?', opts: [{ t: 'de_dust2', v: 52310 }, { t: 'de_inferno', v: 18420 }, { t: 'cs_office', v: 9930 }, { t: 'aim_map', v: 14002 }] },
+    '1d': { q: 'Seu membro favorito do One Direction?', opts: [{ t: 'Niall', v: 31200 }, { t: 'Harry', v: 38940 }, { t: 'Zayn', v: 29870 }, { t: 'Liam / Louis', v: 17560 }] },
+    'listas': { q: 'Como você faz suas listas?', opts: [{ t: 'papel e caneta', v: 21300 }, { t: 'bloco de notas .txt', v: 18990 }, { t: 'planilha com cores', v: 12450 }, { t: 'tenho lista de listas', v: 26780 }] },
+    'porta': { q: 'A pior situação da porta foi:', opts: [{ t: 'tinha gente vendo', v: 88210 }, { t: 'bati a cara no vidro', v: 64500 }, { t: 'puxei a automática', v: 51200 }, { t: 'fiz tudo isso junto', v: 71300 }] },
+    'mergulho': { q: 'Melhor lugar pra mergulhar no Brasil?', opts: [{ t: 'Arraial do Cabo', v: 4120 }, { t: 'Fernando de Noronha', v: 5230 }, { t: 'Bonito / MS', v: 2980 }, { t: 'Ilha Grande', v: 1870 }] },
+    'moto': { q: 'Capacete: fechado ou aberto?', opts: [{ t: 'fechado sempre', v: 41200 }, { t: 'aberto é estiloso', v: 12300 }, { t: 'depende do rolê', v: 8900 }] },
+    'shampoo': { q: 'Você repete o "enxágue e repita"?', opts: [{ t: 'sim, eles mandaram', v: 98200 }, { t: 'nunca, é golpe', v: 43100 }, { t: 'só quando sobra shampoo', v: 38400 }] },
+    'php': { q: 'PHP está morto?', opts: [{ t: 'jamais, roda metade da web', v: 22300 }, { t: 'com Laravel tá vivíssimo', v: 9100 }, { t: 'morto desde 2010 (kkk mentira)', v: 3200 }] }
+};
+Object.keys(OK_POLLS).forEach(k => { if (OK_COMMS[k]) OK_COMMS[k].poll = OK_POLLS[k]; });
+
+/* ── estado de navegação da página de comunidade + persistência ── */
+let _okCurComm = null, _okCpView = 'sobre', _okCurThread = null;
+const OK_JOIN_KEY = 'mt_orkut_joined_v1';
+const OK_FORUM_KEY = 'mt_orkut_forum_v1';
+const OK_POLL_KEY = 'mt_orkut_polls_v1';
+function _okLoadJoined() { try { return JSON.parse(localStorage.getItem(OK_JOIN_KEY) || '[]'); } catch (e) { return []; } }
+function _okSaveJoined(l) { try { localStorage.setItem(OK_JOIN_KEY, JSON.stringify(l)); } catch (e) { } }
+function _okIsJoined(id) { return _okLoadJoined().indexOf(id) !== -1; }
+function _okLoadReplies() { try { return JSON.parse(localStorage.getItem(OK_FORUM_KEY) || '{}'); } catch (e) { return {}; } }
+function _okSaveReplies(o) { try { localStorage.setItem(OK_FORUM_KEY, JSON.stringify(o)); } catch (e) { } }
+function _okThreadKey(comm, thread) { return comm + '::' + thread; }
+function _okThreadReplies(comm, thread) { const all = _okLoadReplies(); return all[_okThreadKey(comm, thread)] || []; }
+function _okThreadCount(comm, f) { return (f.posts.length + _okThreadReplies(comm, f.id).length); }
+function _okLoadPolls() { try { return JSON.parse(localStorage.getItem(OK_POLL_KEY) || '{}'); } catch (e) { return {}; } }
+function _okSavePolls(o) { try { localStorage.setItem(OK_POLL_KEY, JSON.stringify(o)); } catch (e) { } }
+
+/* avatar redondo padrão dos posts do fórum */
+function _okAvatar(name) {
+    return '<div class="ok-fav" style="background:' + _okColor(name) + ';">' + _okEsc((name || '?').charAt(0).toUpperCase()) + '</div>';
+}
+
+/* membros extras genéricos (além das pessoas reais) pra povoar a grade */
+const OK_EXTRA_MEMBERS = ['Thiago R.', 'Camila S.', 'Bruno A.', 'Letícia M.', 'Gustavo P.', 'Priscila L.', 'Marcos V.', 'Renata C.', 'Felipe G.', 'Aline T.', 'Rodrigo N.', 'Patrícia F.'];
+
+/* mostra a página da comunidade (esconde o perfil) */
 function orkutComm(id) {
     sndClick();
-    const c = OK_COMMS[id]; if (!c) return;
-    const m = document.getElementById('ok-comm-modal'); if (!m) return;
-    document.getElementById('ok-comm-ico').textContent = c.ico;
-    document.getElementById('ok-comm-ico').style.background = c.bg;
-    document.getElementById('ok-comm-name').textContent = c.name;
-    document.getElementById('ok-comm-meta').textContent = c.cat + ' · ' + c.members + ' membros';
-    document.getElementById('ok-comm-desc').textContent = c.desc;
-    const tb = document.getElementById('ok-comm-topics');
-    tb.innerHTML = '<div class="ok-comm-topics-title">fóruns ativos</div>'
-        + c.topics.map(t => '<div class="ok-comm-topic" onclick="sndClick()">📌 ' + _okEsc(t) + '</div>').join('');
-    const joined = document.getElementById('ok-comm-join');
-    joined.textContent = 'participar';
-    joined.className = 'ok-comm-join';
-    m.style.display = 'flex';
+    if (!OK_COMMS[id]) return;
+    _okCurComm = id; _okCpView = 'sobre'; _okCurThread = null;
+    const body = document.querySelector('#cpage-5 .ok-body');
+    const page = document.getElementById('ok-community-page');
+    if (body) body.style.display = 'none';
+    if (page) page.style.display = 'block';
+    _okRenderCommunity();
 }
-function orkutCloseComm() { sndClick(); const m = document.getElementById('ok-comm-modal'); if (m) m.style.display = 'none'; }
-function orkutJoinComm(btn) {
+/* volta pro perfil do Matheus */
+function orkutHome() {
     sndClick();
-    btn.textContent = '✓ participando';
-    btn.className = 'ok-comm-join joined';
-    if (window.showNotif) showNotif('orkut', 'Você entrou na comunidade! ☕');
+    _okCurComm = null; _okCurThread = null;
+    const body = document.querySelector('#cpage-5 .ok-body');
+    const page = document.getElementById('ok-community-page');
+    if (page) page.style.display = 'none';
+    if (body) body.style.display = '';
+}
+/* troca a aba da comunidade (sobre / forum / enquetes / membros) */
+function orkutCpView(v) { sndClick(); _okCpView = v; _okCurThread = null; _okRenderCommunity(); }
+/* abre uma discussão dentro do fórum */
+function orkutOpenThread(threadId) { sndClick(); _okCpView = 'forum'; _okCurThread = threadId; _okRenderCommunity(); }
+/* volta da discussão pra lista de fóruns */
+function orkutBackComm() { sndClick(); _okCurThread = null; _okRenderCommunity(); }
+
+/* entrar / sair da comunidade */
+function orkutToggleJoin() {
+    sndClick();
+    const list = _okLoadJoined(); const i = list.indexOf(_okCurComm);
+    if (i === -1) { list.push(_okCurComm); _okSaveJoined(list); if (window.showNotif) showNotif('orkut', 'Você entrou em "' + OK_COMMS[_okCurComm].name + '"! ☕'); }
+    else { list.splice(i, 1); _okSaveJoined(list); }
+    _okRenderCommunity();
+}
+
+/* postar resposta numa discussão */
+function orkutReply() {
+    const nameEl = document.getElementById('ok-reply-name');
+    const textEl = document.getElementById('ok-reply-text');
+    if (!textEl) return;
+    const text = (textEl.value || '').trim();
+    if (!text) { textEl.focus(); return; }
+    if (!_okIsJoined(_okCurComm)) { const l = _okLoadJoined(); l.push(_okCurComm); _okSaveJoined(l); }
+    const name = (nameEl && nameEl.value || '').trim() || 'Você';
+    const all = _okLoadReplies(); const key = _okThreadKey(_okCurComm, _okCurThread);
+    (all[key] = all[key] || []).push({ a: name, d: _okNow(), t: text, mine: true });
+    _okSaveReplies(all);
+    sndClick();
+    _okRenderCommunity();
+    if (window.showNotif) showNotif('orkut', 'Sua resposta foi publicada no fórum! ☕');
+}
+
+/* votar numa enquete */
+function orkutVote(idx) {
+    sndClick();
+    const polls = _okLoadPolls();
+    polls[_okCurComm] = idx;
+    _okSavePolls(polls);
+    if (!_okIsJoined(_okCurComm)) { const l = _okLoadJoined(); l.push(_okCurComm); _okSaveJoined(l); }
+    _okRenderCommunity();
+    if (window.showNotif) showNotif('orkut', 'Voto computado na enquete! ☕');
+}
+
+/* ── render da página inteira da comunidade ── */
+function _okRenderCommunity() {
+    const page = document.getElementById('ok-community-page'); if (!page) return;
+    const c = OK_COMMS[_okCurComm]; if (!c) return;
+    const joined = _okIsJoined(_okCurComm);
+
+    /* SIDEBAR esquerda */
+    const navItem = (v, label) => '<a class="ok-cp-navlink' + (_okCpView === v ? ' active' : '') + '" onclick="orkutCpView(\'' + v + '\')">' + label + '</a>';
+    const thumb = c.img
+        ? '<div class="ok-cp-thumb ok-cp-thumb-img"><img src="' + c.img + '" alt="' + _okEsc(c.name) + '"></div>'
+        : '<div class="ok-cp-thumb" style="background:' + c.bg + ';">' + c.ico + '</div>';
+    const left = '<div class="ok-cp-left">'
+        + thumb
+        + '<div class="ok-cp-cname">' + _okEsc(c.name) + '</div>'
+        + '<div class="ok-cp-cmembers">(' + _okEsc(c.members) + ' membros)</div>'
+        + '<div class="ok-cp-links">'
+        + '<a class="ok-cp-action" onclick="orkutToggleJoin()">' + (joined ? '🚪 deixar comunidade' : '➕ entrar na comunidade') + '</a>'
+        + '<a class="ok-cp-action" onclick="sndClick()">✉️ convidar amigos</a>'
+        + '<a class="ok-cp-action" onclick="sndClick()">⚠️ denunciar abuso</a>'
+        + '<div class="ok-cp-sep"></div>'
+        + navItem('sobre', '📄 sobre')
+        + navItem('forum', '💬 fórum')
+        + navItem('enquetes', '📊 enquetes')
+        + navItem('membros', '👥 membros')
+        + '</div></div>';
+
+    /* breadcrumb + título */
+    const crumb = '<div class="ok-cp-crumb"><a onclick="orkutHome()">Início</a> &gt; '
+        + '<a onclick="orkutHome()">Comunidades</a> &gt; ' + _okEsc(c.cat) + ' &gt; <b>' + _okEsc(c.name) + '</b></div>';
+
+    let main = '';
+    if (_okCpView === 'forum' && _okCurThread) {
+        /* discussão */
+        const f = c.forums.find(x => x.id === _okCurThread);
+        if (!f) { _okCurThread = null; return _okRenderCommunity(); }
+        const all = f.posts.concat(_okThreadReplies(_okCurComm, f.id));
+        const posts = all.map((p, i) => '<div class="ok-post' + (p.mine ? ' ok-post-mine' : '') + '">'
+            + _okAvatar(p.a)
+            + '<div class="ok-post-body"><div class="ok-post-head"><b class="ok-post-author">' + _okEsc(p.a) + '</b>'
+            + (i === 0 ? '<span class="ok-post-op">autor</span>' : '')
+            + (p.mine ? '<span class="ok-scrap-badge">você</span>' : '')
+            + '<span class="ok-post-date">' + _okEsc(p.d) + '</span></div>'
+            + '<div class="ok-post-text">' + _okEsc(p.t) + '</div></div></div>').join('');
+        main = '<div class="ok-thread-bar"><span class="ok-thread-back" onclick="orkutBackComm()">‹ voltar ao fórum</span>'
+            + '<span class="ok-thread-count">' + all.length + ' posts</span></div>'
+            + '<div class="ok-thread-title">📌 ' + _okEsc(f.title) + '</div>'
+            + '<div class="ok-thread-posts">' + posts + '</div>'
+            + '<div class="ok-reply-box"><div class="ok-reply-lbl">deixe sua resposta:</div>'
+            + '<input id="ok-reply-name" class="ok-reply-name" placeholder="seu nome (opcional)" maxlength="30">'
+            + '<textarea id="ok-reply-text" class="ok-reply-text" placeholder="escreva aqui..." maxlength="500"></textarea>'
+            + '<button class="ok-comm-join" onclick="orkutReply()">responder discussão</button></div>';
+    } else if (_okCpView === 'forum') {
+        /* lista de tópicos do fórum */
+        const rows = c.forums.map(f => {
+            const ur = _okThreadReplies(_okCurComm, f.id);
+            const lastP = ur.length ? ur[ur.length - 1] : f.posts[f.posts.length - 1];
+            return '<div class="ok-forum-row" onclick="orkutOpenThread(\'' + f.id + '\')">'
+                + '<div class="ok-forum-pin">📌</div><div class="ok-forum-main">'
+                + '<div class="ok-forum-title">' + _okEsc(f.title) + '</div>'
+                + '<div class="ok-forum-sub">iniciado por <b>' + _okEsc(f.posts[0].a) + '</b> · última resposta de <b>' + _okEsc(lastP.a) + '</b> em ' + _okEsc(lastP.d) + '</div>'
+                + '</div><div class="ok-forum-count">' + _okThreadCount(_okCurComm, f) + '<small>posts</small></div></div>';
+        }).join('');
+        main = '<div class="ok-cp-secttitle">💬 Fórum &mdash; ' + c.forums.length + ' tópicos</div>'
+            + '<div class="ok-forum-list">' + rows + '</div>';
+    } else if (_okCpView === 'enquetes') {
+        /* enquete interativa */
+        const poll = c.poll;
+        const voted = _okLoadPolls()[_okCurComm];
+        const total = poll.opts.reduce((s, o, i) => s + o.v + (voted === i ? 1 : 0), 0);
+        const opts = poll.opts.map((o, i) => {
+            const votes = o.v + (voted === i ? 1 : 0);
+            const pct = total ? Math.round(votes / total * 100) : 0;
+            if (voted === undefined) {
+                return '<div class="ok-poll-opt votable" onclick="orkutVote(' + i + ')"><span class="ok-poll-radio">○</span>' + _okEsc(o.t) + '</div>';
+            }
+            return '<div class="ok-poll-opt' + (voted === i ? ' mine' : '') + '">'
+                + '<div class="ok-poll-optrow"><span>' + (voted === i ? '●' : '○') + ' ' + _okEsc(o.t) + '</span><b>' + pct + '%</b></div>'
+                + '<div class="ok-poll-barbg"><div class="ok-poll-bar" style="width:' + pct + '%;background:' + c.bg + ';"></div></div>'
+                + '<div class="ok-poll-vcount">' + votes.toLocaleString('pt-BR') + ' votos</div></div>';
+        }).join('');
+        main = '<div class="ok-cp-secttitle">📊 Enquete da comunidade</div>'
+            + '<div class="ok-poll"><div class="ok-poll-q">' + _okEsc(poll.q) + '</div>' + opts
+            + '<div class="ok-poll-total">' + (voted === undefined ? 'clique numa opção pra votar' : 'total: ' + total.toLocaleString('pt-BR') + ' votos') + '</div></div>';
+    } else if (_okCpView === 'membros') {
+        /* grade de membros */
+        const names = Object.keys(OK_PEOPLE).concat(OK_EXTRA_MEMBERS);
+        const grid = ['<div class="ok-member ok-member-you"><div class="ok-fav" style="background:#f39c12;">V</div><span>Você</span></div>']
+            .concat(names.map(n => '<div class="ok-member"><div class="ok-fav" style="background:' + _okColor(n) + ';">' + _okEsc(n.charAt(0)) + '</div><span>' + _okEsc(n) + '</span></div>')).join('');
+        main = '<div class="ok-cp-secttitle">👥 Membros (' + _okEsc(c.members) + ')</div>'
+            + '<div class="ok-member-grid">' + grid + '</div>';
+    } else {
+        /* SOBRE: tabela de info estilo orkut clássico */
+        const rowsTbl = [
+            ['descrição', _okEsc(c.desc)],
+            ['idioma', 'Português (Brasil)'],
+            ['categoria', _okEsc(c.cat)],
+            ['dono', '<a class="ok-cp-owner" onclick="orkutHome()">Matheus Teixeira</a>'],
+            ['moderadores', '<a class="ok-cp-owner" onclick="orkutHome()">Matheus Teixeira</a>, Pablo Marinho, Carla Silva'],
+            ['tipo', 'pública'],
+            ['criada em', '12/03/2005']
+        ].map(r => '<tr><td class="ok-cp-infolabel">' + r[0] + ':</td><td class="ok-cp-infoval">' + r[1] + '</td></tr>').join('');
+        main = '<div class="ok-cp-infotable-wrap"><table class="ok-cp-infotable">' + rowsTbl + '</table></div>'
+            + '<div class="ok-cp-cta">'
+            + '<button class="ok-comm-join' + (joined ? ' joined' : '') + '" onclick="orkutToggleJoin()">' + (joined ? '✓ você participa' : '➕ entrar na comunidade') + '</button>'
+            + '<a class="ok-cp-ctalink" onclick="orkutCpView(\'forum\')">ver o fórum (' + c.forums.length + ' tópicos) ›</a>'
+            + '</div>';
+    }
+
+    const right = '<div class="ok-cp-main"><div class="ok-cp-maintitle">' + c.ico + ' ' + _okEsc(c.name) + '</div>'
+        + crumb + '<div class="ok-cp-content">' + main + '</div></div>';
+
+    page.innerHTML = '<div class="ok-cp-wrap">' + left + right + '</div>';
+    if (_okCpView === 'forum' && _okCurThread) { const t = document.getElementById('ok-reply-text'); if (t) t.focus(); }
 }
 
 function chromeTab(n) {

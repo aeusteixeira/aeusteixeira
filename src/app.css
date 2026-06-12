@@ -6083,6 +6083,8 @@ a,
 .ok-rcomm { display: flex; gap: 6px; align-items: center; padding: 3px 4px; cursor: pointer; }
 .ok-rcomm:hover { background: #eef2fa; }
 .ok-rcomm-ico { width: 42px; height: 42px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; border: 1px solid #c0cde2; }
+.ok-rcomm-ico-img { padding: 0; overflow: hidden; background: #fff; }
+.ok-rcomm-ico-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ok-rcomm-name { color: #315699; font-size: 10px; font-weight: 700; text-decoration: underline; line-height: 1.3; }
 .ok-rcomm-count { color: #888; font-size: 9px; }
 
@@ -6107,23 +6109,111 @@ a,
 .ok-visitors .ok-rfriend small { color: #999; font-weight: 400; font-size: 9px; }
 .ok-visitor-you { background: #fff7e6; border: 1px dashed #f5a623; border-radius: 3px; }
 
-/* ── Modal de comunidade ── */
-.ok-comm-modal { display: none; position: fixed; inset: 0; background: rgba(20,30,60,.45); z-index: 9000; align-items: center; justify-content: center; }
-.ok-comm-card { width: 380px; max-width: 90%; background: #fff; border: 1px solid #315699; border-radius: 4px; box-shadow: 0 8px 30px rgba(0,0,0,.4); overflow: hidden; }
-.ok-comm-head { display: flex; align-items: center; gap: 10px; padding: 10px; background: #e8eefa; border-bottom: 1px solid #c0cde2; position: relative; }
-.ok-comm-ico-big { width: 52px; height: 52px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; border: 1px solid #c0cde2; flex-shrink: 0; }
-.ok-comm-title { font-size: 13px; font-weight: 700; color: #315699; line-height: 1.25; }
-.ok-comm-metatxt { font-size: 10px; color: #888; margin-top: 2px; }
-.ok-comm-close { position: absolute; top: 6px; right: 9px; cursor: pointer; color: #888; font-size: 13px; font-weight: 700; }
-.ok-comm-close:hover { color: #c0392b; }
-.ok-comm-descbox { padding: 10px; font-size: 11px; color: #333; line-height: 1.5; border-bottom: 1px solid #e8eefa; }
-.ok-comm-topics-title { font-size: 10px; color: #315699; font-weight: 700; padding: 8px 10px 3px; text-transform: uppercase; }
-.ok-comm-topic { padding: 4px 10px; font-size: 11px; color: #315699; cursor: pointer; }
-.ok-comm-topic:hover { background: #eef2fa; text-decoration: underline; }
-.ok-comm-actions { padding: 10px; border-top: 1px solid #e8eefa; text-align: right; }
+/* ═══ Página de comunidade (estilo orkut clássico, não-modal) ═══ */
+.ok-cp { background: #f4f6fb; min-height: 100%; }
+.ok-cp-wrap { display: flex; gap: 12px; padding: 12px; align-items: flex-start; }
+
+/* sidebar esquerda */
+.ok-cp-left { width: 150px; flex-shrink: 0; }
+.ok-cp-thumb { width: 130px; height: 110px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 52px; color: #fff; border: 1px solid #c0cde2; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.ok-cp-thumb-img { padding: 0; overflow: hidden; background: #fff; }
+.ok-cp-thumb-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ok-cp-cname { font-size: 12px; font-weight: 700; color: #315699; margin-top: 7px; line-height: 1.25; }
+.ok-cp-cmembers { font-size: 10px; color: #888; margin-top: 2px; }
+.ok-cp-links { margin-top: 9px; display: flex; flex-direction: column; }
+.ok-cp-action, .ok-cp-navlink { font-size: 11px; color: #315699; cursor: pointer; padding: 3px 0; text-decoration: none; }
+.ok-cp-action:hover, .ok-cp-navlink:hover { text-decoration: underline; }
+.ok-cp-navlink.active { font-weight: 700; color: #1a3a6b; }
+.ok-cp-sep { height: 1px; background: #d4ddec; margin: 6px 0; }
+
+/* coluna principal */
+.ok-cp-main { flex: 1; min-width: 0; background: #fff; border: 1px solid #c0cde2; border-radius: 3px; overflow: hidden; }
+.ok-cp-maintitle { font-size: 18px; font-weight: 700; color: #2c3e50; padding: 12px 14px 4px; line-height: 1.2; }
+.ok-cp-crumb { font-size: 10px; color: #999; padding: 0 14px 9px; border-bottom: 1px solid #e8eefa; }
+.ok-cp-crumb a { color: #315699; cursor: pointer; text-decoration: none; }
+.ok-cp-crumb a:hover { text-decoration: underline; }
+.ok-cp-content { padding: 0; }
+.ok-cp-secttitle { font-size: 12px; font-weight: 700; color: #315699; padding: 10px 14px 6px; }
+
+/* tabela de info (aba sobre) */
+.ok-cp-infotable-wrap { padding: 6px 14px; }
+.ok-cp-infotable { width: 100%; border-collapse: collapse; }
+.ok-cp-infotable td { padding: 6px 4px; font-size: 11px; vertical-align: top; border-bottom: 1px solid #f0f3f9; line-height: 1.5; }
+.ok-cp-infolabel { width: 92px; text-align: right; color: #888; font-weight: 700; white-space: nowrap; }
+.ok-cp-infoval { color: #333; }
+.ok-cp-owner { color: #315699; cursor: pointer; }
+.ok-cp-owner:hover { text-decoration: underline; }
+.ok-cp-cta { padding: 12px 14px; display: flex; align-items: center; gap: 14px; border-top: 1px solid #e8eefa; }
+.ok-cp-ctalink { font-size: 11px; color: #315699; cursor: pointer; }
+.ok-cp-ctalink:hover { text-decoration: underline; }
+
 .ok-comm-join { background: #5a7fc0; color: #fff; border: 1px solid #315699; border-radius: 3px; padding: 5px 16px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .ok-comm-join:hover { background: #6b90d2; }
-.ok-comm-join.joined { background: #5cb85c; border-color: #3d8b3d; cursor: default; }
+.ok-comm-join.joined { background: #5cb85c; border-color: #3d8b3d; }
+
+/* lista de fóruns */
+.ok-forum-list { padding: 2px 0 8px; }
+.ok-forum-row { display: flex; align-items: center; gap: 9px; padding: 8px 14px; cursor: pointer; border-bottom: 1px solid #f0f3f9; }
+.ok-forum-row:hover { background: #eef2fa; }
+.ok-forum-pin { font-size: 14px; flex-shrink: 0; }
+.ok-forum-main { flex: 1; min-width: 0; }
+.ok-forum-title { font-size: 12px; font-weight: 700; color: #315699; line-height: 1.3; }
+.ok-forum-sub { font-size: 9.5px; color: #999; margin-top: 2px; }
+.ok-forum-count { flex-shrink: 0; text-align: center; font-size: 15px; font-weight: 700; color: #5a7fc0; line-height: 1; }
+.ok-forum-count small { display: block; font-size: 8px; font-weight: 400; color: #aaa; text-transform: uppercase; }
+
+/* discussão (thread) */
+.ok-thread-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: #f4f7fc; border-bottom: 1px solid #e8eefa; }
+.ok-thread-back { font-size: 11px; color: #315699; cursor: pointer; font-weight: 700; }
+.ok-thread-back:hover { text-decoration: underline; }
+.ok-thread-count { font-size: 9.5px; color: #999; }
+.ok-thread-title { padding: 10px 14px; font-size: 13px; font-weight: 700; color: #2c3e50; border-bottom: 1px solid #e8eefa; line-height: 1.3; }
+.ok-thread-posts { padding: 4px 0; }
+.ok-post { display: flex; gap: 9px; padding: 9px 14px; border-bottom: 1px solid #f4f6fb; }
+.ok-post-mine { background: #fffaf0; }
+.ok-fav { width: 32px; height: 32px; border-radius: 3px; flex-shrink: 0; color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.ok-post-body { flex: 1; min-width: 0; }
+.ok-post-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ok-post-author { font-size: 11px; color: #315699; }
+.ok-post-op { font-size: 8px; background: #5a7fc0; color: #fff; padding: 1px 5px; border-radius: 8px; text-transform: uppercase; font-weight: 700; }
+.ok-post-date { font-size: 9px; color: #aaa; margin-left: auto; }
+.ok-post-text { font-size: 11.5px; color: #333; line-height: 1.55; margin-top: 3px; word-wrap: break-word; }
+
+/* caixa de resposta */
+.ok-reply-box { padding: 11px 14px; background: #f4f7fc; border-top: 1px solid #e8eefa; }
+.ok-reply-lbl { font-size: 11px; font-weight: 700; color: #315699; margin-bottom: 6px; }
+.ok-reply-name { width: 100%; box-sizing: border-box; border: 1px solid #c0cde2; border-radius: 2px; padding: 5px 7px; font-size: 11px; margin-bottom: 5px; font-family: inherit; }
+.ok-reply-text { width: 100%; box-sizing: border-box; border: 1px solid #c0cde2; border-radius: 2px; padding: 6px 7px; font-size: 11px; height: 54px; resize: vertical; font-family: inherit; margin-bottom: 7px; }
+
+/* enquete */
+.ok-poll { padding: 4px 14px 14px; }
+.ok-poll-q { font-size: 12.5px; font-weight: 700; color: #2c3e50; margin: 6px 0 10px; }
+.ok-poll-opt { font-size: 11.5px; color: #333; padding: 7px 9px; border: 1px solid #e0e6f0; border-radius: 3px; margin-bottom: 7px; background: #fafbfe; }
+.ok-poll-opt.votable { cursor: pointer; }
+.ok-poll-opt.votable:hover { background: #eef2fa; border-color: #c0cde2; }
+.ok-poll-opt.mine { border-color: #5a7fc0; background: #f0f5ff; }
+.ok-poll-radio { color: #5a7fc0; margin-right: 6px; font-weight: 700; }
+.ok-poll-optrow { display: flex; justify-content: space-between; align-items: center; }
+.ok-poll-optrow b { color: #315699; }
+.ok-poll-barbg { height: 8px; background: #e6ebf5; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+.ok-poll-bar { height: 100%; border-radius: 4px; transition: width .4s; }
+.ok-poll-vcount { font-size: 9px; color: #999; margin-top: 3px; }
+.ok-poll-total { font-size: 10px; color: #888; margin-top: 8px; font-style: italic; }
+
+/* membros */
+.ok-member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; padding: 8px 14px 16px; }
+.ok-member { text-align: center; cursor: pointer; }
+.ok-member .ok-fav { width: 46px; height: 46px; font-size: 19px; margin: 0 auto 4px; }
+.ok-member span { font-size: 9.5px; color: #315699; display: block; line-height: 1.2; }
+.ok-member-you .ok-fav { border: 2px dashed #f5a623; }
+
+@media (max-width: 620px) {
+  .ok-cp-wrap { flex-direction: column; }
+  .ok-cp-left { width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .ok-cp-thumb { width: 70px; height: 60px; font-size: 30px; }
+  .ok-cp-links { flex-direction: row; flex-wrap: wrap; gap: 4px 12px; margin-top: 0; }
+  .ok-cp-sep { display: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    VIRUS.BAT — Terminal de destruição
