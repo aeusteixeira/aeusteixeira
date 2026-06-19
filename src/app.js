@@ -268,6 +268,7 @@ const chromeTabUrls = [
     'www.clubedohardware.com.br/forums/topic/1098432-como-desinstalar-o-baidu-pc-faster-completamente',
     'www.orkut.com.br/Main#Profile?uid=5841029374',
     'www.youtube.com/watch?v=aWzKb071D9o',
+    'twitter.com/Matheus__1D',
     'chrome://history',
 ];
 const chromeTitles = [
@@ -278,6 +279,7 @@ const chromeTitles = [
     'Como desinstalar o Baidu PC Faster completamente - Clube do Hardware',
     'Orkut - Matheus Teixeira — Google Chrome',
     'Em busca da casa automática #1? - Minecraft Aventura — YouTube',
+    'Matheus (@Matheus__1D) on Twitter',
     'Histórico — Google Chrome',
 ];
 /* ══════════════════════════════════════
@@ -299,8 +301,8 @@ function chromeMenuAction(action) {
     sndClick();
     switch (action) {
         case 'history':
-            document.getElementById('ctab-7').style.display = '';
-            chromeTab(7);
+            document.getElementById('ctab-8').style.display = '';
+            chromeTab(8);
             break;
         case 'downloads':
             openWindow('win-downloads');
@@ -3745,7 +3747,7 @@ const OK_COMMS = {
     },
     '1d': {
         ico: '🎸', bg: '#e91e63', name: 'One Direction Brasil Fã Clube', members: '128.493', cat: 'Música',
-        desc: 'O maior fã clube do 1D no Brasil. O Matheus fez o blog oficial não-oficial. Directioner raiz. 💚',
+        desc: 'O maior fã clube do 1D no Brasil. O Matheus fez o blog oficial não-oficial. Fã raiz. 💚',
         forums: [
             { id: 'niall', title: 'Niall ou Harry?? me ajudem a decidir', posts: [
                 _p('Fernanda M.', '22/06/2006 16:02', 'GENTE decidam comigo de uma vez: Niall ou Harry? eu NÃO consigo escolher, tô em crise existencial'),
@@ -4096,7 +4098,8 @@ function chromeTab(n) {
     if (n === 1) bkInit();
     if (n === 2) gmInit();
     if (n === 5) orkutInit();
-    if (n === 7) renderHistory();
+    if (n === 7) twInit();
+    if (n === 8) renderHistory();
     sndClick();
 }
 
@@ -4117,9 +4120,127 @@ function closeTab(n) {
 
 function reopenAllTabs() {
     document.querySelectorAll('.chrome-tab').forEach((t, i) => {
-        t.style.display = i <= 6 ? '' : 'none'; /* abas 0-6 sempre, 7+ só pelo menu */
+        t.style.display = i <= 7 ? '' : 'none'; /* abas 0-7 sempre, 8+ só pelo menu */
     });
     chromeTab(0);
+}
+
+/* ══════════════════════════════════════
+   TWITTER 2014 — perfil @Matheus__1D (fã de 1D + dev iniciante)
+══════════════════════════════════════ */
+const TW_AVATAR = 'src/img/matheus.jpg';   /* foto real do Matheus (perfil dele logado) */
+const TW_BANNER = 'src/img/twitter/banner.jpg';   /* foto do grupo (header + fotos) */
+const TW_BG = 'src/img/twitter/bg.jpg'; /* wallpaper de fundo (céu noturno/Via Láctea, sem repetir) */
+/* feed inicial (tweets fixos do Matheus, 2014). curtidos/rt = contadores */
+const TW_SEED = [
+  { u:'Matheus ♥', h:'@Matheus__1D', t:'1 min', me:true,
+    txt:'acabei de subir meu PRIMEIRO site inteiro feito sozinho em php ç_ç minha mãe me deu uma apostila e eu não largo mais isso. acho que achei o que quero fazer da vida <3', rt:34, fav:212 },
+  { u:'Matheus ♥', h:'@Matheus__1D', t:'47 min', me:true,
+    txt:'alguém sabe fazer formulário de contato mandar email em php? tô há 2h nisso e o servidor não coopera kkk #php #mysql', rt:4, fav:21 },
+  { u:'Pablo', h:'@pablo_zueiro', t:'1 h', me:false,
+    txt:'@Matheus__1D mano vc vive nesse computador, vira gente kkkk', rt:0, fav:18 },
+  { u:'Matheus ♥', h:'@Matheus__1D', t:'3 h', me:true,
+    txt:'passei a tarde no SENAC mexendo em banco de dados e nem vi a hora passar. zero arrependimento :B essa é a área', rt:6, fav:73 },
+  { u:'Matheus ♥', h:'@Matheus__1D', t:'6 h', me:true,
+    txt:'minha mãe: vai estudar\neu: tô estudando mãe\n(tô fazendo um sistema de login do zero)', rt:58, fav:301 },
+  { u:'Matheus ♥', h:'@Matheus__1D', t:'9 h', me:true,
+    txt:'terminei tudo que tinha pra hoje, AGORA SIM o clipe novo do One Direction <3 dá pra gostar de música boa e escrever código no mesmo dia, é só organizar o tempo', rt:41, fav:276 },
+];
+let twFeed = [];
+
+function twLoad(){
+  try{
+    const f = JSON.parse(localStorage.getItem('mt_twitter_feed_v1'));
+    if(Array.isArray(f)) return f;
+  }catch(e){}
+  return null;
+}
+function twSave(){ try{ localStorage.setItem('mt_twitter_feed_v1', JSON.stringify(twFeed)); }catch(e){} }
+
+let twInited = false;
+function twInit(){
+  /* aplica imagens (bg/banner/avatar/fotos) e monta o feed */
+  const page = document.getElementById('cpage-7'); if(!page) return;
+  const old = page.querySelector('.tw-old'); if(old) old.style.backgroundImage = "url('"+TW_BG+"')";
+  const banner = page.querySelector('.tw-banner'); if(banner) banner.style.backgroundImage = "linear-gradient(rgba(0,0,0,0) 60%, rgba(0,0,0,.25)), url('"+TW_BANNER+"')";
+  const av = page.querySelector('.tw-avatar'); if(av) av.style.backgroundImage = "url('"+TW_AVATAR+"')";
+  page.querySelectorAll('.tw-photo').forEach(p=>{ p.style.backgroundImage = "url('"+TW_BANNER+"')"; });
+  if(!twInited){
+    twFeed = twLoad() || TW_SEED.map(t=>({...t}));
+    twInited = true;
+  }
+  twRenderFeed();
+}
+
+function _twEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _twAvColor(h){
+  const cols={'@Matheus__1D':'#11806a','@carlinha_xoxo':'#c0392b','@pablo_zueiro':'#e67e22'};
+  return cols[h] || '#657786';
+}
+function twRenderFeed(){
+  const list = document.getElementById('tw-feed-list'); if(!list) return;
+  list.innerHTML = twFeed.map((t,i)=>{
+    const txt = _twEsc(t.txt).replace(/(@[A-Za-z0-9_]+)/g,'<a class="tw-mention">$1</a>')
+                             .replace(/(#[A-Za-z0-9_]+)/g,'<a class="tw-hash">$1</a>');
+    const av = t.me ? '<span class="tw-tw-av" style="background-image:url(\''+TW_AVATAR+'\')"></span>'
+                    : '<span class="tw-tw-av" style="background:'+_twAvColor(t.h)+'">'+_twEsc(t.u[0])+'</span>';
+    return '<div class="tw-tweet">'
+      + av
+      + '<div class="tw-tw-body">'
+      +   '<div class="tw-tw-head"><b class="tw-tw-name">'+_twEsc(t.u).replace('♥','<span class="tw-heart">♥</span>')+'</b> '
+      +     '<span class="tw-tw-handle">'+_twEsc(t.h)+'</span> · <span class="tw-tw-time">'+_twEsc(t.t)+'</span></div>'
+      +   '<div class="tw-tw-text">'+txt+'</div>'
+      +   '<div class="tw-tw-actions">'
+      +     '<span class="tw-act" onclick="twAct(this)">↩ <span class="tw-act-l">Responder</span></span>'
+      +     '<span class="tw-act tw-act-rt" onclick="twAct(this,'+i+',\'rt\')">⟲ Retweetar <b class="tw-act-c">'+(t.rt||0)+'</b></span>'
+      +     '<span class="tw-act tw-act-fav" onclick="twAct(this,'+i+',\'fav\')">★ Favoritar <b class="tw-act-c">'+(t.fav||0)+'</b></span>'
+      +     '<span class="tw-act">··· Mais</span>'
+      +   '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function twAct(el, i, kind){
+  sndClick();
+  if(kind==null){ return; } /* responder/mais: so feedback sonoro */
+  const t = twFeed[i]; if(!t) return;
+  const key = kind==='rt' ? '_rtOn' : '_favOn';
+  const fld = kind==='rt' ? 'rt' : 'fav';
+  if(t[key]){ t[key]=false; t[fld]=Math.max(0,(t[fld]||0)-1); el.classList.remove('tw-act-on'); }
+  else { t[key]=true; t[fld]=(t[fld]||0)+1; el.classList.add('tw-act-on'); }
+  twSave();
+  const c = el.querySelector('.tw-act-c'); if(c) c.textContent = t[fld];
+}
+
+function twComposeInput(){
+  const ta = document.getElementById('tw-compose');
+  const cnt = document.getElementById('tw-count');
+  const btn = document.getElementById('tw-tweet-btn');
+  if(!ta) return;
+  const left = 140 - ta.value.length;
+  if(cnt){ cnt.textContent = left; cnt.style.color = left<10 ? '#e0245e' : '#999'; }
+  if(btn) btn.disabled = ta.value.trim().length===0;
+}
+
+function twPostTweet(){
+  const ta = document.getElementById('tw-compose');
+  if(!ta || !ta.value.trim()) return;
+  const txt = ta.value.trim();
+  twFeed.unshift({ u:'Matheus ♥', h:'@Matheus__1D', t:'agora', me:true, txt:txt, rt:0, fav:0 });
+  twSave();
+  ta.value=''; twComposeInput();
+  twRenderFeed();
+  sndClick();
+  showNotif('🐦 Twitter','Seu Tweet foi publicado!');
+}
+
+function twFollowMini(btn){
+  sndClick();
+  if(btn.classList.contains('tw-follow-mini-on')){
+    btn.classList.remove('tw-follow-mini-on'); btn.textContent='Seguir';
+  } else {
+    btn.classList.add('tw-follow-mini-on'); btn.textContent='Seguindo';
+  }
 }
 
 /* ══════════════════════════════════════
@@ -6540,7 +6661,7 @@ function chromeCloseDyn(xEl){
 }
 
 function renderHistory(){
-  const page=document.getElementById('cpage-7'); if(!page) return;
+  const page=document.getElementById('cpage-8'); if(!page) return;
   let host=page.querySelector('.cb-hist-list');
   if(!host){
     page.innerHTML='<div style="padding:18px 26px;font-family:Arial,sans-serif">'

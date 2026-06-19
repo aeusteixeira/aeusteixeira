@@ -283,10 +283,15 @@
           <span class="chrome-tab-lbl">Viniccius13 — YouTube</span>
           <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(6)">✕</span>
         </div>
-        <div class="chrome-tab" id="ctab-7" onclick="chromeTab(7)" style="display:none;">
+        <div class="chrome-tab" id="ctab-7" onclick="chromeTab(7)">
+          <span class="chrome-tab-fav"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" style="width:12px;height:12px;vertical-align:middle;"></span>
+          <span class="chrome-tab-lbl">Matheus (@Matheus__1D) on Twitter</span>
+          <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(7)">✕</span>
+        </div>
+        <div class="chrome-tab" id="ctab-8" onclick="chromeTab(8)" style="display:none;">
           <span class="chrome-tab-fav">🕐</span>
           <span class="chrome-tab-lbl">Histórico</span>
-          <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(7)">✕</span>
+          <span class="chrome-tab-x" onclick="event.stopPropagation();closeTab(8)">✕</span>
         </div>
         <div class="chrome-newtab" id="chrome-newtab-btn" title="Nova guia (Ctrl+T)" onclick="chromeNewTab()">+</div>
       </div>
@@ -1819,7 +1824,114 @@
           </div>
         </div>
 
+        <!-- TAB 7: Twitter 2014 (perfil do Matheus, fã de 1D + dev iniciante) -->
         <div class="chrome-page" id="cpage-7" style="display:none;">
+          <div class="tw-old">
+            <!-- Wallpaper customizado (One Direction) atras de tudo -->
+            <div class="tw-bg"></div>
+            <!-- Barra de topo azul-clara -->
+            <div class="tw-topbar">
+              <div class="tw-topbar-inner">
+                <div class="tw-topnav">
+                  <span class="tw-topnav-item tw-topnav-active"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M12 3 2.5 11.2l1.3 1.5L5 11.6V21h5v-6h4v6h5v-9.4l1.2 1.1 1.3-1.5L12 3z"/></svg>Página inicial</span>
+                  <span class="tw-topnav-item"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 0 0 2.2-2.2H9.8A2.2 2.2 0 0 0 12 22zm6.5-6.5v-4.5c0-3-1.8-5.4-4.5-6.1V4a2 2 0 0 0-4 0v.9C7.3 5.6 5.5 8 5.5 11v4.5L4 17v1h16v-1l-1.5-1.5z"/></svg>Notificações</span>
+                  <span class="tw-topnav-item tw-topnav-hash"># Descobrir</span>
+                  <span class="tw-topnav-item"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5z"/></svg>Eu</span>
+                </div>
+                <div class="tw-topbird"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter"></div>
+                <div class="tw-topright">
+                  <div class="tw-search"><input type="text" placeholder="Buscar" readonly><span class="tw-search-ico"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg></span></div>
+                  <span class="tw-top-ico" title="Mensagens"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M3 5h18c.6 0 1 .4 1 1v12c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1V6c0-.6.4-1 1-1zm.9 2L12 12l8.1-5H3.9z"/></svg></span>
+                  <span class="tw-top-ico" title="Configurações"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M19.4 13c0-.3.1-.6.1-1s0-.7-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L4 11c0 .3-.1.6-.1 1s0 .7.1 1l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></span>
+                  <span class="tw-top-ico tw-tweet-ico" title="Tweetar"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M3 17.2V21h3.8L17.8 10 14 6.2 3 17.2zM20.7 7.1c.4-.4.4-1 0-1.4l-2.4-2.4a1 1 0 0 0-1.4 0l-1.8 1.8L18.9 8.9l1.8-1.8z"/></svg></span>
+                </div>
+              </div>
+            </div>
+            <!-- Conteudo 2 colunas -->
+            <div class="tw-content">
+              <!-- COLUNA ESQUERDA -->
+              <div class="tw-left">
+                <div class="tw-card tw-stats-card">
+                  <a class="tw-stat-row tw-stat-head"><span>Tweets</span><span class="tw-chev">›</span></a>
+                  <a class="tw-stat-row"><span>Seguindo</span><span class="tw-chev">›</span></a>
+                  <a class="tw-stat-row"><span>Seguidores</span><span class="tw-chev">›</span></a>
+                  <a class="tw-stat-row"><span>Favoritos</span><span class="tw-chev">›</span></a>
+                  <a class="tw-stat-row"><span>Listas</span><span class="tw-chev">›</span></a>
+                </div>
+                <div class="tw-card tw-compose-card">
+                  <div class="tw-compose-title">Compor novo Tweet</div>
+                  <textarea class="tw-compose-area" id="tw-compose" maxlength="140" placeholder="No que você está pensando?" oninput="twComposeInput()"></textarea>
+                  <div class="tw-compose-foot">
+                    <span class="tw-compose-tools"><svg class="tw-gico" viewBox="0 0 24 24"><path d="M9 4 7.2 6H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-3.2L15 4H9zm3 12.5a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg><svg class="tw-gico" viewBox="0 0 24 24"><path d="M12 2C7.9 2 4.5 5.4 4.5 9.5c0 5.3 6.7 11.6 7 11.9.3.2.7.2 1 0 .3-.3 7-6.6 7-11.9C19.5 5.4 16.1 2 12 2zm0 10.2a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z"/></svg></span>
+                    <span class="tw-compose-count" id="tw-count">140</span>
+                    <button class="tw-tweet-btn" id="tw-tweet-btn" onclick="twPostTweet()" disabled>Tweetar</button>
+                  </div>
+                </div>
+                <div class="tw-card tw-photos-card">
+                  <div class="tw-card-head">Fotos e vídeos<span class="tw-chev">›</span></div>
+                  <div class="tw-photo-grid">
+                    <div class="tw-photo" style="background-position:20% 30%"></div>
+                    <div class="tw-photo" style="background-position:50% 10%"></div>
+                    <div class="tw-photo" style="background-position:80% 40%"></div>
+                    <div class="tw-photo" style="background-position:30% 70%"></div>
+                    <div class="tw-photo" style="background-position:60% 80%"></div>
+                    <div class="tw-photo" style="background-position:90% 60%"></div>
+                  </div>
+                </div>
+                <div class="tw-card tw-wtf-card">
+                  <div class="tw-card-head">Quem seguir<span class="tw-wtf-links">· Atualizar · Ver tudo</span></div>
+                  <div class="tw-wtf">
+                    <div class="tw-wtf-av" style="background:#3b5998">H</div>
+                    <div class="tw-wtf-info"><b>Harry Styles</b> <span class="tw-wtf-h">@Harry_Styles</span><div class="tw-wtf-sub">Seguido por louis e outros</div></div>
+                    <button class="tw-follow-mini" onclick="twFollowMini(this)">Seguir</button>
+                  </div>
+                  <div class="tw-wtf">
+                    <div class="tw-wtf-av" style="background:#16a085">N</div>
+                    <div class="tw-wtf-info"><b>Niall Horan</b> <span class="tw-wtf-h">@NiallOfficial</span><div class="tw-wtf-sub">Seguido por você e outros</div></div>
+                    <button class="tw-follow-mini" onclick="twFollowMini(this)">Seguir</button>
+                  </div>
+                  <div class="tw-wtf">
+                    <div class="tw-wtf-av" style="background:#e67e22">P</div>
+                    <div class="tw-wtf-info"><b>Pablo</b> <span class="tw-wtf-h">@pablo_zueiro</span><div class="tw-wtf-sub">Seguido por Carla e outros</div></div>
+                    <button class="tw-follow-mini" onclick="twFollowMini(this)">Seguir</button>
+                  </div>
+                  <div class="tw-wtf-foot">Contas populares · Encontrar amigos</div>
+                </div>
+              </div>
+
+              <!-- COLUNA CENTRAL -->
+              <div class="tw-center">
+                <div class="tw-profile-card">
+                  <div class="tw-banner">
+                    <div class="tw-avatar"></div>
+                  </div>
+                  <div class="tw-pinfo">
+                    <div class="tw-pname">Matheus <span class="tw-heart">♥</span></div>
+                    <div class="tw-phandle">@Matheus__1D</div>
+                    <div class="tw-pbio">criando meus primeiros sites em PHP <svg class="tw-gico" viewBox="0 0 24 24"><path d="M4 6c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v9h2v1c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1v-1h2V6zm2 1v7h12V7H6z"/></svg> · futuro programador · também rodo o maior blog de One Direction do BR</div>
+                    <div class="tw-pmeta"><span class="tw-pmeta-i"><svg class="tw-ico" viewBox="0 0 24 24"><path d="M12 2C7.9 2 4.5 5.4 4.5 9.5c0 5.3 6.7 11.6 7 11.9.3.2.7.2 1 0 .3-.3 7-6.6 7-11.9C19.5 5.4 16.1 2 12 2zm0 10.2a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z"/></svg>Nova Iguaçu, RJ</span><span class="tw-pmeta-i"><svg class="tw-ico" viewBox="0 0 24 24"><path d="M19 4h-1V2.5h-1.6V4H7.6V2.5H6V4H5C3.9 4 3 4.9 3 6v13c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.4 15c0 .2-.2.4-.4.4H5c-.2 0-.4-.2-.4-.4V9h14.8v10zm0-11.6H4.6V6c0-.2.2-.4.4-.4h14c.2 0 .4.2.4.4v1.4z"/></svg>Entrou em março de 2011</span></div>
+                  </div>
+                  <div class="tw-pstats">
+                    <div class="tw-pstat"><span class="tw-pstat-n">48,3<small>mil</small></span><span class="tw-pstat-l">TWEETS</span></div>
+                    <div class="tw-pstat"><span class="tw-pstat-n">891</span><span class="tw-pstat-l">SEGUINDO</span></div>
+                    <div class="tw-pstat"><span class="tw-pstat-n" id="tw-followers-n">12.847</span><span class="tw-pstat-l">SEGUIDORES</span></div>
+                    <div class="tw-pstat-spacer"></div>
+                    <button class="tw-edit-btn" onclick="sndClick()">Editar perfil</button>
+                  </div>
+                </div>
+
+                <div class="tw-feed">
+                  <div class="tw-feed-head">Tweets</div>
+                  <div id="tw-feed-list">
+                    <!-- tweets injetados por twRenderFeed() -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chrome-page" id="cpage-8" style="display:none;">
           <div class="hist-page">
             <h2 class="hist-title">Histórico</h2>
             <div class="hist-search">
