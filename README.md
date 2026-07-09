@@ -1,4 +1,4 @@
-<img src="./banner.svg" alt="matheus@github ~ neofetch" width="820">
+<img src="./banner.svg" alt="aeusteixeira@github" width="820">
 
 ### Experiencia recente
 
@@ -17,4 +17,4 @@ Mergulhador -- Motociclista -- Fotografo urbano -- Fazedor de listas profissiona
 
 ---
 
-Contato: [contato.matheusteixeira@gmail.com](mailto:contato.matheusteixeira@gmail.com) | [LinkedIn](https://linkedin.com/in/aeusteixeira) | [Site](https://matheusteixeira.com.br)
+Contato: [LinkedIn](https://linkedin.com/in/aeusteixeira) | [Twitter](https://twitter.com/aeusteixeira) | [Site](https://matheusteixeira.com.br)
