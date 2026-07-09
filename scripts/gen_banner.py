@@ -121,7 +121,7 @@ o.append(f'<line x1="1" y1="31" x2="{W-1}" y2="31" stroke="{C_BORDER}"/>')
 for i, c in enumerate(['#ff5f56', '#ffbd2e', '#27c93f']):
     o.append(f'<circle cx="{20+i*18}" cy="16" r="6" fill="{c}"/>')
 o.append(f'<text x="{W/2}" y="20" fill="#8b949e" font-size="12" text-anchor="middle" '
-         f'font-family="\'JetBrains Mono\',monospace">matheus@teixeira ~ neofetch</text>')
+         f'font-family="\'JetBrains Mono\',monospace">matheus@teixeira</text>')
 
 y = PAD_TOP + FS
 for i, art in enumerate(ART):
