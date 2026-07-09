@@ -78,7 +78,7 @@ FS = 13.0
 CW = FS * 0.60
 LH = 16.0
 PAD_X = 22
-PAD_TOP = 22
+PAD_TOP = 48   # espaco para a barra de titulo do terminal
 ART_W = max(len(a) for a in ART)
 INFO_X = PAD_X + (ART_W + 3) * CW
 
@@ -113,6 +113,15 @@ o.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" view
          f'font-family="\'JetBrains Mono\',\'Cascadia Code\',\'DejaVu Sans Mono\',\'Consolas\',monospace">')
 o.append(f'<rect x="0" y="0" width="{W}" height="{H}" rx="10" fill="{C_BG}"/>')
 o.append(f'<rect x="0.5" y="0.5" width="{W-1}" height="{H-1}" rx="10" fill="none" stroke="{C_BORDER}"/>')
+
+# barra de titulo do terminal (mac-style)
+o.append(f'<rect x="1" y="1" width="{W-2}" height="30" rx="10" fill="#161b22"/>')
+o.append(f'<rect x="1" y="16" width="{W-2}" height="15" fill="#161b22"/>')
+o.append(f'<line x1="1" y1="31" x2="{W-1}" y2="31" stroke="{C_BORDER}"/>')
+for i, c in enumerate(['#ff5f56', '#ffbd2e', '#27c93f']):
+    o.append(f'<circle cx="{20+i*18}" cy="16" r="6" fill="{c}"/>')
+o.append(f'<text x="{W/2}" y="20" fill="#8b949e" font-size="12" text-anchor="middle" '
+         f'font-family="\'JetBrains Mono\',monospace">matheus@teixeira ~ neofetch</text>')
 
 y = PAD_TOP + FS
 for i, art in enumerate(ART):
