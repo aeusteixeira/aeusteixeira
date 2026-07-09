@@ -1,4 +1,4 @@
-<img src="./banner.svg" alt="aeusteixeira@github" width="820">
+<img src="./banner.svg" alt="matheus@teixeira" width="900">
 
 ### Experiencia recente
 
