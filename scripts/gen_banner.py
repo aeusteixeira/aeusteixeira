@@ -37,7 +37,7 @@ ART = [
 # info alinhado por linha da arte. (label, valor) -> label laranja, valor claro.
 # ('title', txt) = destaque branco. ('rule', txt) = separador. (None) = vazia.
 INFO = {
-    0:  ('title', 'aeusteixeira'),
+    0:  ('title', 'Matheus Teixeira'),
     1:  ('rule',  '--------------------'),
     2:  ('OS',        'Sao Paulo, Brasil'),
     3:  ('Uptime',    '8+ anos PHP/Laravel'),
