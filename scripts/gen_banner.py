@@ -104,15 +104,23 @@ def esc(s):
 def span(color, text, extra=''):
     return f'<tspan fill="{color}"{extra}>{esc(text)}</tspan>'
 
-PROMPT = r'C:\Users\matheus>'
-W = int(INFO_X + TOTAL * CW) + PAD_X
+PROMPT = r'C:\Documents and Settings\Matheus>'
+MS1 = 'Microsoft Windows XP [Versão 5.1.2600]'
+MS2 = '(C) Copyright 1985-2001 Microsoft Corp.'
+C_CMD = '#c6c6c6'   # prata do texto padrao do cmd
+SB_W = 17           # largura da barra de rolagem
+
+CONTENT_R = INFO_X + TOTAL * CW
+W = int(CONTENT_R + 14 + SB_W + 5)
 
 # layout vertical
-prompt1_y = H_TB + 24
-art_y0 = prompt1_y + int(LH * 1.9)
+ms1_y = H_TB + 20
+ms2_y = ms1_y + LH
+prompt1_y = ms2_y + int(LH * 1.9)
+art_y0 = prompt1_y + int(LH * 1.6)
 art_bottom = art_y0 + len(ART) * LH
-prompt2_y = art_bottom + int(LH * 1.4)
-H = int(prompt2_y + 14)
+prompt2_y = art_bottom + int(LH * 1.2)
+H = int(prompt2_y + 16)
 
 o = []
 o.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
@@ -140,28 +148,30 @@ o.append(f'<rect x="2.5" y="3" width="{W-5}" height="1.3" fill="#bcd8ff" opacity
 o.append(f'<rect x="9" y="8" width="16" height="14" rx="1.5" fill="#000" stroke="#8fb6ef"/>')
 o.append(f'<text x="11" y="19" font-size="10" fill="#e8e8e8" font-family="monospace">&gt;_</text>')
 o.append(f'<text x="31" y="20" font-size="12.5" fill="#ffffff" font-family="Tahoma,\'Segoe UI\',sans-serif" '
-         f'font-weight="bold">C:\\WINDOWS\\system32\\cmd.exe</text>')
+         f'font-weight="bold">C:\\WINDOWS\\System32\\cmd.exe</text>')
 # botoes XP (min, max, close)
-bw, bh, by = 20, 17, 6
-cx = W - 7 - bw
+bw, bh, by = 21, 18, 5
+cx = W - 6 - bw
 mx = cx - bw - 2
 nx = mx - bw - 2
 for bx, grad in [(nx, 'url(#btnBlue)'), (mx, 'url(#btnBlue)'), (cx, 'url(#btnRed)')]:
-    o.append(f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="3" fill="{grad}" stroke="#ffffff" stroke-opacity="0.45"/>')
-    o.append(f'<rect x="{bx+1}" y="{by+1}" width="{bw-2}" height="1.3" fill="#ffffff" opacity="0.5"/>')
+    o.append(f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="3" fill="{grad}" stroke="#cfe3fb" stroke-opacity="0.7"/>')
+    o.append(f'<rect x="{bx+1.5}" y="{by+1}" width="{bw-3}" height="1.4" rx="0.7" fill="#ffffff" opacity="0.55"/>')
 # glifos: minimizar
-o.append(f'<rect x="{nx+6}" y="{by+bh-6}" width="8" height="2.2" fill="#fff"/>')
+o.append(f'<rect x="{nx+6}" y="{by+bh-6}" width="9" height="2.4" fill="#fff"/>')
 # maximizar
-o.append(f'<rect x="{mx+5}" y="{by+4}" width="10" height="9" fill="none" stroke="#fff" stroke-width="1.6"/>')
-o.append(f'<rect x="{mx+5}" y="{by+4}" width="10" height="2.6" fill="#fff"/>')
+o.append(f'<rect x="{mx+5}" y="{by+4}" width="11" height="9" fill="none" stroke="#fff" stroke-width="1.6"/>')
+o.append(f'<rect x="{mx+5}" y="{by+4}" width="11" height="2.6" fill="#fff"/>')
 # fechar (X)
-o.append(f'<g stroke="#fff" stroke-width="1.8" stroke-linecap="round">'
+o.append(f'<g stroke="#fff" stroke-width="1.9" stroke-linecap="round">'
          f'<line x1="{cx+6}" y1="{by+5}" x2="{cx+bw-6}" y2="{by+bh-5}"/>'
          f'<line x1="{cx+bw-6}" y1="{by+5}" x2="{cx+6}" y2="{by+bh-5}"/></g>')
 
-# --- prompt de entrada ---
+# --- cabecalho do cmd + prompt ---
+o.append(f'<text x="{PAD_X}" y="{ms1_y}" font-size="{FS}" fill="{C_CMD}" xml:space="preserve">{esc(MS1)}</text>')
+o.append(f'<text x="{PAD_X}" y="{ms2_y}" font-size="{FS}" fill="{C_CMD}" xml:space="preserve">{esc(MS2)}</text>')
 o.append(f'<text x="{PAD_X}" y="{prompt1_y}" font-size="{FS}" xml:space="preserve">'
-         + span(C_PROMPT, PROMPT) + span(C_VALUE, ' aboutme') + '</text>')
+         + span(C_CMD, PROMPT) + span(C_VALUE, ' aboutme') + '</text>')
 
 # --- arte + info ---
 y = art_y0 + FS
@@ -187,10 +197,33 @@ for i, art in enumerate(ART):
     y += LH
 
 # --- prompt final com cursor piscando ---
-o.append(f'<text x="{PAD_X}" y="{prompt2_y}" font-size="{FS}" xml:space="preserve">' + span(C_PROMPT, PROMPT) + '</text>')
+o.append(f'<text x="{PAD_X}" y="{prompt2_y}" font-size="{FS}" xml:space="preserve">' + span(C_CMD, PROMPT) + '</text>')
 cur_x = PAD_X + (len(PROMPT) + 0.4) * CW
 o.append(f'<rect x="{cur_x:.1f}" y="{prompt2_y-FS+2:.1f}" width="{CW*0.9:.1f}" height="{FS-1:.1f}" fill="{C_VALUE}">'
          f'<animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.1s" repeatCount="indefinite"/></rect>')
+
+# --- barra de rolagem XP (prata 3D) ---
+def raised(x, y, w, h, face='#d4d0c8'):
+    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{face}"/>'
+            f'<path d="M{x} {y+h} L{x} {y} L{x+w} {y}" fill="none" stroke="#ffffff"/>'
+            f'<path d="M{x} {y+h} L{x+w} {y+h} L{x+w} {y}" fill="none" stroke="#7f7f79"/>')
+
+sbx = W - 3 - SB_W
+sb_top = H_TB
+sb_bot = H - 3
+mid = sbx + SB_W / 2
+o.append(f'<rect x="{sbx}" y="{sb_top}" width="{SB_W}" height="{sb_bot - sb_top}" fill="#e6e3da"/>')
+# seta cima
+o.append(raised(sbx, sb_top, SB_W, SB_W))
+o.append(f'<path d="M{mid} {sb_top+5} L{mid-4} {sb_top+11} L{mid+4} {sb_top+11} Z" fill="#3a3a3a"/>')
+# seta baixo
+dby = sb_bot - SB_W
+o.append(raised(sbx, dby, SB_W, SB_W))
+o.append(f'<path d="M{mid} {dby+12} L{mid-4} {dby+6} L{mid+4} {dby+6} Z" fill="#3a3a3a"/>')
+# thumb (perto do topo, pois estamos no inicio da saida)
+track_h = (dby) - (sb_top + SB_W)
+thumb_h = max(28, track_h * 0.42)
+o.append(raised(sbx + 1, sb_top + SB_W + 2, SB_W - 2, thumb_h))
 
 o.append('</svg>')
 
